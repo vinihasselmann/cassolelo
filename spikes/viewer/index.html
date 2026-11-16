@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spike Viewer</title>
+  <!-- Autodesk Viewer v7, CDN oficial -->
+  <link rel="stylesheet" href="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/style.min.css">
+  <script src="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/viewer3D.min.js"></script>
+  <style>
+    html, body { margin: 0; height: 100%; font-family: system-ui, sans-serif; }
+    #app { display: flex; height: 100%; }
+    #viewer { position: relative; flex: 1; }
+    #panel { width: 300px; padding: 12px; border-left: 1px solid #ccc; overflow: auto; background: #fafafa; }
+    #panel h2 { font-size: 16px; margin: 0 0 8px; }
+    #panel dt { font-weight: 600; margin-top: 8px; font-size: 13px; }
+    #panel dd { margin: 0; font-family: monospace; font-size: 13px; word-break: break-all; }
+    #status { color: #666; font-size: 12px; margin-top: 12px; }
+    .erro { color: #b00020; }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div id="viewer"></div>
+  <aside id="panel">
+    <h2>Peça selecionada</h2>
+    <dl>
+      <dt>dbId</dt><dd id="f-dbid">—</dd>
+      <dt>externalId</dt><dd id="f-ext">—</dd>
+      <dt>Marca</dt><dd id="f-mark">—</dd>
+      <dt>Categoria</dt><dd id="f-cat">—</dd>
+      <dt>Peças com a mesma marca</dt><dd id="f-count">—</dd>
+    </dl>
+    <div id="status">Carregando…</div>
+  </aside>
+</div>
+<script>
+(async function () {
+  const $ = (id) => document.getElementById(id);
+  const setStatus = (msg, isError) => { $('status').textContent = msg; $('status').className = isError ? 'erro' : ''; };
+
+  const urn = new URLSearchParams(location.search).get('urn');
+  if (!urn) { setStatus('Informe o URN na URL: /?urn=<urn base64>', true); return; }
+
+  const cfg = await (await fetch('/config')).json();
+  const markNames = cfg.mark_property_names;
+  const lower = markNames.map((n) => n.toLowerCase());
+  const api = cfg.region === 'EMEA' ? 'streamingV2_EU' : 'streamingV2';
+
+  const options = {
+    env: 'AutodeskProduction2',
+    api: api,
+    getAccessToken: async (onSuccess) => {
+      const r = await fetch('/token');
+      if (!r.ok) { setStatus('Falha ao obter token: ' + (await r.text()), true); return; }
+      const t = await r.json();
+      onSuccess(t.access_token, t.expires_in);
+    },
+  };
+
+  let viewer;
+  let groupSelection = null; // dbIds selecionados pelo próprio app (evita laço)
+
+  const findMark = (props) => {
+    for (const wanted of lower) {
+      const p = props.find((x) => (x.displayName || '').toLowerCase() === wanted
+                               || (x.attributeName || '').toLowerCase() === wanted);
+      if (p && String(p.displayValue).trim()) return String(p.displayValue).trim();
+    }
+    return null;
+  };
+  const findCategory = (props) => {
+    const p = props.find((x) => x.attributeName === 'Category' || x.displayName === 'Category');
+    return p ? String(p.displayValue) : null;
+  };
+  const getProps = (dbId) => new Promise((res, rej) => viewer.getProperties(dbId, res, rej));
+
+  function selectSameMark(mark, category, clickedId) {
+    // busca textual restrita aos atributos de marca, depois confere igualdade exata
+    viewer.search(mark, (ids) => {
+      viewer.model.getBulkProperties(ids, { propFilter: markNames.concat(['Category']) }, (results) => {
+        const same = results.filter((r) => findMark(r.properties) === mark
+          && (!category || !findCategory(r.properties) || findCategory(r.properties) === category))
+          .map((r) => r.dbId);
+        if (!same.includes(clickedId)) same.push(clickedId);
+        $('f-count').textContent = String(same.length);
+        groupSelection = new Set(same);
+        viewer.select(same);
+        setStatus(same.length + ' peça(s) da marca ' + mark + ' selecionadas.');
+      });
+    }, (err) => setStatus('Erro na busca: ' + err, true), markNames);
+  }
+
+  async function onSelection(ev) {
+    const ids = ev.dbIdArray || [];
+    if (groupSelection && ids.length === groupSelection.size && ids.every((i) => groupSelection.has(i))) return;
+    groupSelection = null;
+    if (ids.length !== 1) {
+      if (!ids.length) ['f-dbid', 'f-ext', 'f-mark', 'f-cat', 'f-count'].forEach((f) => { $(f).textContent = '—'; });
+      return;
+    }
+    const dbId = ids[0];
+    try {
+      const r = await getProps(dbId);
+      const mark = findMark(r.properties);
+      const category = findCategory(r.properties);
+      $('f-dbid').textContent = String(dbId);
+      $('f-ext').textContent = r.externalId || '—';
+      $('f-mark').textContent = mark || '(sem marca)';
+      $('f-cat').textContent = category || '—';
+      $('f-count').textContent = mark ? '…' : '—';
+      if (mark) selectSameMark(mark, category, dbId);
+      else setStatus('Peça sem ' + markNames.join('/') + '.');
+    } catch (e) {
+      setStatus('Erro ao ler propriedades: ' + JSON.stringify(e), true);
+    }
+  }
+
+  Autodesk.Viewing.Initializer(options, () => {
+    viewer = new Autodesk.Viewing.GuiViewer3D($('viewer'));
+    viewer.start();
+    viewer.addEventListener(Autodesk.Viewing.SELECTION_CHANGED_EVENT, onSelection);
+    Autodesk.Viewing.Document.load('urn:' + urn, (doc) => {
+      const node = doc.getRoot().getDefaultGeometry();
+      viewer.loadDocumentNode(doc, node).then(() => setStatus('Modelo carregado. Clique numa peça.'));
+    }, (code, msg) => setStatus('Falha ao abrir o modelo (' + code + '): ' + (msg || ''), true));
+  });
+})();
+</script>
+</body>
+</html>

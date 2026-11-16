@@ -2,6 +2,12 @@
 .env
 .env.*
 !.env.example
+!.env.*.example
+# Segredos de produção/teste (um arquivo por segredo, Docker secrets)
+infra/secrets/*
+!infra/secrets/README.md
+# Backups do banco (dados reais)
+infra/backups/
 
 # Python
 __pycache__/
@@ -29,3 +35,15 @@ test-results/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Saídas dos spikes (dados reais dos modelos)
+spikes/out/
+loadtest/out/
+
+# Arquivos BIM originais (grandes e com dados de clientes; ficam no Autodesk Docs).
+# As fixtures de teste são as respostas JSON sanitizadas do APS, não os modelos.
+*.rvt
+*.rfa
+*.nwd
+*.nwc
+*.ifc

@@ -1,0 +1,5684 @@
+{
+ "data": {
+  "type": "properties",
+  "collection": [
+   {
+    "objectid": 7084,
+    "name": "CASSOL-PREO-Viga-R [6657266]",
+    "externalId": "f6c5d130-0254-44a5-9353-a5410320f029-006594f2",
+    "properties": {
+     "Outros": {
+      "Vao_Titulo": "V21",
+      "Vao": "1.000",
+      "Solidarizado": "Sim",
+      "Capa": "0.000 cm",
+      "Altura_Gerber_Esq": "30.000 cm",
+      "Largura_Gerber_Esq": "50.000 cm",
+      "Altura_Gerber_Dir": "30.000 cm",
+      "Largura_Gerber_Dir": "50.000 cm",
+      "Solidarizar_na_montagem": "Nao",
+      "Unir_com_o_proximo": "Nao",
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Restrições": {
+      "Nível de referência": "EMBARQUE",
+      "Deslocamento do nível inicial": "0.000 cm",
+      "Deslocamento do nível final": "0.000 cm",
+      "Rotação do corte transversal": "0.000 °",
+      "FOLGA-Viga e Pilar 1": "1.000 cm",
+      "FOLGA-Viga e Pilar 2": "1.000 cm"
+     },
+     "Construção": {
+      "CASSOL-Linha de Produção": "PRÉ-FABRICADOS",
+      "TECNOLOGIA-Aço": "ARMADO",
+      "TECNOLOGIA-Forma": "CARPINTARIA",
+      "TECNOLOGIA-Concreto": "ADITIVADO",
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": ""
+     },
+     "Dados": {
+      "fck (MPa)": "45.000",
+      "Cobrimento": "3.000 cm",
+      "Rebaixo": "0.000 cm",
+      "Cortina": "Nao",
+      "fck": "Concreto C45"
+     },
+     "Cotas": {
+      "Comprimento": "1010.000 cm",
+      "PEÇA-Altura Preo": "80.000 cm",
+      "PEÇA-Altura Total": "80.000 cm",
+      "PEÇA-Comprimento": "917.460 cm",
+      "PEÇA-Largura Preo": "40.000 cm",
+      "PEÇA-Largura Total": "40.000 cm",
+      "Volume": "2.934 m^3",
+      "Elevação no topo": "520.000 cm",
+      "Elevação na parte inferior": "440.000 cm",
+      "SEÇÃO-Altura": "80.000 cm",
+      "SEÇÃO-Largura": "40.000 cm",
+      "SOLIDARIZAÇÃO-Altura": "0.000 cm",
+      "SOLIDARIZAÇÃO-Largura": "20.000 cm",
+      "SOLIDADARIZAÇÃO-Verificação": "0.100 cm"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "V10-01",
+      "Unique TQS ID": "-2057",
+      "Titulo": "V21",
+      "Chave": "-2057",
+      "Tipo Elemento": "Viga",
+      "SHA1": "AADBA1E30E82D7CCC95FF2C712962ECDCABC0976",
+      "Principal": "Yes",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "R80-40x80cm-V10",
+      "Chave do nome do corte": "",
+      "Classificação de incêndio": "",
+      "Comentários de tipos": "",
+      "Custo": "0.000 ฿",
+      "Código de montagem": "V",
+      "Descrição": "VIGA",
+      "Fabricante": "",
+      "Modelo": "R",
+      "Nota-chave": "",
+      "TQS-Seção": "",
+      "Tipo de imagem": "",
+      "URL": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "V10",
+      "Número OmniClass": "23.25.30.11.14.14",
+      "Título OmniClass": "Beams",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido": "",
+      "Exportar para IFC como": "",
+      "Exportar para IFC": "Por tipo",
+      "IfcGUID": "3snT4m0bH4fPDJfK43HMJR",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "2vbCXy8VHEN9UwjuayBk1o"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum",
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "CONSOLO 1-Visibilidade": "Yes",
+      "CONSOLO 1-Altura 1": "30.000 cm",
+      "CONSOLO 1-Altura 2": "0.000 cm",
+      "CONSOLO 1-Profundidade": "20.000 cm",
+      "CONSOLO 1-Gerber": "Yes",
+      "CONSOLO 1-Gerber Altura": "31.000 cm",
+      "CONSOLO 1-Gerber Profundidade": "20.000 cm",
+      "CONSOLO 2-Visibilidade": "Yes",
+      "CONSOLO 2-Altura 1": "30.000 cm",
+      "CONSOLO 2-Altura 2": "0.000 cm",
+      "CONSOLO 2-Profundidade": "20.000 cm",
+      "CONSOLO 2-Gerber": "Yes",
+      "CONSOLO 2-Gerber Altura": "31.000 cm",
+      "CONSOLO 2-Gerber Profundidade": "20.000 cm",
+      "NEOPRENE 1-Visibilidade": "Yes",
+      "NEOPRENE 1-Posição": "10.000 cm",
+      "NEOPRENE 1-Tipo": "CASSOL-ACS-Neoprene : NP05-10x100x166mm",
+      "NEOPRENE 2-Visibilidade": "Yes",
+      "NEOPRENE 2-Posição": "10.000 cm",
+      "NEOPRENE 2-Tipo": "CASSOL-ACS-Neoprene : NP04-10x250x350mm",
+      "CONSOLO-Marca": "CP01",
+      "CONSOLO-Taxa CA": "200.000 kg/m³",
+      "NEOPRENE-Espessura": "1.000 cm"
+     },
+     "Extremidade secundária": {
+      "FURO DE FIXAÇÃO-Posição 1": "9.000 cm",
+      "FURO DE FIXAÇÃO-Posição 1 Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2": "9.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2 Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição AB": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição A'": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição B'": "10.000 cm",
+      "FURO DE FIXAÇÃO-Abertura": "2.500 cm",
+      "FURO DE FIXAÇÃO-Posição AB Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição A' Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição B' Extra": "0.000 cm"
+     },
+     "Estrutural": {
+      "Comprimento do corte": "921.960 cm",
+      "Uso estrutural": "Outro",
+      "Tipo inicial de anexo": "Elevação final",
+      "Tipo final de anexo": "Elevação final",
+      "Recobrimento de vergalhão - Face superior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Fase inferior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Viga/Coluna) <25 mm>",
+      "TAXA-CA": "100.000 kg/m³",
+      "TAXA-CP": "0.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Posição geométrica": {
+      "Extensão inicial": "-0.063 cm",
+      "Extensão final": "0.000 cm",
+      "Recuo do início da junta": "1.270 cm",
+      "Recorte da união final": "1.270 cm",
+      "Justificação yz": "Uniforme",
+      "Justificação y": "Origem",
+      "Valor do deslocamento y": "0.000 cm",
+      "Justificação z": "Topo",
+      "Valor do deslocamento z": "0.000 cm"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 40MPa",
+      "Material solidarização": "Concreto, Moldado in loco",
+      "Material consolo": "Concreto, Pré-moldado - 50MPa_Consolo"
+     },
+     "Visibilidade": {
+      "SOLIDARIZAÇÃO-Visibilidade": "No"
+     }
+    }
+   },
+   {
+    "objectid": 7085,
+    "name": "CASSOL-PREO-Viga-R [6658541]",
+    "externalId": "f6c5d130-0254-44a5-9353-a5410320f029-006599ed",
+    "properties": {
+     "Outros": {
+      "Vao_Titulo": "V21",
+      "Vao": "1.000",
+      "Solidarizado": "Sim",
+      "Capa": "0.000 cm",
+      "Altura_Gerber_Esq": "30.000 cm",
+      "Largura_Gerber_Esq": "50.000 cm",
+      "Altura_Gerber_Dir": "30.000 cm",
+      "Largura_Gerber_Dir": "50.000 cm",
+      "Solidarizar_na_montagem": "Nao",
+      "Unir_com_o_proximo": "Nao",
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Restrições": {
+      "Nível de referência": "EMBARQUE",
+      "Deslocamento do nível inicial": "0.000 cm",
+      "Deslocamento do nível final": "0.000 cm",
+      "Rotação do corte transversal": "0.000 °",
+      "FOLGA-Viga e Pilar 1": "1.000 cm",
+      "FOLGA-Viga e Pilar 2": "1.000 cm"
+     },
+     "Construção": {
+      "CASSOL-Linha de Produção": "PRÉ-FABRICADOS",
+      "TECNOLOGIA-Aço": "ARMADO",
+      "TECNOLOGIA-Forma": "CARPINTARIA",
+      "TECNOLOGIA-Concreto": "ADITIVADO",
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": ""
+     },
+     "Dados": {
+      "fck (MPa)": "45.000",
+      "Cobrimento": "3.000 cm",
+      "Rebaixo": "0.000 cm",
+      "Cortina": "Nao",
+      "fck": "Concreto C45"
+     },
+     "Cotas": {
+      "Comprimento": "990.000 cm",
+      "PEÇA-Altura Preo": "80.000 cm",
+      "PEÇA-Altura Total": "80.000 cm",
+      "PEÇA-Comprimento": "917.460 cm",
+      "PEÇA-Largura Preo": "40.000 cm",
+      "PEÇA-Largura Total": "40.000 cm",
+      "Volume": "2.934 m^3",
+      "Elevação no topo": "520.000 cm",
+      "Elevação na parte inferior": "440.000 cm",
+      "SEÇÃO-Altura": "80.000 cm",
+      "SEÇÃO-Largura": "40.000 cm",
+      "SOLIDARIZAÇÃO-Altura": "0.000 cm",
+      "SOLIDARIZAÇÃO-Largura": "20.000 cm",
+      "SOLIDADARIZAÇÃO-Verificação": "0.100 cm"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "V10-01",
+      "Unique TQS ID": "-2057",
+      "Titulo": "V21",
+      "Chave": "-2057",
+      "Tipo Elemento": "Viga",
+      "SHA1": "AADBA1E30E82D7CCC95FF2C712962ECDCABC0976",
+      "Principal": "Yes",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "R80-40x80cm-V10",
+      "Chave do nome do corte": "",
+      "Classificação de incêndio": "",
+      "Comentários de tipos": "",
+      "Custo": "0.000 ฿",
+      "Código de montagem": "V",
+      "Descrição": "VIGA",
+      "Fabricante": "",
+      "Modelo": "R",
+      "Nota-chave": "",
+      "TQS-Seção": "",
+      "Tipo de imagem": "",
+      "URL": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "V10",
+      "Número OmniClass": "23.25.30.11.14.14",
+      "Título OmniClass": "Beams",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido": "",
+      "Exportar para IFC como": "",
+      "Exportar para IFC": "Por tipo",
+      "IfcGUID": "3snT4m0bH4fPDJfK43HMd4",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "2vbCXy8VHEN9UwjuayBk1o"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum",
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "CONSOLO 1-Visibilidade": "Yes",
+      "CONSOLO 1-Altura 1": "30.000 cm",
+      "CONSOLO 1-Altura 2": "0.000 cm",
+      "CONSOLO 1-Profundidade": "20.000 cm",
+      "CONSOLO 1-Gerber": "Yes",
+      "CONSOLO 1-Gerber Altura": "31.000 cm",
+      "CONSOLO 1-Gerber Profundidade": "20.000 cm",
+      "CONSOLO 2-Visibilidade": "Yes",
+      "CONSOLO 2-Altura 1": "30.000 cm",
+      "CONSOLO 2-Altura 2": "0.000 cm",
+      "CONSOLO 2-Profundidade": "20.000 cm",
+      "CONSOLO 2-Gerber": "Yes",
+      "CONSOLO 2-Gerber Altura": "31.000 cm",
+      "CONSOLO 2-Gerber Profundidade": "20.000 cm",
+      "NEOPRENE 1-Visibilidade": "Yes",
+      "NEOPRENE 1-Posição": "10.000 cm",
+      "NEOPRENE 1-Tipo": "CASSOL-ACS-Neoprene : NP05-10x100x166mm",
+      "NEOPRENE 2-Visibilidade": "Yes",
+      "NEOPRENE 2-Posição": "10.000 cm",
+      "NEOPRENE 2-Tipo": "CASSOL-ACS-Neoprene : NP04-10x250x350mm",
+      "CONSOLO-Marca": "CP01",
+      "CONSOLO-Taxa CA": "200.000 kg/m³",
+      "NEOPRENE-Espessura": "1.000 cm"
+     },
+     "Extremidade secundária": {
+      "FURO DE FIXAÇÃO-Posição 1": "9.000 cm",
+      "FURO DE FIXAÇÃO-Posição 1 Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2": "9.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2 Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição AB": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição A'": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição B'": "10.000 cm",
+      "FURO DE FIXAÇÃO-Abertura": "2.500 cm",
+      "FURO DE FIXAÇÃO-Posição AB Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição A' Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição B' Extra": "0.000 cm"
+     },
+     "Estrutural": {
+      "Comprimento do corte": "921.960 cm",
+      "Uso estrutural": "Outro",
+      "Tipo inicial de anexo": "Elevação final",
+      "Tipo final de anexo": "Elevação final",
+      "Recobrimento de vergalhão - Face superior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Fase inferior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Viga/Coluna) <25 mm>",
+      "TAXA-CA": "100.000 kg/m³",
+      "TAXA-CP": "0.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Posição geométrica": {
+      "Extensão inicial": "-45.000 cm",
+      "Extensão final": "0.000 cm",
+      "Recuo do início da junta": "1.270 cm",
+      "Recorte da união final": "1.270 cm",
+      "Justificação yz": "Uniforme",
+      "Justificação y": "Origem",
+      "Valor do deslocamento y": "0.000 cm",
+      "Justificação z": "Topo",
+      "Valor do deslocamento z": "0.000 cm"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 40MPa",
+      "Material solidarização": "Concreto, Moldado in loco",
+      "Material consolo": "Concreto, Pré-moldado - 50MPa_Consolo"
+     },
+     "Visibilidade": {
+      "SOLIDARIZAÇÃO-Visibilidade": "No"
+     }
+    }
+   },
+   {
+    "objectid": 7086,
+    "name": "CASSOL-PREO-Viga-R [6658789]",
+    "externalId": "f6c5d130-0254-44a5-9353-a5410320f029-00659ae5",
+    "properties": {
+     "Outros": {
+      "Vao_Titulo": "V21",
+      "Vao": "1.000",
+      "Solidarizado": "Sim",
+      "Capa": "0.000 cm",
+      "Altura_Gerber_Esq": "30.000 cm",
+      "Largura_Gerber_Esq": "50.000 cm",
+      "Altura_Gerber_Dir": "30.000 cm",
+      "Largura_Gerber_Dir": "50.000 cm",
+      "Solidarizar_na_montagem": "Nao",
+      "Unir_com_o_proximo": "Nao",
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Restrições": {
+      "Nível de referência": "EMBARQUE",
+      "Deslocamento do nível inicial": "0.000 cm",
+      "Deslocamento do nível final": "0.000 cm",
+      "Rotação do corte transversal": "0.000 °",
+      "FOLGA-Viga e Pilar 1": "1.000 cm",
+      "FOLGA-Viga e Pilar 2": "1.000 cm"
+     },
+     "Construção": {
+      "CASSOL-Linha de Produção": "PRÉ-FABRICADOS",
+      "TECNOLOGIA-Aço": "ARMADO",
+      "TECNOLOGIA-Forma": "CARPINTARIA",
+      "TECNOLOGIA-Concreto": "ADITIVADO",
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": ""
+     },
+     "Dados": {
+      "fck (MPa)": "45.000",
+      "Cobrimento": "3.000 cm",
+      "Rebaixo": "0.000 cm",
+      "Cortina": "Nao",
+      "fck": "Concreto C45"
+     },
+     "Cotas": {
+      "Comprimento": "990.000 cm",
+      "PEÇA-Altura Preo": "80.000 cm",
+      "PEÇA-Altura Total": "80.000 cm",
+      "PEÇA-Comprimento": "917.460 cm",
+      "PEÇA-Largura Preo": "40.000 cm",
+      "PEÇA-Largura Total": "40.000 cm",
+      "Volume": "2.934 m^3",
+      "Elevação no topo": "520.000 cm",
+      "Elevação na parte inferior": "440.000 cm",
+      "SEÇÃO-Altura": "80.000 cm",
+      "SEÇÃO-Largura": "40.000 cm",
+      "SOLIDARIZAÇÃO-Altura": "0.000 cm",
+      "SOLIDARIZAÇÃO-Largura": "20.000 cm",
+      "SOLIDADARIZAÇÃO-Verificação": "0.100 cm"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "V10-01",
+      "Unique TQS ID": "-2057",
+      "Titulo": "V21",
+      "Chave": "-2057",
+      "Tipo Elemento": "Viga",
+      "SHA1": "AADBA1E30E82D7CCC95FF2C712962ECDCABC0976",
+      "Principal": "Yes",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "R80-40x80cm-V10",
+      "Chave do nome do corte": "",
+      "Classificação de incêndio": "",
+      "Comentários de tipos": "",
+      "Custo": "0.000 ฿",
+      "Código de montagem": "V",
+      "Descrição": "VIGA",
+      "Fabricante": "",
+      "Modelo": "R",
+      "Nota-chave": "",
+      "TQS-Seção": "",
+      "Tipo de imagem": "",
+      "URL": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "V10",
+      "Número OmniClass": "23.25.30.11.14.14",
+      "Título OmniClass": "Beams",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido": "",
+      "Exportar para IFC como": "",
+      "Exportar para IFC": "Por tipo",
+      "IfcGUID": "3snT4m0bH4fPDJfK43HMhC",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "2vbCXy8VHEN9UwjuayBk1o"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum",
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "CONSOLO 1-Visibilidade": "Yes",
+      "CONSOLO 1-Altura 1": "30.000 cm",
+      "CONSOLO 1-Altura 2": "0.000 cm",
+      "CONSOLO 1-Profundidade": "20.000 cm",
+      "CONSOLO 1-Gerber": "Yes",
+      "CONSOLO 1-Gerber Altura": "31.000 cm",
+      "CONSOLO 1-Gerber Profundidade": "20.000 cm",
+      "CONSOLO 2-Visibilidade": "Yes",
+      "CONSOLO 2-Altura 1": "30.000 cm",
+      "CONSOLO 2-Altura 2": "0.000 cm",
+      "CONSOLO 2-Profundidade": "20.000 cm",
+      "CONSOLO 2-Gerber": "Yes",
+      "CONSOLO 2-Gerber Altura": "31.000 cm",
+      "CONSOLO 2-Gerber Profundidade": "20.000 cm",
+      "NEOPRENE 1-Visibilidade": "Yes",
+      "NEOPRENE 1-Posição": "10.000 cm",
+      "NEOPRENE 1-Tipo": "CASSOL-ACS-Neoprene : NP05-10x100x166mm",
+      "NEOPRENE 2-Visibilidade": "Yes",
+      "NEOPRENE 2-Posição": "10.000 cm",
+      "NEOPRENE 2-Tipo": "CASSOL-ACS-Neoprene : NP04-10x250x350mm",
+      "CONSOLO-Marca": "CP01",
+      "CONSOLO-Taxa CA": "200.000 kg/m³",
+      "NEOPRENE-Espessura": "1.000 cm"
+     },
+     "Extremidade secundária": {
+      "FURO DE FIXAÇÃO-Posição 1": "9.000 cm",
+      "FURO DE FIXAÇÃO-Posição 1 Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2": "9.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2 Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição AB": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição A'": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição B'": "10.000 cm",
+      "FURO DE FIXAÇÃO-Abertura": "2.500 cm",
+      "FURO DE FIXAÇÃO-Posição AB Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição A' Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição B' Extra": "0.000 cm"
+     },
+     "Estrutural": {
+      "Comprimento do corte": "921.960 cm",
+      "Uso estrutural": "Outro",
+      "Tipo inicial de anexo": "Elevação final",
+      "Tipo final de anexo": "Elevação final",
+      "Recobrimento de vergalhão - Face superior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Fase inferior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Viga/Coluna) <25 mm>",
+      "TAXA-CA": "100.000 kg/m³",
+      "TAXA-CP": "0.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Posição geométrica": {
+      "Extensão inicial": "-0.063 cm",
+      "Extensão final": "0.000 cm",
+      "Recuo do início da junta": "1.270 cm",
+      "Recorte da união final": "1.270 cm",
+      "Justificação yz": "Uniforme",
+      "Justificação y": "Origem",
+      "Valor do deslocamento y": "0.000 cm",
+      "Justificação z": "Topo",
+      "Valor do deslocamento z": "0.000 cm"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 40MPa",
+      "Material solidarização": "Concreto, Moldado in loco",
+      "Material consolo": "Concreto, Pré-moldado - 50MPa_Consolo"
+     },
+     "Visibilidade": {
+      "SOLIDARIZAÇÃO-Visibilidade": "No"
+     }
+    }
+   },
+   {
+    "objectid": 7087,
+    "name": "CASSOL-PREO-Viga-R [6658884]",
+    "externalId": "f6c5d130-0254-44a5-9353-a5410320f029-00659b44",
+    "properties": {
+     "Outros": {
+      "Vao_Titulo": "V21",
+      "Vao": "1.000",
+      "Solidarizado": "Sim",
+      "Capa": "0.000 cm",
+      "Altura_Gerber_Esq": "30.000 cm",
+      "Largura_Gerber_Esq": "50.000 cm",
+      "Altura_Gerber_Dir": "30.000 cm",
+      "Largura_Gerber_Dir": "50.000 cm",
+      "Solidarizar_na_montagem": "Nao",
+      "Unir_com_o_proximo": "Nao",
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Restrições": {
+      "Nível de referência": "EMBARQUE",
+      "Deslocamento do nível inicial": "0.000 cm",
+      "Deslocamento do nível final": "0.000 cm",
+      "Rotação do corte transversal": "0.000 °",
+      "FOLGA-Viga e Pilar 1": "1.000 cm",
+      "FOLGA-Viga e Pilar 2": "1.000 cm"
+     },
+     "Construção": {
+      "CASSOL-Linha de Produção": "PRÉ-FABRICADOS",
+      "TECNOLOGIA-Aço": "ARMADO",
+      "TECNOLOGIA-Forma": "CARPINTARIA",
+      "TECNOLOGIA-Concreto": "ADITIVADO",
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": ""
+     },
+     "Dados": {
+      "fck (MPa)": "45.000",
+      "Cobrimento": "3.000 cm",
+      "Rebaixo": "0.000 cm",
+      "Cortina": "Nao",
+      "fck": "Concreto C45"
+     },
+     "Cotas": {
+      "Comprimento": "980.000 cm",
+      "PEÇA-Altura Preo": "80.000 cm",
+      "PEÇA-Altura Total": "80.000 cm",
+      "PEÇA-Comprimento": "902.460 cm",
+      "PEÇA-Largura Preo": "40.000 cm",
+      "PEÇA-Largura Total": "40.000 cm",
+      "Volume": "2.886 m^3",
+      "Elevação no topo": "520.000 cm",
+      "Elevação na parte inferior": "440.000 cm",
+      "SEÇÃO-Altura": "80.000 cm",
+      "SEÇÃO-Largura": "40.000 cm",
+      "SOLIDARIZAÇÃO-Altura": "0.000 cm",
+      "SOLIDARIZAÇÃO-Largura": "20.000 cm",
+      "SOLIDADARIZAÇÃO-Verificação": "0.100 cm"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "V10-02",
+      "Unique TQS ID": "-2057",
+      "Titulo": "V21",
+      "Chave": "-2057",
+      "Tipo Elemento": "Viga",
+      "SHA1": "AADBA1E30E82D7CCC95FF2C712962ECDCABC0976",
+      "Principal": "Yes",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "R80-40x80cm-V10",
+      "Chave do nome do corte": "",
+      "Classificação de incêndio": "",
+      "Comentários de tipos": "",
+      "Custo": "0.000 ฿",
+      "Código de montagem": "V",
+      "Descrição": "VIGA",
+      "Fabricante": "",
+      "Modelo": "R",
+      "Nota-chave": "",
+      "TQS-Seção": "",
+      "Tipo de imagem": "",
+      "URL": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "V10",
+      "Número OmniClass": "23.25.30.11.14.14",
+      "Título OmniClass": "Beams",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido": "",
+      "Exportar para IFC como": "",
+      "Exportar para IFC": "Por tipo",
+      "IfcGUID": "3snT4m0bH4fPDJfK43HMjj",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "2vbCXy8VHEN9UwjuayBk1o"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum",
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "CONSOLO 1-Visibilidade": "Yes",
+      "CONSOLO 1-Altura 1": "30.000 cm",
+      "CONSOLO 1-Altura 2": "0.000 cm",
+      "CONSOLO 1-Profundidade": "20.000 cm",
+      "CONSOLO 1-Gerber": "Yes",
+      "CONSOLO 1-Gerber Altura": "31.000 cm",
+      "CONSOLO 1-Gerber Profundidade": "20.000 cm",
+      "CONSOLO 2-Visibilidade": "Yes",
+      "CONSOLO 2-Altura 1": "30.000 cm",
+      "CONSOLO 2-Altura 2": "0.000 cm",
+      "CONSOLO 2-Profundidade": "20.000 cm",
+      "CONSOLO 2-Gerber": "Yes",
+      "CONSOLO 2-Gerber Altura": "31.000 cm",
+      "CONSOLO 2-Gerber Profundidade": "20.000 cm",
+      "NEOPRENE 1-Visibilidade": "Yes",
+      "NEOPRENE 1-Posição": "10.000 cm",
+      "NEOPRENE 1-Tipo": "CASSOL-ACS-Neoprene : NP05-10x100x166mm",
+      "NEOPRENE 2-Visibilidade": "Yes",
+      "NEOPRENE 2-Posição": "10.000 cm",
+      "NEOPRENE 2-Tipo": "CASSOL-ACS-Neoprene : NP04-10x250x350mm",
+      "CONSOLO-Marca": "CP01",
+      "CONSOLO-Taxa CA": "200.000 kg/m³",
+      "NEOPRENE-Espessura": "1.000 cm"
+     },
+     "Extremidade secundária": {
+      "FURO DE FIXAÇÃO-Posição 1": "9.000 cm",
+      "FURO DE FIXAÇÃO-Posição 1 Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2": "9.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2 Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição AB": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição A'": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição B'": "10.000 cm",
+      "FURO DE FIXAÇÃO-Abertura": "2.500 cm",
+      "FURO DE FIXAÇÃO-Posição AB Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição A' Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição B' Extra": "0.000 cm"
+     },
+     "Estrutural": {
+      "Comprimento do corte": "906.960 cm",
+      "Uso estrutural": "Outro",
+      "Tipo inicial de anexo": "Elevação final",
+      "Tipo final de anexo": "Elevação final",
+      "Recobrimento de vergalhão - Face superior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Fase inferior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Viga/Coluna) <25 mm>",
+      "TAXA-CA": "100.000 kg/m³",
+      "TAXA-CP": "0.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Posição geométrica": {
+      "Extensão inicial": "-0.063 cm",
+      "Extensão final": "0.000 cm",
+      "Recuo do início da junta": "1.270 cm",
+      "Recorte da união final": "1.270 cm",
+      "Justificação yz": "Uniforme",
+      "Justificação y": "Origem",
+      "Valor do deslocamento y": "0.000 cm",
+      "Justificação z": "Topo",
+      "Valor do deslocamento z": "0.000 cm"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 40MPa",
+      "Material solidarização": "Concreto, Moldado in loco",
+      "Material consolo": "Concreto, Pré-moldado - 50MPa_Consolo"
+     },
+     "Visibilidade": {
+      "SOLIDARIZAÇÃO-Visibilidade": "No"
+     }
+    }
+   },
+   {
+    "objectid": 7081,
+    "name": "R80-40x80cm-V10",
+    "externalId": "b994c87c-21f4-4e5c-97ba-b7893c1d8489-003364fb",
+    "properties": {
+     "Restrições": {
+      "FOLGA-Viga e Pilar 1": "1.000 cm",
+      "FOLGA-Viga e Pilar 2": "1.000 cm"
+     },
+     "Cotas": {
+      "SEÇÃO-Altura": "80.000 cm",
+      "SEÇÃO-Largura": "40.000 cm",
+      "SOLIDARIZAÇÃO-Altura": "0.000 cm",
+      "SOLIDARIZAÇÃO-Largura": "20.000 cm",
+      "SOLIDADARIZAÇÃO-Verificação": "0.100 cm"
+     },
+     "Dados de identidade": {
+      "Chave do nome do corte": "",
+      "Classificação de incêndio": "",
+      "Comentários de tipos": "",
+      "Custo": "0.000 ฿",
+      "Código de montagem": "V",
+      "Descrição": "VIGA",
+      "Fabricante": "",
+      "Modelo": "R",
+      "Nota-chave": "",
+      "TQS-Seção": "",
+      "Tipo de imagem": "",
+      "URL": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "V10",
+      "Número OmniClass": "23.25.30.11.14.14",
+      "Título OmniClass": "Beams",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "2vbCXy8VHEN9UwjuayBk1o"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 40MPa",
+      "Material solidarização": "Concreto, Moldado in loco",
+      "Material consolo": "Concreto, Pré-moldado - 50MPa_Consolo"
+     },
+     "Fases": {
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "CONSOLO-Marca": "CP01",
+      "CONSOLO-Taxa CA": "200.000 kg/m³",
+      "NEOPRENE-Espessura": "1.000 cm"
+     },
+     "Extremidade secundária": {
+      "FURO DE FIXAÇÃO-Abertura": "2.500 cm",
+      "FURO DE FIXAÇÃO-Posição AB Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição A' Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição B' Extra": "0.000 cm"
+     },
+     "Estrutural": {
+      "TAXA-CA": "100.000 kg/m³",
+      "TAXA-CP": "0.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Visibilidade": {
+      "SOLIDARIZAÇÃO-Visibilidade": "No"
+     }
+    }
+   },
+   {
+    "objectid": 7290,
+    "name": "CASSOL-PREO-Viga-R [6664989]",
+    "externalId": "f6c5d130-0254-44a5-9353-a5410320f029-0065b31d",
+    "properties": {
+     "Outros": {
+      "Vao_Titulo": "",
+      "Vao": "0.000",
+      "Solidarizado": "",
+      "Capa": "0.000 cm",
+      "Altura_Gerber_Esq": "0.000 cm",
+      "Largura_Gerber_Esq": "0.000 cm",
+      "Altura_Gerber_Dir": "0.000 cm",
+      "Largura_Gerber_Dir": "0.000 cm",
+      "Solidarizar_na_montagem": "",
+      "Unir_com_o_proximo": "",
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Restrições": {
+      "Nível de referência": "DESEMBARQUE",
+      "Deslocamento do nível inicial": "-2.722 cm",
+      "Deslocamento do nível final": "-0.000 cm",
+      "Rotação do corte transversal": "0.000 °",
+      "FOLGA-Viga e Pilar 1": "1.000 cm",
+      "FOLGA-Viga e Pilar 2": "1.000 cm"
+     },
+     "Construção": {
+      "CASSOL-Linha de Produção": "PRÉ-FABRICADOS",
+      "TECNOLOGIA-Aço": "ARMADO",
+      "TECNOLOGIA-Forma": "CARPINTARIA",
+      "TECNOLOGIA-Concreto": "ADITIVADO",
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": ""
+     },
+     "Dados": {
+      "fck (MPa)": "0.000",
+      "Cobrimento": "0.000 cm",
+      "Rebaixo": "0.000 cm",
+      "Cortina": "",
+      "fck": ""
+     },
+     "Cotas": {
+      "Comprimento": "256.698 cm",
+      "PEÇA-Altura Preo": "60.000 cm",
+      "PEÇA-Altura Total": "60.000 cm",
+      "PEÇA-Comprimento": "225.686 cm",
+      "PEÇA-Largura Preo": "20.000 cm",
+      "PEÇA-Largura Total": "20.000 cm",
+      "Volume": "0.312 m^3",
+      "Elevação no topo": "0.000 cm",
+      "Elevação na parte inferior": "0.000 cm",
+      "SEÇÃO-Altura": "60.000 cm",
+      "SEÇÃO-Largura": "20.000 cm",
+      "SOLIDARIZAÇÃO-Altura": "0.000 cm",
+      "SOLIDARIZAÇÃO-Largura": "20.000 cm",
+      "SOLIDADARIZAÇÃO-Verificação": "0.100 cm"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "V11-01",
+      "Unique TQS ID": "0",
+      "Titulo": "",
+      "Chave": "",
+      "Tipo Elemento": "",
+      "SHA1": "",
+      "Principal": "No",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "R60-20x60cm-V11",
+      "Chave do nome do corte": "",
+      "Classificação de incêndio": "",
+      "Comentários de tipos": "",
+      "Custo": "0.000 ฿",
+      "Código de montagem": "V",
+      "Descrição": "VIGA",
+      "Fabricante": "",
+      "Modelo": "R",
+      "Nota-chave": "",
+      "TQS-Seção": "",
+      "Tipo de imagem": "",
+      "URL": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "V11",
+      "Número OmniClass": "23.25.30.11.14.14",
+      "Título OmniClass": "Beams",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido": "",
+      "Exportar para IFC como": "",
+      "Exportar para IFC": "Por tipo",
+      "IfcGUID": "3snT4m0bH4fPDJfK43HKCq",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "2ZK7AHrULE5wI7V$NY2CXa"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum",
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "CONSOLO 1-Visibilidade": "Yes",
+      "CONSOLO 1-Altura 1": "20.000 cm",
+      "CONSOLO 1-Altura 2": "30.000 cm",
+      "CONSOLO 1-Profundidade": "30.000 cm",
+      "CONSOLO 1-Gerber": "No",
+      "CONSOLO 1-Gerber Altura": "0.000 cm",
+      "CONSOLO 1-Gerber Profundidade": "0.000 cm",
+      "CONSOLO 2-Visibilidade": "Yes",
+      "CONSOLO 2-Altura 1": "20.000 cm",
+      "CONSOLO 2-Altura 2": "30.000 cm",
+      "CONSOLO 2-Profundidade": "30.000 cm",
+      "CONSOLO 2-Gerber": "No",
+      "CONSOLO 2-Gerber Altura": "0.000 cm",
+      "CONSOLO 2-Gerber Profundidade": "0.000 cm",
+      "NEOPRENE 1-Visibilidade": "Yes",
+      "NEOPRENE 1-Posição": "15.000 cm",
+      "NEOPRENE 1-Tipo": "CASSOL-ACS-Neoprene : NP08-10x150x250mm",
+      "NEOPRENE 2-Visibilidade": "Yes",
+      "NEOPRENE 2-Posição": "15.000 cm",
+      "NEOPRENE 2-Tipo": "CASSOL-ACS-Neoprene : NP08-10x150x250mm",
+      "CONSOLO-Marca": "CP01",
+      "CONSOLO-Taxa CA": "200.000 kg/m³",
+      "NEOPRENE-Espessura": "1.000 cm"
+     },
+     "Extremidade secundária": {
+      "FURO DE FIXAÇÃO-Posição 1": "14.000 cm",
+      "FURO DE FIXAÇÃO-Posição 1 Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2": "14.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2 Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição AB": "3.000 cm",
+      "FURO DE FIXAÇÃO-Posição A'": "3.000 cm",
+      "FURO DE FIXAÇÃO-Posição B'": "3.000 cm",
+      "FURO DE FIXAÇÃO-Abertura": "2.500 cm",
+      "FURO DE FIXAÇÃO-Posição AB Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição A' Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição B' Extra": "0.000 cm"
+     },
+     "Estrutural": {
+      "Comprimento do corte": "227.686 cm",
+      "Uso estrutural": "Outro",
+      "Tipo inicial de anexo": "Elevação final",
+      "Tipo final de anexo": "Elevação final",
+      "Recobrimento de vergalhão - Face superior": "",
+      "Recobrimento de vergalhão - Fase inferior": "",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Viga/Coluna) <25 mm>",
+      "TAXA-CA": "80.000 kg/m³",
+      "TAXA-CP": "0.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Posição geométrica": {
+      "Extensão inicial": "0.000 cm",
+      "Extensão final": "0.000 cm",
+      "Recuo do início da junta": "1.270 cm",
+      "Recorte da união final": "1.270 cm",
+      "Justificação yz": "Uniforme",
+      "Justificação y": "Origem",
+      "Valor do deslocamento y": "0.000 cm",
+      "Justificação z": "Topo",
+      "Valor do deslocamento z": "0.000 cm"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 40MPa",
+      "Material solidarização": "Concreto, Moldado in loco",
+      "Material consolo": "Concreto, Pré-moldado - 50MPa_Consolo"
+     },
+     "Visibilidade": {
+      "SOLIDARIZAÇÃO-Visibilidade": "No"
+     }
+    }
+   },
+   {
+    "objectid": 7291,
+    "name": "CASSOL-PREO-Viga-R [6664991]",
+    "externalId": "f6c5d130-0254-44a5-9353-a5410320f029-0065b31f",
+    "properties": {
+     "Outros": {
+      "Vao_Titulo": "",
+      "Vao": "0.000",
+      "Solidarizado": "",
+      "Capa": "0.000 cm",
+      "Altura_Gerber_Esq": "0.000 cm",
+      "Largura_Gerber_Esq": "0.000 cm",
+      "Altura_Gerber_Dir": "0.000 cm",
+      "Largura_Gerber_Dir": "0.000 cm",
+      "Solidarizar_na_montagem": "",
+      "Unir_com_o_proximo": "",
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Restrições": {
+      "Nível de referência": "COBERTURA",
+      "Deslocamento do nível inicial": "-0.000 cm",
+      "Deslocamento do nível final": "-0.000 cm",
+      "Rotação do corte transversal": "0.000 °",
+      "FOLGA-Viga e Pilar 1": "1.000 cm",
+      "FOLGA-Viga e Pilar 2": "1.000 cm"
+     },
+     "Construção": {
+      "CASSOL-Linha de Produção": "PRÉ-FABRICADOS",
+      "TECNOLOGIA-Aço": "ARMADO",
+      "TECNOLOGIA-Forma": "CARPINTARIA",
+      "TECNOLOGIA-Concreto": "ADITIVADO",
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": ""
+     },
+     "Dados": {
+      "fck (MPa)": "0.000",
+      "Cobrimento": "0.000 cm",
+      "Rebaixo": "0.000 cm",
+      "Cortina": "",
+      "fck": ""
+     },
+     "Cotas": {
+      "Comprimento": "269.390 cm",
+      "PEÇA-Altura Preo": "60.000 cm",
+      "PEÇA-Altura Total": "60.000 cm",
+      "PEÇA-Comprimento": "226.850 cm",
+      "PEÇA-Largura Preo": "20.000 cm",
+      "PEÇA-Largura Total": "20.000 cm",
+      "Volume": "0.314 m^3",
+      "Elevação no topo": "1500.000 cm",
+      "Elevação na parte inferior": "1389.000 cm",
+      "SEÇÃO-Altura": "60.000 cm",
+      "SEÇÃO-Largura": "20.000 cm",
+      "SOLIDARIZAÇÃO-Altura": "0.000 cm",
+      "SOLIDARIZAÇÃO-Largura": "20.000 cm",
+      "SOLIDADARIZAÇÃO-Verificação": "0.100 cm"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "V11-02",
+      "Unique TQS ID": "0",
+      "Titulo": "",
+      "Chave": "",
+      "Tipo Elemento": "",
+      "SHA1": "",
+      "Principal": "No",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "R60-20x60cm-V11",
+      "Chave do nome do corte": "",
+      "Classificação de incêndio": "",
+      "Comentários de tipos": "",
+      "Custo": "0.000 ฿",
+      "Código de montagem": "V",
+      "Descrição": "VIGA",
+      "Fabricante": "",
+      "Modelo": "R",
+      "Nota-chave": "",
+      "TQS-Seção": "",
+      "Tipo de imagem": "",
+      "URL": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "V11",
+      "Número OmniClass": "23.25.30.11.14.14",
+      "Título OmniClass": "Beams",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido": "",
+      "Exportar para IFC como": "",
+      "Exportar para IFC": "Por tipo",
+      "IfcGUID": "3snT4m0bH4fPDJfK43HKCs",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "2ZK7AHrULE5wI7V$NY2CXa"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum",
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "CONSOLO 1-Visibilidade": "Yes",
+      "CONSOLO 1-Altura 1": "20.000 cm",
+      "CONSOLO 1-Altura 2": "30.000 cm",
+      "CONSOLO 1-Profundidade": "30.000 cm",
+      "CONSOLO 1-Gerber": "No",
+      "CONSOLO 1-Gerber Altura": "0.000 cm",
+      "CONSOLO 1-Gerber Profundidade": "0.000 cm",
+      "CONSOLO 2-Visibilidade": "Yes",
+      "CONSOLO 2-Altura 1": "20.000 cm",
+      "CONSOLO 2-Altura 2": "30.000 cm",
+      "CONSOLO 2-Profundidade": "30.000 cm",
+      "CONSOLO 2-Gerber": "No",
+      "CONSOLO 2-Gerber Altura": "0.000 cm",
+      "CONSOLO 2-Gerber Profundidade": "0.000 cm",
+      "NEOPRENE 1-Visibilidade": "Yes",
+      "NEOPRENE 1-Posição": "15.000 cm",
+      "NEOPRENE 1-Tipo": "CASSOL-ACS-Neoprene : NP08-10x150x250mm",
+      "NEOPRENE 2-Visibilidade": "Yes",
+      "NEOPRENE 2-Posição": "15.000 cm",
+      "NEOPRENE 2-Tipo": "CASSOL-ACS-Neoprene : NP08-10x150x250mm",
+      "CONSOLO-Marca": "CP01",
+      "CONSOLO-Taxa CA": "200.000 kg/m³",
+      "NEOPRENE-Espessura": "1.000 cm"
+     },
+     "Extremidade secundária": {
+      "FURO DE FIXAÇÃO-Posição 1": "14.000 cm",
+      "FURO DE FIXAÇÃO-Posição 1 Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2": "14.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2 Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição AB": "3.000 cm",
+      "FURO DE FIXAÇÃO-Posição A'": "3.000 cm",
+      "FURO DE FIXAÇÃO-Posição B'": "3.000 cm",
+      "FURO DE FIXAÇÃO-Abertura": "2.500 cm",
+      "FURO DE FIXAÇÃO-Posição AB Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição A' Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição B' Extra": "0.000 cm"
+     },
+     "Estrutural": {
+      "Comprimento do corte": "228.850 cm",
+      "Uso estrutural": "Outro",
+      "Tipo inicial de anexo": "Elevação final",
+      "Tipo final de anexo": "Elevação final",
+      "Recobrimento de vergalhão - Face superior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Fase inferior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Viga/Coluna) <25 mm>",
+      "TAXA-CA": "80.000 kg/m³",
+      "TAXA-CP": "0.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Posição geométrica": {
+      "Extensão inicial": "0.000 cm",
+      "Extensão final": "0.000 cm",
+      "Recuo do início da junta": "1.270 cm",
+      "Recorte da união final": "1.270 cm",
+      "Justificação yz": "Uniforme",
+      "Justificação y": "Origem",
+      "Valor do deslocamento y": "0.000 cm",
+      "Justificação z": "Topo",
+      "Valor do deslocamento z": "0.000 cm"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 40MPa",
+      "Material solidarização": "Concreto, Moldado in loco",
+      "Material consolo": "Concreto, Pré-moldado - 50MPa_Consolo"
+     },
+     "Visibilidade": {
+      "SOLIDARIZAÇÃO-Visibilidade": "No"
+     }
+    }
+   },
+   {
+    "objectid": 7292,
+    "name": "CASSOL-PREO-Viga-R [6664993]",
+    "externalId": "f6c5d130-0254-44a5-9353-a5410320f029-0065b321",
+    "properties": {
+     "Outros": {
+      "Vao_Titulo": "",
+      "Vao": "0.000",
+      "Solidarizado": "",
+      "Capa": "0.000 cm",
+      "Altura_Gerber_Esq": "0.000 cm",
+      "Largura_Gerber_Esq": "0.000 cm",
+      "Altura_Gerber_Dir": "0.000 cm",
+      "Largura_Gerber_Dir": "0.000 cm",
+      "Solidarizar_na_montagem": "",
+      "Unir_com_o_proximo": "",
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Restrições": {
+      "Nível de referência": "DESEMBARQUE",
+      "Deslocamento do nível inicial": "-0.000 cm",
+      "Deslocamento do nível final": "0.000 cm",
+      "Rotação do corte transversal": "0.000 °",
+      "FOLGA-Viga e Pilar 1": "1.000 cm",
+      "FOLGA-Viga e Pilar 2": "1.000 cm"
+     },
+     "Construção": {
+      "CASSOL-Linha de Produção": "PRÉ-FABRICADOS",
+      "TECNOLOGIA-Aço": "ARMADO",
+      "TECNOLOGIA-Forma": "CARPINTARIA",
+      "TECNOLOGIA-Concreto": "ADITIVADO",
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": ""
+     },
+     "Dados": {
+      "fck (MPa)": "0.000",
+      "Cobrimento": "0.000 cm",
+      "Rebaixo": "0.000 cm",
+      "Cortina": "",
+      "fck": ""
+     },
+     "Cotas": {
+      "Comprimento": "269.083 cm",
+      "PEÇA-Altura Preo": "60.000 cm",
+      "PEÇA-Altura Total": "60.000 cm",
+      "PEÇA-Comprimento": "269.083 cm",
+      "PEÇA-Largura Preo": "20.000 cm",
+      "PEÇA-Largura Total": "20.000 cm",
+      "Volume": "0.297 m^3",
+      "Elevação no topo": "920.000 cm",
+      "Elevação na parte inferior": "860.000 cm",
+      "SEÇÃO-Altura": "60.000 cm",
+      "SEÇÃO-Largura": "20.000 cm",
+      "SOLIDARIZAÇÃO-Altura": "0.000 cm",
+      "SOLIDARIZAÇÃO-Largura": "20.000 cm",
+      "SOLIDADARIZAÇÃO-Verificação": "0.100 cm"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "V11-03",
+      "Unique TQS ID": "0",
+      "Titulo": "",
+      "Chave": "",
+      "Tipo Elemento": "",
+      "SHA1": "",
+      "Principal": "No",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "R60-20x60cm-V11",
+      "Chave do nome do corte": "",
+      "Classificação de incêndio": "",
+      "Comentários de tipos": "",
+      "Custo": "0.000 ฿",
+      "Código de montagem": "V",
+      "Descrição": "VIGA",
+      "Fabricante": "",
+      "Modelo": "R",
+      "Nota-chave": "",
+      "TQS-Seção": "",
+      "Tipo de imagem": "",
+      "URL": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "V11",
+      "Número OmniClass": "23.25.30.11.14.14",
+      "Título OmniClass": "Beams",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido": "",
+      "Exportar para IFC como": "",
+      "Exportar para IFC": "Por tipo",
+      "IfcGUID": "3snT4m0bH4fPDJfK43HKC8",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "2ZK7AHrULE5wI7V$NY2CXa"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum",
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "CONSOLO 1-Visibilidade": "No",
+      "CONSOLO 1-Altura 1": "41.000 cm",
+      "CONSOLO 1-Altura 2": "0.000 cm",
+      "CONSOLO 1-Profundidade": "16.000 cm",
+      "CONSOLO 1-Gerber": "Yes",
+      "CONSOLO 1-Gerber Altura": "42.000 cm",
+      "CONSOLO 1-Gerber Profundidade": "16.000 cm",
+      "CONSOLO 2-Visibilidade": "No",
+      "CONSOLO 2-Altura 1": "41.000 cm",
+      "CONSOLO 2-Altura 2": "0.000 cm",
+      "CONSOLO 2-Profundidade": "16.000 cm",
+      "CONSOLO 2-Gerber": "Yes",
+      "CONSOLO 2-Gerber Altura": "42.000 cm",
+      "CONSOLO 2-Gerber Profundidade": "16.000 cm",
+      "NEOPRENE 1-Visibilidade": "Yes",
+      "NEOPRENE 1-Posição": "8.000 cm",
+      "NEOPRENE 1-Tipo": "CASSOL-ACS-Neoprene : NP08-10x150x250mm",
+      "NEOPRENE 2-Visibilidade": "Yes",
+      "NEOPRENE 2-Posição": "8.000 cm",
+      "NEOPRENE 2-Tipo": "CASSOL-ACS-Neoprene : NP08-10x150x250mm",
+      "CONSOLO-Marca": "CP01",
+      "CONSOLO-Taxa CA": "200.000 kg/m³",
+      "NEOPRENE-Espessura": "1.000 cm"
+     },
+     "Extremidade secundária": {
+      "FURO DE FIXAÇÃO-Posição 1": "7.000 cm",
+      "FURO DE FIXAÇÃO-Posição 1 Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2": "7.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2 Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição AB": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição A'": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição B'": "0.000 cm",
+      "FURO DE FIXAÇÃO-Abertura": "2.500 cm",
+      "FURO DE FIXAÇÃO-Posição AB Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição A' Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição B' Extra": "0.000 cm"
+     },
+     "Estrutural": {
+      "Comprimento do corte": "270.083 cm",
+      "Uso estrutural": "Outro",
+      "Recobrimento de vergalhão - Face superior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Fase inferior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Viga/Coluna) <25 mm>",
+      "TAXA-CA": "80.000 kg/m³",
+      "TAXA-CP": "0.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Posição geométrica": {
+      "Extensão inicial": "0.000 cm",
+      "Extensão final": "0.000 cm",
+      "Justificação yz": "Uniforme",
+      "Justificação y": "Origem",
+      "Valor do deslocamento y": "0.000 cm",
+      "Justificação z": "Topo",
+      "Valor do deslocamento z": "0.000 cm"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 40MPa",
+      "Material solidarização": "Concreto, Moldado in loco",
+      "Material consolo": "Concreto, Pré-moldado - 50MPa_Consolo"
+     },
+     "Visibilidade": {
+      "SOLIDARIZAÇÃO-Visibilidade": "No"
+     }
+    }
+   },
+   {
+    "objectid": 7293,
+    "name": "CASSOL-PREO-Viga-R [6664994]",
+    "externalId": "f6c5d130-0254-44a5-9353-a5410320f029-0065b322",
+    "properties": {
+     "Outros": {
+      "Vao_Titulo": "",
+      "Vao": "0.000",
+      "Solidarizado": "",
+      "Capa": "0.000 cm",
+      "Altura_Gerber_Esq": "0.000 cm",
+      "Largura_Gerber_Esq": "0.000 cm",
+      "Altura_Gerber_Dir": "0.000 cm",
+      "Largura_Gerber_Dir": "0.000 cm",
+      "Solidarizar_na_montagem": "",
+      "Unir_com_o_proximo": "",
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Restrições": {
+      "Nível de referência": "COBERTURA",
+      "Deslocamento do nível inicial": "0.000 cm",
+      "Deslocamento do nível final": "0.000 cm",
+      "Rotação do corte transversal": "0.000 °",
+      "FOLGA-Viga e Pilar 1": "1.000 cm",
+      "FOLGA-Viga e Pilar 2": "1.000 cm"
+     },
+     "Construção": {
+      "CASSOL-Linha de Produção": "PRÉ-FABRICADOS",
+      "TECNOLOGIA-Aço": "ARMADO",
+      "TECNOLOGIA-Forma": "CARPINTARIA",
+      "TECNOLOGIA-Concreto": "ADITIVADO",
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": ""
+     },
+     "Dados": {
+      "fck (MPa)": "0.000",
+      "Cobrimento": "0.000 cm",
+      "Rebaixo": "0.000 cm",
+      "Cortina": "",
+      "fck": ""
+     },
+     "Cotas": {
+      "Comprimento": "269.083 cm",
+      "PEÇA-Altura Preo": "60.000 cm",
+      "PEÇA-Altura Total": "60.000 cm",
+      "PEÇA-Comprimento": "269.083 cm",
+      "PEÇA-Largura Preo": "20.000 cm",
+      "PEÇA-Largura Total": "20.000 cm",
+      "Volume": "0.297 m^3",
+      "Elevação no topo": "1500.000 cm",
+      "Elevação na parte inferior": "1440.000 cm",
+      "SEÇÃO-Altura": "60.000 cm",
+      "SEÇÃO-Largura": "20.000 cm",
+      "SOLIDARIZAÇÃO-Altura": "0.000 cm",
+      "SOLIDARIZAÇÃO-Largura": "20.000 cm",
+      "SOLIDADARIZAÇÃO-Verificação": "0.100 cm"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "V11-03",
+      "Unique TQS ID": "0",
+      "Titulo": "",
+      "Chave": "",
+      "Tipo Elemento": "",
+      "SHA1": "",
+      "Principal": "No",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "R60-20x60cm-V11",
+      "Chave do nome do corte": "",
+      "Classificação de incêndio": "",
+      "Comentários de tipos": "",
+      "Custo": "0.000 ฿",
+      "Código de montagem": "V",
+      "Descrição": "VIGA",
+      "Fabricante": "",
+      "Modelo": "R",
+      "Nota-chave": "",
+      "TQS-Seção": "",
+      "Tipo de imagem": "",
+      "URL": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "V11",
+      "Número OmniClass": "23.25.30.11.14.14",
+      "Título OmniClass": "Beams",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido": "",
+      "Exportar para IFC como": "",
+      "Exportar para IFC": "Por tipo",
+      "IfcGUID": "3snT4m0bH4fPDJfK43HKCB",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "2ZK7AHrULE5wI7V$NY2CXa"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum",
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "CONSOLO 1-Visibilidade": "No",
+      "CONSOLO 1-Altura 1": "41.000 cm",
+      "CONSOLO 1-Altura 2": "0.000 cm",
+      "CONSOLO 1-Profundidade": "16.000 cm",
+      "CONSOLO 1-Gerber": "Yes",
+      "CONSOLO 1-Gerber Altura": "42.000 cm",
+      "CONSOLO 1-Gerber Profundidade": "16.000 cm",
+      "CONSOLO 2-Visibilidade": "No",
+      "CONSOLO 2-Altura 1": "41.000 cm",
+      "CONSOLO 2-Altura 2": "0.000 cm",
+      "CONSOLO 2-Profundidade": "16.000 cm",
+      "CONSOLO 2-Gerber": "Yes",
+      "CONSOLO 2-Gerber Altura": "42.000 cm",
+      "CONSOLO 2-Gerber Profundidade": "16.000 cm",
+      "NEOPRENE 1-Visibilidade": "Yes",
+      "NEOPRENE 1-Posição": "8.000 cm",
+      "NEOPRENE 1-Tipo": "CASSOL-ACS-Neoprene : NP08-10x150x250mm",
+      "NEOPRENE 2-Visibilidade": "Yes",
+      "NEOPRENE 2-Posição": "8.000 cm",
+      "NEOPRENE 2-Tipo": "CASSOL-ACS-Neoprene : NP08-10x150x250mm",
+      "CONSOLO-Marca": "CP01",
+      "CONSOLO-Taxa CA": "200.000 kg/m³",
+      "NEOPRENE-Espessura": "1.000 cm"
+     },
+     "Extremidade secundária": {
+      "FURO DE FIXAÇÃO-Posição 1": "7.000 cm",
+      "FURO DE FIXAÇÃO-Posição 1 Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2": "7.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2 Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição AB": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição A'": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição B'": "0.000 cm",
+      "FURO DE FIXAÇÃO-Abertura": "2.500 cm",
+      "FURO DE FIXAÇÃO-Posição AB Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição A' Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição B' Extra": "0.000 cm"
+     },
+     "Estrutural": {
+      "Comprimento do corte": "270.083 cm",
+      "Uso estrutural": "Outro",
+      "Recobrimento de vergalhão - Face superior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Fase inferior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Viga/Coluna) <25 mm>",
+      "TAXA-CA": "80.000 kg/m³",
+      "TAXA-CP": "0.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Posição geométrica": {
+      "Extensão inicial": "0.000 cm",
+      "Extensão final": "0.000 cm",
+      "Justificação yz": "Uniforme",
+      "Justificação y": "Origem",
+      "Valor do deslocamento y": "0.000 cm",
+      "Justificação z": "Topo",
+      "Valor do deslocamento z": "0.000 cm"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 40MPa",
+      "Material solidarização": "Concreto, Moldado in loco",
+      "Material consolo": "Concreto, Pré-moldado - 50MPa_Consolo"
+     },
+     "Visibilidade": {
+      "SOLIDARIZAÇÃO-Visibilidade": "No"
+     }
+    }
+   },
+   {
+    "objectid": 7082,
+    "name": "R60-20x60cm-V11",
+    "externalId": "a3507291-d5e5-4e17-a487-7ff5e258c958-0050013c",
+    "properties": {
+     "Restrições": {
+      "FOLGA-Viga e Pilar 1": "1.000 cm",
+      "FOLGA-Viga e Pilar 2": "1.000 cm"
+     },
+     "Cotas": {
+      "SEÇÃO-Altura": "60.000 cm",
+      "SEÇÃO-Largura": "20.000 cm",
+      "SOLIDARIZAÇÃO-Altura": "0.000 cm",
+      "SOLIDARIZAÇÃO-Largura": "20.000 cm",
+      "SOLIDADARIZAÇÃO-Verificação": "0.100 cm"
+     },
+     "Dados de identidade": {
+      "Chave do nome do corte": "",
+      "Classificação de incêndio": "",
+      "Comentários de tipos": "",
+      "Custo": "0.000 ฿",
+      "Código de montagem": "V",
+      "Descrição": "VIGA",
+      "Fabricante": "",
+      "Modelo": "R",
+      "Nota-chave": "",
+      "TQS-Seção": "",
+      "Tipo de imagem": "",
+      "URL": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "V11",
+      "Número OmniClass": "23.25.30.11.14.14",
+      "Título OmniClass": "Beams",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "2ZK7AHrULE5wI7V$NY2CXa"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 40MPa",
+      "Material solidarização": "Concreto, Moldado in loco",
+      "Material consolo": "Concreto, Pré-moldado - 50MPa_Consolo"
+     },
+     "Fases": {
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "CONSOLO-Marca": "CP01",
+      "CONSOLO-Taxa CA": "200.000 kg/m³",
+      "NEOPRENE-Espessura": "1.000 cm"
+     },
+     "Extremidade secundária": {
+      "FURO DE FIXAÇÃO-Abertura": "2.500 cm",
+      "FURO DE FIXAÇÃO-Posição AB Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição A' Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição B' Extra": "0.000 cm"
+     },
+     "Estrutural": {
+      "TAXA-CA": "80.000 kg/m³",
+      "TAXA-CP": "0.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Visibilidade": {
+      "SOLIDARIZAÇÃO-Visibilidade": "No"
+     }
+    }
+   },
+   {
+    "objectid": 7078,
+    "name": "CASSOL-PREO-Viga-R",
+    "externalId": "CASSOL-PREO-Viga-R:Quadro estrutural",
+    "properties": {}
+   },
+   {
+    "objectid": 7158,
+    "name": "CASSOL-PREO-Viga-I [6658418]",
+    "externalId": "f6c5d130-0254-44a5-9353-a5410320f029-00659972",
+    "properties": {
+     "Outros": {
+      "Vao_Titulo": "V17",
+      "Vao": "1.000",
+      "Solidarizado": "Sim",
+      "Capa": "0.000 cm",
+      "Altura_Gerber_Esq": "30.000 cm",
+      "Largura_Gerber_Esq": "50.000 cm",
+      "Altura_Gerber_Dir": "30.000 cm",
+      "Largura_Gerber_Dir": "50.000 cm",
+      "Solidarizar_na_montagem": "Nao",
+      "Unir_com_o_proximo": "Nao",
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Restrições": {
+      "Nível de referência": "EMBARQUE",
+      "Deslocamento do nível inicial": "0.000 cm",
+      "Deslocamento do nível final": "0.000 cm",
+      "Rotação do corte transversal": "0.000 °",
+      "FOLGA-Viga e Pilar 1": "1.000 cm",
+      "FOLGA-Viga e Pilar 2": "1.000 cm"
+     },
+     "Construção": {
+      "CASSOL-Linha de Produção": "VIGAS PROTENDIDAS",
+      "TECNOLOGIA-Aço": "ARMADO E PROTENDIDO",
+      "TECNOLOGIA-Forma": "METÁLICA",
+      "TECNOLOGIA-Concreto": "ADITIVADO",
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": ""
+     },
+     "Dados": {
+      "fck (MPa)": "45.000",
+      "Cobrimento": "3.000 cm",
+      "Rebaixo": "0.000 cm",
+      "Cortina": "Nao",
+      "fck": "Concreto C45"
+     },
+     "Cotas": {
+      "PEÇA-Largura Preo": "50.000 cm",
+      "PEÇA-Largura Total": "50.000 cm",
+      "PEÇA-Altura Preo": "90.000 cm",
+      "PEÇA-Altura Total": "123.500 cm",
+      "PEÇA-Comprimento": "672.891 cm",
+      "Comprimento": "710.431 cm",
+      "Volume": "2.327 m^3",
+      "Elevação no topo": "520.000 cm",
+      "Elevação na parte inferior": "345.500 cm",
+      "SEÇÃO-Altura": "90.000 cm",
+      "ALMA-Largura": "20.000 cm",
+      "EXTENSÃO DA ALMA-Altura": "0.000 cm",
+      "MESA SUPERIOR-Largura": "50.000 cm",
+      "MESA SUPERIOR-Altura": "10.000 cm",
+      "ABA SUPERIOR-Lagura": "15.000 cm",
+      "ABA SUPERIOR-Altura": "8.000 cm",
+      "MESA INFERIOR-Largura": "50.000 cm",
+      "MESA INFERIOR-Altura": "10.000 cm",
+      "ABA INFERIOR-Lagura": "15.000 cm",
+      "ABA INFERIOR-Altura": "8.000 cm",
+      "SEÇÃO SUPERIOR-Largura": "20.000 cm",
+      "SEÇÃO SUPERIOR-Altura": "0.000 cm",
+      "SEÇÃO SUPERIOR-Deslocamento": "0.000 cm",
+      "SOLIDARIZAÇÃO-Largura": "20.000 cm",
+      "SOLIDARIZAÇÃO-Altura": "33.500 cm",
+      "SOLIDARIZAÇÃO-Verificação": "0.000 cm"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "V05-01",
+      "Unique TQS ID": "-2051",
+      "Titulo": "V17",
+      "Chave": "-2051",
+      "Tipo Elemento": "Viga",
+      "SHA1": "01BBC62E138012B587B4BFE4B70AA0F895C845AA",
+      "Principal": "Yes",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "I90-50x90cm-V05",
+      "Código de montagem": "V",
+      "Tipo de imagem": "",
+      "Nota-chave": "",
+      "Modelo": "I",
+      "Fabricante": "",
+      "Comentários de tipos": "",
+      "URL": "",
+      "Descrição": "VIGA",
+      "Classificação de incêndio": "",
+      "Custo": "0.000 ฿",
+      "Chave do nome do corte": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "V05",
+      "Número OmniClass": "23.25.30.11.14.14",
+      "Título OmniClass": "Beams",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido": "",
+      "Exportar para IFC como": "",
+      "Exportar para IFC": "Por tipo",
+      "IfcGUID": "3snT4m0bH4fPDJfK43HMbR",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "2R6dK$jzf9hO5gvvBrUDOh"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum",
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "CONSOLO 1-Visibilidade": "Yes",
+      "CONSOLO 1-Altura 1": "20.000 cm",
+      "CONSOLO 1-Altura 2": "30.000 cm",
+      "CONSOLO 1-Profundidade": "30.000 cm",
+      "CONSOLO 2-Visibilidade": "Yes",
+      "CONSOLO 2-Altura 1": "20.000 cm",
+      "CONSOLO 2-Altura 2": "30.000 cm",
+      "CONSOLO 2-Profundidade": "30.000 cm",
+      "NEOPRENE 1-Visibilidade": "Yes",
+      "NEOPRENE 1-Posição": "15.000 cm",
+      "NEOPRENE 1\u001f-Tipo": "CASSOL-ACS-Neoprene : NP08-10x150x250mm",
+      "NEOPRENE 2-Visibilidade": "Yes",
+      "NEOPRENE 2-Posição": "15.000 cm",
+      "NEOPRENE 2\u001f-Tipo": "CASSOL-ACS-Neoprene : NP08-10x150x250mm",
+      "CONSOLO-Marca": "CP01",
+      "CONSOLO-Taxa CA": "200.000 kg/m³"
+     },
+     "Extremidade secundária": {
+      "FURO DE MONTAGEM-Posição": "50.000 cm",
+      "FURO DE FIXAÇÃO-Posição 1": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2": "10.000 cm",
+      "FURO DE MONTAGEM-Diâmetro": "10.000 cm",
+      "FURO DE MONTAGEM-Distância do Topo": "28.000 cm",
+      "FURO DE FIXAÇÃO-Abertura": "5.000 cm",
+      "FURO DE FIXAÇÃO-Comprimento": "8.000 cm",
+      "FURO DE FIXAÇÃO-Largura": "4.000 cm",
+      "FURO DE FIXAÇÃO-Posição A": "7.000 cm",
+      "FURO DE FIXAÇÃO-Posição B": "7.000 cm"
+     },
+     "Segmentos e conexões": {
+      "CONTINUIDADE-Quantidade": "0",
+      "CONTINUIDADE-Bitola": "0.000 mm"
+     },
+     "Estrutural": {
+      "Localização do símbolo de verga": "Centro da geometria",
+      "Conexão de início": "Nenhum",
+      "Conexão de fim": "Nenhum",
+      "Comprimento do corte": "674.891 cm",
+      "Uso estrutural": "Outro",
+      "Tipo inicial de anexo": "Elevação final",
+      "Tipo final de anexo": "Elevação final",
+      "Recobrimento de vergalhão - Face superior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Fase inferior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Viga/Coluna) <25 mm>",
+      "TAXA-CA": "125.000 kg/m³",
+      "TAXA-CP": "65.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Posição geométrica": {
+      "Extensão inicial": "0.000 cm",
+      "Extensão final": "0.000 cm",
+      "Recuo do início da junta": "1.270 cm",
+      "Recorte da união final": "1.270 cm",
+      "Justificação yz": "Uniforme",
+      "Justificação y": "Origem",
+      "Valor do deslocamento y": "0.000 cm",
+      "Justificação z": "Topo",
+      "Valor do deslocamento z": "0.000 cm"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 40MPa",
+      "Material solidarização": "Concreto, Moldado in loco",
+      "Material consolo": "Concreto, Pré-moldado - 50MPa_Consolo"
+     },
+     "Visibilidade": {
+      "EXTENSÃO DA ALMA-Visibilidade": "No",
+      "SEÇÃO SUPERIOR-Visibilidade": "No",
+      "SOLIDARIZAÇÃO-Visibilidade": "Yes"
+     }
+    }
+   },
+   {
+    "objectid": 7159,
+    "name": "CASSOL-PREO-Viga-I [6658516]",
+    "externalId": "f6c5d130-0254-44a5-9353-a5410320f029-006599d4",
+    "properties": {
+     "Outros": {
+      "Vao_Titulo": "V20",
+      "Vao": "1.000",
+      "Solidarizado": "Sim",
+      "Capa": "0.000 cm",
+      "Altura_Gerber_Esq": "30.000 cm",
+      "Largura_Gerber_Esq": "50.000 cm",
+      "Altura_Gerber_Dir": "30.000 cm",
+      "Largura_Gerber_Dir": "50.000 cm",
+      "Solidarizar_na_montagem": "Nao",
+      "Unir_com_o_proximo": "Nao",
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Restrições": {
+      "Nível de referência": "EMBARQUE",
+      "Deslocamento do nível inicial": "0.000 cm",
+      "Deslocamento do nível final": "0.000 cm",
+      "Rotação do corte transversal": "0.000 °",
+      "FOLGA-Viga e Pilar 1": "1.000 cm",
+      "FOLGA-Viga e Pilar 2": "1.000 cm"
+     },
+     "Construção": {
+      "CASSOL-Linha de Produção": "VIGAS PROTENDIDAS",
+      "TECNOLOGIA-Aço": "ARMADO E PROTENDIDO",
+      "TECNOLOGIA-Forma": "METÁLICA",
+      "TECNOLOGIA-Concreto": "ADITIVADO",
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": ""
+     },
+     "Dados": {
+      "fck (MPa)": "45.000",
+      "Cobrimento": "3.000 cm",
+      "Rebaixo": "0.000 cm",
+      "Cortina": "Nao",
+      "fck": "Concreto C45"
+     },
+     "Cotas": {
+      "PEÇA-Largura Preo": "50.000 cm",
+      "PEÇA-Largura Total": "50.000 cm",
+      "PEÇA-Altura Preo": "90.000 cm",
+      "PEÇA-Altura Total": "123.500 cm",
+      "PEÇA-Comprimento": "933.730 cm",
+      "Comprimento": "1000.000 cm",
+      "Volume": "3.138 m^3",
+      "Elevação no topo": "520.000 cm",
+      "Elevação na parte inferior": "345.500 cm",
+      "SEÇÃO-Altura": "90.000 cm",
+      "ALMA-Largura": "20.000 cm",
+      "EXTENSÃO DA ALMA-Altura": "0.000 cm",
+      "MESA SUPERIOR-Largura": "50.000 cm",
+      "MESA SUPERIOR-Altura": "10.000 cm",
+      "ABA SUPERIOR-Lagura": "15.000 cm",
+      "ABA SUPERIOR-Altura": "8.000 cm",
+      "MESA INFERIOR-Largura": "50.000 cm",
+      "MESA INFERIOR-Altura": "10.000 cm",
+      "ABA INFERIOR-Lagura": "15.000 cm",
+      "ABA INFERIOR-Altura": "8.000 cm",
+      "SEÇÃO SUPERIOR-Largura": "20.000 cm",
+      "SEÇÃO SUPERIOR-Altura": "0.000 cm",
+      "SEÇÃO SUPERIOR-Deslocamento": "0.000 cm",
+      "SOLIDARIZAÇÃO-Largura": "20.000 cm",
+      "SOLIDARIZAÇÃO-Altura": "33.500 cm",
+      "SOLIDARIZAÇÃO-Verificação": "0.000 cm"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "V05-02",
+      "Unique TQS ID": "-2060",
+      "Titulo": "V20",
+      "Chave": "-2060",
+      "Tipo Elemento": "Viga",
+      "SHA1": "F4CA9683926712D8C39D6CD5CE3D337A9485F528",
+      "Principal": "Yes",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "I90-50x90cm-V05",
+      "Código de montagem": "V",
+      "Tipo de imagem": "",
+      "Nota-chave": "",
+      "Modelo": "I",
+      "Fabricante": "",
+      "Comentários de tipos": "",
+      "URL": "",
+      "Descrição": "VIGA",
+      "Classificação de incêndio": "",
+      "Custo": "0.000 ฿",
+      "Chave do nome do corte": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "V05",
+      "Número OmniClass": "23.25.30.11.14.14",
+      "Título OmniClass": "Beams",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido": "",
+      "Exportar para IFC como": "",
+      "Exportar para IFC": "Por tipo",
+      "IfcGUID": "3snT4m0bH4fPDJfK43HMdz",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "2R6dK$jzf9hO5gvvBrUDOh"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum",
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "CONSOLO 1-Visibilidade": "Yes",
+      "CONSOLO 1-Altura 1": "20.000 cm",
+      "CONSOLO 1-Altura 2": "30.000 cm",
+      "CONSOLO 1-Profundidade": "30.000 cm",
+      "CONSOLO 2-Visibilidade": "No",
+      "CONSOLO 2-Altura 1": "20.000 cm",
+      "CONSOLO 2-Altura 2": "30.000 cm",
+      "CONSOLO 2-Profundidade": "30.000 cm",
+      "NEOPRENE 1-Visibilidade": "Yes",
+      "NEOPRENE 1-Posição": "15.000 cm",
+      "NEOPRENE 1\u001f-Tipo": "CASSOL-ACS-Neoprene : NP08-10x150x250mm",
+      "NEOPRENE 2-Visibilidade": "Yes",
+      "NEOPRENE 2-Posição": "15.000 cm",
+      "NEOPRENE 2\u001f-Tipo": "CASSOL-ACS-Neoprene : NP08-10x150x250mm",
+      "CONSOLO-Marca": "CP01",
+      "CONSOLO-Taxa CA": "200.000 kg/m³"
+     },
+     "Extremidade secundária": {
+      "FURO DE MONTAGEM-Posição": "50.000 cm",
+      "FURO DE FIXAÇÃO-Posição 1": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2": "10.000 cm",
+      "FURO DE MONTAGEM-Diâmetro": "10.000 cm",
+      "FURO DE MONTAGEM-Distância do Topo": "28.000 cm",
+      "FURO DE FIXAÇÃO-Abertura": "5.000 cm",
+      "FURO DE FIXAÇÃO-Comprimento": "8.000 cm",
+      "FURO DE FIXAÇÃO-Largura": "4.000 cm",
+      "FURO DE FIXAÇÃO-Posição A": "7.000 cm",
+      "FURO DE FIXAÇÃO-Posição B": "7.000 cm"
+     },
+     "Segmentos e conexões": {
+      "CONTINUIDADE-Quantidade": "0",
+      "CONTINUIDADE-Bitola": "0.000 mm"
+     },
+     "Estrutural": {
+      "Localização do símbolo de verga": "Centro da geometria",
+      "Conexão de início": "Nenhum",
+      "Conexão de fim": "Nenhum",
+      "Comprimento do corte": "934.730 cm",
+      "Uso estrutural": "Outro",
+      "Tipo inicial de anexo": "Elevação final",
+      "Tipo final de anexo": "Elevação final",
+      "Recobrimento de vergalhão - Face superior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Fase inferior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Viga/Coluna) <25 mm>",
+      "TAXA-CA": "125.000 kg/m³",
+      "TAXA-CP": "65.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Posição geométrica": {
+      "Extensão inicial": "0.000 cm",
+      "Extensão final": "4.005 cm",
+      "Recuo do início da junta": "-0.000 cm",
+      "Recorte da união final": "1.270 cm",
+      "Justificação yz": "Uniforme",
+      "Justificação y": "Origem",
+      "Valor do deslocamento y": "0.000 cm",
+      "Justificação z": "Topo",
+      "Valor do deslocamento z": "0.000 cm"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 40MPa",
+      "Material solidarização": "Concreto, Moldado in loco",
+      "Material consolo": "Concreto, Pré-moldado - 50MPa_Consolo"
+     },
+     "Visibilidade": {
+      "EXTENSÃO DA ALMA-Visibilidade": "No",
+      "SEÇÃO SUPERIOR-Visibilidade": "No",
+      "SOLIDARIZAÇÃO-Visibilidade": "Yes"
+     }
+    }
+   },
+   {
+    "objectid": 7160,
+    "name": "CASSOL-PREO-Viga-I [6658991]",
+    "externalId": "f6c5d130-0254-44a5-9353-a5410320f029-00659baf",
+    "properties": {
+     "Outros": {
+      "Vao_Titulo": "V17",
+      "Vao": "3.000",
+      "Solidarizado": "Sim",
+      "Capa": "0.000 cm",
+      "Altura_Gerber_Esq": "30.000 cm",
+      "Largura_Gerber_Esq": "50.000 cm",
+      "Altura_Gerber_Dir": "30.000 cm",
+      "Largura_Gerber_Dir": "50.000 cm",
+      "Solidarizar_na_montagem": "Nao",
+      "Unir_com_o_proximo": "Nao",
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Restrições": {
+      "Nível de referência": "EMBARQUE",
+      "Deslocamento do nível inicial": "0.000 cm",
+      "Deslocamento do nível final": "0.000 cm",
+      "Rotação do corte transversal": "0.000 °",
+      "FOLGA-Viga e Pilar 1": "1.000 cm",
+      "FOLGA-Viga e Pilar 2": "1.000 cm"
+     },
+     "Construção": {
+      "CASSOL-Linha de Produção": "VIGAS PROTENDIDAS",
+      "TECNOLOGIA-Aço": "ARMADO E PROTENDIDO",
+      "TECNOLOGIA-Forma": "METÁLICA",
+      "TECNOLOGIA-Concreto": "ADITIVADO",
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": ""
+     },
+     "Dados": {
+      "fck (MPa)": "45.000",
+      "Cobrimento": "3.000 cm",
+      "Rebaixo": "0.000 cm",
+      "Cortina": "Nao",
+      "fck": "Concreto C45"
+     },
+     "Cotas": {
+      "PEÇA-Largura Preo": "50.000 cm",
+      "PEÇA-Largura Total": "50.000 cm",
+      "PEÇA-Altura Preo": "90.000 cm",
+      "PEÇA-Altura Total": "123.500 cm",
+      "PEÇA-Comprimento": "1065.522 cm",
+      "Comprimento": "1129.404 cm",
+      "Volume": "3.627 m^3",
+      "Elevação no topo": "520.000 cm",
+      "Elevação na parte inferior": "345.500 cm",
+      "SEÇÃO-Altura": "90.000 cm",
+      "ALMA-Largura": "20.000 cm",
+      "EXTENSÃO DA ALMA-Altura": "0.000 cm",
+      "MESA SUPERIOR-Largura": "50.000 cm",
+      "MESA SUPERIOR-Altura": "10.000 cm",
+      "ABA SUPERIOR-Lagura": "15.000 cm",
+      "ABA SUPERIOR-Altura": "8.000 cm",
+      "MESA INFERIOR-Largura": "50.000 cm",
+      "MESA INFERIOR-Altura": "10.000 cm",
+      "ABA INFERIOR-Lagura": "15.000 cm",
+      "ABA INFERIOR-Altura": "8.000 cm",
+      "SEÇÃO SUPERIOR-Largura": "20.000 cm",
+      "SEÇÃO SUPERIOR-Altura": "0.000 cm",
+      "SEÇÃO SUPERIOR-Deslocamento": "0.000 cm",
+      "SOLIDARIZAÇÃO-Largura": "20.000 cm",
+      "SOLIDARIZAÇÃO-Altura": "33.500 cm",
+      "SOLIDARIZAÇÃO-Verificação": "0.000 cm"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "V05-03",
+      "Unique TQS ID": "-2053",
+      "Titulo": "V17",
+      "Chave": "-2053",
+      "Tipo Elemento": "Viga",
+      "SHA1": "F02E024BAED9CA63B0E70A41B6F433B2051E8C30",
+      "Principal": "Yes",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "I90-50x90cm-V05",
+      "Código de montagem": "V",
+      "Tipo de imagem": "",
+      "Nota-chave": "",
+      "Modelo": "I",
+      "Fabricante": "",
+      "Comentários de tipos": "",
+      "URL": "",
+      "Descrição": "VIGA",
+      "Classificação de incêndio": "",
+      "Custo": "0.000 ฿",
+      "Chave do nome do corte": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "V05",
+      "Número OmniClass": "23.25.30.11.14.14",
+      "Título OmniClass": "Beams",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido": "",
+      "Exportar para IFC como": "",
+      "Exportar para IFC": "Por tipo",
+      "IfcGUID": "3snT4m0bH4fPDJfK43HMk6",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "2R6dK$jzf9hO5gvvBrUDOh"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum",
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "CONSOLO 1-Visibilidade": "Yes",
+      "CONSOLO 1-Altura 1": "20.000 cm",
+      "CONSOLO 1-Altura 2": "30.000 cm",
+      "CONSOLO 1-Profundidade": "30.000 cm",
+      "CONSOLO 2-Visibilidade": "Yes",
+      "CONSOLO 2-Altura 1": "20.000 cm",
+      "CONSOLO 2-Altura 2": "30.000 cm",
+      "CONSOLO 2-Profundidade": "30.000 cm",
+      "NEOPRENE 1-Visibilidade": "Yes",
+      "NEOPRENE 1-Posição": "15.000 cm",
+      "NEOPRENE 1\u001f-Tipo": "CASSOL-ACS-Neoprene : NP08-10x150x250mm",
+      "NEOPRENE 2-Visibilidade": "Yes",
+      "NEOPRENE 2-Posição": "15.000 cm",
+      "NEOPRENE 2\u001f-Tipo": "CASSOL-ACS-Neoprene : NP08-10x150x250mm",
+      "CONSOLO-Marca": "CP01",
+      "CONSOLO-Taxa CA": "200.000 kg/m³"
+     },
+     "Extremidade secundária": {
+      "FURO DE MONTAGEM-Posição": "50.000 cm",
+      "FURO DE FIXAÇÃO-Posição 1": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2": "10.000 cm",
+      "FURO DE MONTAGEM-Diâmetro": "10.000 cm",
+      "FURO DE MONTAGEM-Distância do Topo": "28.000 cm",
+      "FURO DE FIXAÇÃO-Abertura": "5.000 cm",
+      "FURO DE FIXAÇÃO-Comprimento": "8.000 cm",
+      "FURO DE FIXAÇÃO-Largura": "4.000 cm",
+      "FURO DE FIXAÇÃO-Posição A": "7.000 cm",
+      "FURO DE FIXAÇÃO-Posição B": "7.000 cm"
+     },
+     "Segmentos e conexões": {
+      "CONTINUIDADE-Quantidade": "0",
+      "CONTINUIDADE-Bitola": "0.000 mm"
+     },
+     "Estrutural": {
+      "Localização do símbolo de verga": "Centro da geometria",
+      "Conexão de início": "Nenhum",
+      "Conexão de fim": "Nenhum",
+      "Comprimento do corte": "1067.522 cm",
+      "Uso estrutural": "Outro",
+      "Tipo inicial de anexo": "Elevação final",
+      "Tipo final de anexo": "Elevação final",
+      "Recobrimento de vergalhão - Face superior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Fase inferior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Viga/Coluna) <25 mm>",
+      "TAXA-CA": "125.000 kg/m³",
+      "TAXA-CP": "65.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Posição geométrica": {
+      "Extensão inicial": "0.000 cm",
+      "Extensão final": "0.000 cm",
+      "Recuo do início da junta": "1.270 cm",
+      "Recorte da união final": "1.270 cm",
+      "Justificação yz": "Uniforme",
+      "Justificação y": "Origem",
+      "Valor do deslocamento y": "0.000 cm",
+      "Justificação z": "Topo",
+      "Valor do deslocamento z": "0.000 cm"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 40MPa",
+      "Material solidarização": "Concreto, Moldado in loco",
+      "Material consolo": "Concreto, Pré-moldado - 50MPa_Consolo"
+     },
+     "Visibilidade": {
+      "EXTENSÃO DA ALMA-Visibilidade": "No",
+      "SEÇÃO SUPERIOR-Visibilidade": "No",
+      "SOLIDARIZAÇÃO-Visibilidade": "Yes"
+     }
+    }
+   },
+   {
+    "objectid": 7161,
+    "name": "CASSOL-PREO-Viga-I [6659092]",
+    "externalId": "f6c5d130-0254-44a5-9353-a5410320f029-00659c14",
+    "properties": {
+     "Outros": {
+      "Vao_Titulo": "V17",
+      "Vao": "3.000",
+      "Solidarizado": "Sim",
+      "Capa": "0.000 cm",
+      "Altura_Gerber_Esq": "30.000 cm",
+      "Largura_Gerber_Esq": "50.000 cm",
+      "Altura_Gerber_Dir": "30.000 cm",
+      "Largura_Gerber_Dir": "50.000 cm",
+      "Solidarizar_na_montagem": "Nao",
+      "Unir_com_o_proximo": "Nao",
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Restrições": {
+      "Nível de referência": "EMBARQUE",
+      "Deslocamento do nível inicial": "0.000 cm",
+      "Deslocamento do nível final": "0.000 cm",
+      "Rotação do corte transversal": "0.000 °",
+      "FOLGA-Viga e Pilar 1": "1.000 cm",
+      "FOLGA-Viga e Pilar 2": "1.000 cm"
+     },
+     "Construção": {
+      "CASSOL-Linha de Produção": "VIGAS PROTENDIDAS",
+      "TECNOLOGIA-Aço": "ARMADO E PROTENDIDO",
+      "TECNOLOGIA-Forma": "METÁLICA",
+      "TECNOLOGIA-Concreto": "ADITIVADO",
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": ""
+     },
+     "Dados": {
+      "fck (MPa)": "45.000",
+      "Cobrimento": "3.000 cm",
+      "Rebaixo": "0.000 cm",
+      "Cortina": "Nao",
+      "fck": "Concreto C45"
+     },
+     "Cotas": {
+      "PEÇA-Largura Preo": "50.000 cm",
+      "PEÇA-Largura Total": "50.000 cm",
+      "PEÇA-Altura Preo": "90.000 cm",
+      "PEÇA-Altura Total": "123.500 cm",
+      "PEÇA-Comprimento": "1064.784 cm",
+      "Comprimento": "1129.409 cm",
+      "Volume": "3.625 m^3",
+      "Elevação no topo": "520.000 cm",
+      "Elevação na parte inferior": "345.500 cm",
+      "SEÇÃO-Altura": "90.000 cm",
+      "ALMA-Largura": "20.000 cm",
+      "EXTENSÃO DA ALMA-Altura": "0.000 cm",
+      "MESA SUPERIOR-Largura": "50.000 cm",
+      "MESA SUPERIOR-Altura": "10.000 cm",
+      "ABA SUPERIOR-Lagura": "15.000 cm",
+      "ABA SUPERIOR-Altura": "8.000 cm",
+      "MESA INFERIOR-Largura": "50.000 cm",
+      "MESA INFERIOR-Altura": "10.000 cm",
+      "ABA INFERIOR-Lagura": "15.000 cm",
+      "ABA INFERIOR-Altura": "8.000 cm",
+      "SEÇÃO SUPERIOR-Largura": "20.000 cm",
+      "SEÇÃO SUPERIOR-Altura": "0.000 cm",
+      "SEÇÃO SUPERIOR-Deslocamento": "0.000 cm",
+      "SOLIDARIZAÇÃO-Largura": "20.000 cm",
+      "SOLIDARIZAÇÃO-Altura": "33.500 cm",
+      "SOLIDARIZAÇÃO-Verificação": "0.000 cm"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "V05-04",
+      "Unique TQS ID": "-2053",
+      "Titulo": "V17",
+      "Chave": "-2053",
+      "Tipo Elemento": "Viga",
+      "SHA1": "F02E024BAED9CA63B0E70A41B6F433B2051E8C30",
+      "Principal": "Yes",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "I90-50x90cm-V05",
+      "Código de montagem": "V",
+      "Tipo de imagem": "",
+      "Nota-chave": "",
+      "Modelo": "I",
+      "Fabricante": "",
+      "Comentários de tipos": "",
+      "URL": "",
+      "Descrição": "VIGA",
+      "Classificação de incêndio": "",
+      "Custo": "0.000 ฿",
+      "Chave do nome do corte": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "V05",
+      "Número OmniClass": "23.25.30.11.14.14",
+      "Título OmniClass": "Beams",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido": "",
+      "Exportar para IFC como": "",
+      "Exportar para IFC": "Por tipo",
+      "IfcGUID": "3snT4m0bH4fPDJfK43HMmz",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "2R6dK$jzf9hO5gvvBrUDOh"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum",
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "CONSOLO 1-Visibilidade": "Yes",
+      "CONSOLO 1-Altura 1": "20.000 cm",
+      "CONSOLO 1-Altura 2": "30.000 cm",
+      "CONSOLO 1-Profundidade": "30.000 cm",
+      "CONSOLO 2-Visibilidade": "Yes",
+      "CONSOLO 2-Altura 1": "20.000 cm",
+      "CONSOLO 2-Altura 2": "30.000 cm",
+      "CONSOLO 2-Profundidade": "30.000 cm",
+      "NEOPRENE 1-Visibilidade": "Yes",
+      "NEOPRENE 1-Posição": "15.000 cm",
+      "NEOPRENE 1\u001f-Tipo": "CASSOL-ACS-Neoprene : NP08-10x150x250mm",
+      "NEOPRENE 2-Visibilidade": "Yes",
+      "NEOPRENE 2-Posição": "15.000 cm",
+      "NEOPRENE 2\u001f-Tipo": "CASSOL-ACS-Neoprene : NP08-10x150x250mm",
+      "CONSOLO-Marca": "CP01",
+      "CONSOLO-Taxa CA": "200.000 kg/m³"
+     },
+     "Extremidade secundária": {
+      "FURO DE MONTAGEM-Posição": "50.000 cm",
+      "FURO DE FIXAÇÃO-Posição 1": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2": "10.000 cm",
+      "FURO DE MONTAGEM-Diâmetro": "10.000 cm",
+      "FURO DE MONTAGEM-Distância do Topo": "28.000 cm",
+      "FURO DE FIXAÇÃO-Abertura": "5.000 cm",
+      "FURO DE FIXAÇÃO-Comprimento": "8.000 cm",
+      "FURO DE FIXAÇÃO-Largura": "4.000 cm",
+      "FURO DE FIXAÇÃO-Posição A": "7.000 cm",
+      "FURO DE FIXAÇÃO-Posição B": "7.000 cm"
+     },
+     "Segmentos e conexões": {
+      "CONTINUIDADE-Quantidade": "0",
+      "CONTINUIDADE-Bitola": "0.000 mm"
+     },
+     "Estrutural": {
+      "Localização do símbolo de verga": "Centro da geometria",
+      "Conexão de início": "Nenhum",
+      "Conexão de fim": "Nenhum",
+      "Comprimento do corte": "1066.784 cm",
+      "Uso estrutural": "Outro",
+      "Tipo inicial de anexo": "Elevação final",
+      "Tipo final de anexo": "Elevação final",
+      "Recobrimento de vergalhão - Face superior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Fase inferior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Viga/Coluna) <25 mm>",
+      "TAXA-CA": "125.000 kg/m³",
+      "TAXA-CP": "65.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Posição geométrica": {
+      "Extensão inicial": "0.000 cm",
+      "Extensão final": "0.000 cm",
+      "Recuo do início da junta": "1.270 cm",
+      "Recorte da união final": "2.128 cm",
+      "Justificação yz": "Uniforme",
+      "Justificação y": "Origem",
+      "Valor do deslocamento y": "0.000 cm",
+      "Justificação z": "Topo",
+      "Valor do deslocamento z": "0.000 cm"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 40MPa",
+      "Material solidarização": "Concreto, Moldado in loco",
+      "Material consolo": "Concreto, Pré-moldado - 50MPa_Consolo"
+     },
+     "Visibilidade": {
+      "EXTENSÃO DA ALMA-Visibilidade": "No",
+      "SEÇÃO SUPERIOR-Visibilidade": "No",
+      "SOLIDARIZAÇÃO-Visibilidade": "Yes"
+     }
+    }
+   },
+   {
+    "objectid": 7156,
+    "name": "I90-50x90cm-V05",
+    "externalId": "9b1a753f-b7da-49ad-816a-e792f52e9968-00564f43",
+    "properties": {
+     "Restrições": {
+      "FOLGA-Viga e Pilar 1": "1.000 cm",
+      "FOLGA-Viga e Pilar 2": "1.000 cm"
+     },
+     "Cotas": {
+      "SEÇÃO-Altura": "90.000 cm",
+      "ALMA-Largura": "20.000 cm",
+      "EXTENSÃO DA ALMA-Altura": "0.000 cm",
+      "MESA SUPERIOR-Largura": "50.000 cm",
+      "MESA SUPERIOR-Altura": "10.000 cm",
+      "ABA SUPERIOR-Lagura": "15.000 cm",
+      "ABA SUPERIOR-Altura": "8.000 cm",
+      "MESA INFERIOR-Largura": "50.000 cm",
+      "MESA INFERIOR-Altura": "10.000 cm",
+      "ABA INFERIOR-Lagura": "15.000 cm",
+      "ABA INFERIOR-Altura": "8.000 cm",
+      "SEÇÃO SUPERIOR-Largura": "20.000 cm",
+      "SEÇÃO SUPERIOR-Altura": "0.000 cm",
+      "SEÇÃO SUPERIOR-Deslocamento": "0.000 cm",
+      "SOLIDARIZAÇÃO-Largura": "20.000 cm",
+      "SOLIDARIZAÇÃO-Altura": "33.500 cm",
+      "SOLIDARIZAÇÃO-Verificação": "0.000 cm"
+     },
+     "Dados de identidade": {
+      "Código de montagem": "V",
+      "Tipo de imagem": "",
+      "Nota-chave": "",
+      "Modelo": "I",
+      "Fabricante": "",
+      "Comentários de tipos": "",
+      "URL": "",
+      "Descrição": "VIGA",
+      "Classificação de incêndio": "",
+      "Custo": "0.000 ฿",
+      "Chave do nome do corte": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "V05",
+      "Número OmniClass": "23.25.30.11.14.14",
+      "Título OmniClass": "Beams",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "2R6dK$jzf9hO5gvvBrUDOh"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 40MPa",
+      "Material solidarização": "Concreto, Moldado in loco",
+      "Material consolo": "Concreto, Pré-moldado - 50MPa_Consolo"
+     },
+     "Fases": {
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "CONSOLO-Marca": "CP01",
+      "CONSOLO-Taxa CA": "200.000 kg/m³"
+     },
+     "Extremidade secundária": {
+      "FURO DE MONTAGEM-Diâmetro": "10.000 cm",
+      "FURO DE MONTAGEM-Distância do Topo": "28.000 cm",
+      "FURO DE FIXAÇÃO-Abertura": "5.000 cm",
+      "FURO DE FIXAÇÃO-Comprimento": "8.000 cm",
+      "FURO DE FIXAÇÃO-Largura": "4.000 cm",
+      "FURO DE FIXAÇÃO-Posição A": "7.000 cm",
+      "FURO DE FIXAÇÃO-Posição B": "7.000 cm"
+     },
+     "Estrutural": {
+      "TAXA-CA": "125.000 kg/m³",
+      "TAXA-CP": "65.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Visibilidade": {
+      "EXTENSÃO DA ALMA-Visibilidade": "No",
+      "SEÇÃO SUPERIOR-Visibilidade": "No",
+      "SOLIDARIZAÇÃO-Visibilidade": "Yes"
+     }
+    }
+   },
+   {
+    "objectid": 7079,
+    "name": "CASSOL-PREO-Viga-I",
+    "externalId": "CASSOL-PREO-Viga-I:Quadro estrutural",
+    "properties": {}
+   },
+   {
+    "objectid": 7251,
+    "name": "CASSOL-PREO-Viga-L [6659306]",
+    "externalId": "f6c5d130-0254-44a5-9353-a5410320f029-00659cea",
+    "properties": {
+     "Outros": {
+      "Vao_Titulo": "V21",
+      "Vao": "2.000",
+      "Solidarizado": "Sim",
+      "Capa": "0.000 cm",
+      "Altura_Gerber_Esq": "30.000 cm",
+      "Largura_Gerber_Esq": "50.000 cm",
+      "Altura_Gerber_Dir": "30.000 cm",
+      "Largura_Gerber_Dir": "50.000 cm",
+      "Solidarizar_na_montagem": "Nao",
+      "Unir_com_o_proximo": "Nao",
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Restrições": {
+      "Nível de referência": "EMBARQUE",
+      "Deslocamento do nível inicial": "-0.000 cm",
+      "Deslocamento do nível final": "0.000 cm",
+      "Rotação do corte transversal": "0.000 °",
+      "FOLGA-Viga e Pilar 1": "1.000 cm",
+      "FOLGA-Viga e Pilar 2": "1.000 cm"
+     },
+     "Construção": {
+      "CASSOL-Linha de Produção": "VIGAS PROTENDIDAS",
+      "TECNOLOGIA-Aço": "ARMADO E PROTENDIDO",
+      "TECNOLOGIA-Forma": "METÁLICA",
+      "TECNOLOGIA-Concreto": "ADITIVADO",
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": ""
+     },
+     "Dados": {
+      "fck (MPa)": "45.000",
+      "Cobrimento": "3.000 cm",
+      "Rebaixo": "0.000 cm",
+      "Cortina": "Nao",
+      "fck": "Concreto C45"
+     },
+     "Cotas": {
+      "Comprimento": "150.000 cm",
+      "PEÇA-Altura Preo": "100.000 cm",
+      "PEÇA-Altura Total": "100.000 cm",
+      "PEÇA-Largura Preo": "40.000 cm",
+      "PEÇA-Largura Total": "40.000 cm",
+      "PEÇA-Comprimento": "138.730 cm",
+      "Volume": "0.546 m^3",
+      "Elevação no topo": "520.000 cm",
+      "Elevação na parte inferior": "369.000 cm",
+      "SEÇÃO-Altura": "100.000 cm",
+      "SEÇÃO-Largura": "40.000 cm",
+      "ASSENTO-Altura": "33.500 cm",
+      "ASSENTO-Largura": "20.000 cm",
+      "SOLIDARIZAÇÃO-Altura": "0.000 cm",
+      "SOLIDARIZAÇÃO-Largura": "20.000 cm",
+      "SOLIDARIZAÇÃO-Verificação": "0.100 cm"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "V01-01",
+      "Unique TQS ID": "-2058",
+      "Titulo": "V21",
+      "Chave": "-2058",
+      "Tipo Elemento": "Viga",
+      "SHA1": "57B061FAEA5BCDB58F2B1AEC7D6077D71E51C8BC",
+      "Principal": "Yes",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "L100-40x66.5cm-V01",
+      "Chave do nome do corte": "",
+      "Classificação de incêndio": "",
+      "Comentários de tipos": "",
+      "Custo": "0.000 ฿",
+      "Código de montagem": "V",
+      "Descrição": "VIGA",
+      "Fabricante": "",
+      "Modelo": "L",
+      "Nota-chave": "",
+      "TQS-Seção": "",
+      "Tipo de imagem": "",
+      "URL": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "V01",
+      "Número OmniClass": "23.25.30.11.14.14",
+      "Título OmniClass": "Beams",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido": "",
+      "Exportar para IFC como": "",
+      "Exportar para IFC": "Por tipo",
+      "IfcGUID": "3snT4m0bH4fPDJfK43HMp3",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "2vbCXy8VHEN9UwjuayBW4u"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum",
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "CONSOLO 1-Visibilidade": "Yes",
+      "CONSOLO 1-Altura 1": "20.000 cm",
+      "CONSOLO 1-Altura 2": "30.000 cm",
+      "CONSOLO 1-Profundidade": "30.000 cm",
+      "CONSOLO 1-Gerber": "No",
+      "CONSOLO 1-Gerber Altura": "0.000 cm",
+      "CONSOLO 2-Visibilidade": "Yes",
+      "CONSOLO 2-Altura 1": "20.000 cm",
+      "CONSOLO 2-Altura 2": "30.000 cm",
+      "CONSOLO 2-Profundidade": "30.000 cm",
+      "CONSOLO 2-Gerber": "No",
+      "CONSOLO 2-Gerber Altura": "0.000 cm",
+      "NEOPRENE 1-Visibilidade": "Yes",
+      "NEOPRENE 1-Posição": "15.000 cm",
+      "NEOPRENE 1-Tipo": "CASSOL-ACS-Neoprene : NP04-10x250x350mm",
+      "NEOPRENE 2-Visibilidade": "Yes",
+      "NEOPRENE 2-Posição": "15.000 cm",
+      "NEOPRENE 2-Tipo": "CASSOL-ACS-Neoprene : NP04-10x250x350mm",
+      "CONSOLO-Marca": "CP01",
+      "CONSOLO-Taxa CA": "200.000 kg/m³",
+      "NEOPRENE-Espessura": "1.000 cm"
+     },
+     "Extremidade secundária": {
+      "FURO DE FIXAÇÃO-Posição 1": "14.000 cm",
+      "FURO DE FIXAÇÃO-Posição 1 Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2": "14.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2 Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Abertura": "2.500 cm",
+      "FURO DE FIXAÇÃO-Poisção B'": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição AB": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição AB Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição A'": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição A' Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição B' Extra": "0.000 cm"
+     },
+     "Estrutural": {
+      "Comprimento do corte": "140.730 cm",
+      "Uso estrutural": "Outro",
+      "Tipo inicial de anexo": "Elevação final",
+      "Recobrimento de vergalhão - Face superior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Fase inferior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Viga/Coluna) <25 mm>",
+      "TAXA-CA": "110.000 kg/m³",
+      "TAXA-CP": "7.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Posição geométrica": {
+      "Extensão inicial": "0.031 cm",
+      "Extensão final": "0.000 cm",
+      "Recuo do início da junta": "1.270 cm",
+      "Justificação yz": "Uniforme",
+      "Justificação y": "Origem",
+      "Valor do deslocamento y": "0.000 cm",
+      "Justificação z": "Topo",
+      "Valor do deslocamento z": "0.000 cm"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 40MPa",
+      "Material solidarização": "Concreto, Moldado in loco",
+      "Material consolo": "Concreto, Pré-moldado - 50MPa_Consolo"
+     },
+     "Visibilidade": {
+      "SOLIDARIZAÇÃO-Visibilidade": "No"
+     }
+    }
+   },
+   {
+    "objectid": 7252,
+    "name": "CASSOL-PREO-Viga-L [6659349]",
+    "externalId": "f6c5d130-0254-44a5-9353-a5410320f029-00659d15",
+    "properties": {
+     "Outros": {
+      "Vao_Titulo": "V21",
+      "Vao": "2.000",
+      "Solidarizado": "Sim",
+      "Capa": "0.000 cm",
+      "Altura_Gerber_Esq": "30.000 cm",
+      "Largura_Gerber_Esq": "50.000 cm",
+      "Altura_Gerber_Dir": "30.000 cm",
+      "Largura_Gerber_Dir": "50.000 cm",
+      "Solidarizar_na_montagem": "Nao",
+      "Unir_com_o_proximo": "Nao",
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Restrições": {
+      "Nível de referência": "EMBARQUE",
+      "Deslocamento do nível inicial": "0.000 cm",
+      "Deslocamento do nível final": "0.000 cm",
+      "Rotação do corte transversal": "0.000 °",
+      "FOLGA-Viga e Pilar 1": "1.000 cm",
+      "FOLGA-Viga e Pilar 2": "1.000 cm"
+     },
+     "Construção": {
+      "CASSOL-Linha de Produção": "VIGAS PROTENDIDAS",
+      "TECNOLOGIA-Aço": "ARMADO E PROTENDIDO",
+      "TECNOLOGIA-Forma": "METÁLICA",
+      "TECNOLOGIA-Concreto": "ADITIVADO",
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": ""
+     },
+     "Dados": {
+      "fck (MPa)": "45.000",
+      "Cobrimento": "3.000 cm",
+      "Rebaixo": "0.000 cm",
+      "Cortina": "Nao",
+      "fck": "Concreto C45"
+     },
+     "Cotas": {
+      "Comprimento": "740.000 cm",
+      "PEÇA-Altura Preo": "100.000 cm",
+      "PEÇA-Altura Total": "100.000 cm",
+      "PEÇA-Largura Preo": "40.000 cm",
+      "PEÇA-Largura Total": "40.000 cm",
+      "PEÇA-Comprimento": "687.460 cm",
+      "Volume": "2.373 m^3",
+      "Elevação no topo": "520.000 cm",
+      "Elevação na parte inferior": "369.000 cm",
+      "SEÇÃO-Altura": "100.000 cm",
+      "SEÇÃO-Largura": "40.000 cm",
+      "ASSENTO-Altura": "33.500 cm",
+      "ASSENTO-Largura": "20.000 cm",
+      "SOLIDARIZAÇÃO-Altura": "0.000 cm",
+      "SOLIDARIZAÇÃO-Largura": "20.000 cm",
+      "SOLIDARIZAÇÃO-Verificação": "0.100 cm"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "V01-02",
+      "Unique TQS ID": "-2058",
+      "Titulo": "V21",
+      "Chave": "-2058",
+      "Tipo Elemento": "Viga",
+      "SHA1": "57B061FAEA5BCDB58F2B1AEC7D6077D71E51C8BC",
+      "Principal": "Yes",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "L100-40x66.5cm-V01",
+      "Chave do nome do corte": "",
+      "Classificação de incêndio": "",
+      "Comentários de tipos": "",
+      "Custo": "0.000 ฿",
+      "Código de montagem": "V",
+      "Descrição": "VIGA",
+      "Fabricante": "",
+      "Modelo": "L",
+      "Nota-chave": "",
+      "TQS-Seção": "",
+      "Tipo de imagem": "",
+      "URL": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "V01",
+      "Número OmniClass": "23.25.30.11.14.14",
+      "Título OmniClass": "Beams",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido": "",
+      "Exportar para IFC como": "",
+      "Exportar para IFC": "Por tipo",
+      "IfcGUID": "3snT4m0bH4fPDJfK43HMqy",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "2vbCXy8VHEN9UwjuayBW4u"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum",
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "CONSOLO 1-Visibilidade": "Yes",
+      "CONSOLO 1-Altura 1": "20.000 cm",
+      "CONSOLO 1-Altura 2": "30.000 cm",
+      "CONSOLO 1-Profundidade": "30.000 cm",
+      "CONSOLO 1-Gerber": "No",
+      "CONSOLO 1-Gerber Altura": "0.000 cm",
+      "CONSOLO 2-Visibilidade": "Yes",
+      "CONSOLO 2-Altura 1": "20.000 cm",
+      "CONSOLO 2-Altura 2": "30.000 cm",
+      "CONSOLO 2-Profundidade": "30.000 cm",
+      "CONSOLO 2-Gerber": "No",
+      "CONSOLO 2-Gerber Altura": "0.000 cm",
+      "NEOPRENE 1-Visibilidade": "Yes",
+      "NEOPRENE 1-Posição": "15.000 cm",
+      "NEOPRENE 1-Tipo": "CASSOL-ACS-Neoprene : NP04-10x250x350mm",
+      "NEOPRENE 2-Visibilidade": "Yes",
+      "NEOPRENE 2-Posição": "15.000 cm",
+      "NEOPRENE 2-Tipo": "CASSOL-ACS-Neoprene : NP04-10x250x350mm",
+      "CONSOLO-Marca": "CP01",
+      "CONSOLO-Taxa CA": "200.000 kg/m³",
+      "NEOPRENE-Espessura": "1.000 cm"
+     },
+     "Extremidade secundária": {
+      "FURO DE FIXAÇÃO-Posição 1": "14.000 cm",
+      "FURO DE FIXAÇÃO-Posição 1 Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2": "14.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2 Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Abertura": "2.500 cm",
+      "FURO DE FIXAÇÃO-Poisção B'": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição AB": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição AB Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição A'": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição A' Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição B' Extra": "0.000 cm"
+     },
+     "Estrutural": {
+      "Comprimento do corte": "689.460 cm",
+      "Uso estrutural": "Outro",
+      "Tipo inicial de anexo": "Elevação final",
+      "Tipo final de anexo": "Elevação final",
+      "Recobrimento de vergalhão - Face superior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Fase inferior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Viga/Coluna) <25 mm>",
+      "TAXA-CA": "110.000 kg/m³",
+      "TAXA-CP": "7.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Posição geométrica": {
+      "Extensão inicial": "0.000 cm",
+      "Extensão final": "0.000 cm",
+      "Recuo do início da junta": "1.270 cm",
+      "Recorte da união final": "1.270 cm",
+      "Justificação yz": "Uniforme",
+      "Justificação y": "Origem",
+      "Valor do deslocamento y": "0.000 cm",
+      "Justificação z": "Topo",
+      "Valor do deslocamento z": "0.000 cm"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 40MPa",
+      "Material solidarização": "Concreto, Moldado in loco",
+      "Material consolo": "Concreto, Pré-moldado - 50MPa_Consolo"
+     },
+     "Visibilidade": {
+      "SOLIDARIZAÇÃO-Visibilidade": "No"
+     }
+    }
+   },
+   {
+    "objectid": 7253,
+    "name": "CASSOL-PREO-Viga-L [6659412]",
+    "externalId": "f6c5d130-0254-44a5-9353-a5410320f029-00659d54",
+    "properties": {
+     "Outros": {
+      "Vao_Titulo": "V21",
+      "Vao": "2.000",
+      "Solidarizado": "Sim",
+      "Capa": "0.000 cm",
+      "Altura_Gerber_Esq": "30.000 cm",
+      "Largura_Gerber_Esq": "50.000 cm",
+      "Altura_Gerber_Dir": "30.000 cm",
+      "Largura_Gerber_Dir": "50.000 cm",
+      "Solidarizar_na_montagem": "Nao",
+      "Unir_com_o_proximo": "Nao",
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Restrições": {
+      "Nível de referência": "EMBARQUE",
+      "Deslocamento do nível inicial": "0.000 cm",
+      "Deslocamento do nível final": "0.000 cm",
+      "Rotação do corte transversal": "0.000 °",
+      "FOLGA-Viga e Pilar 1": "1.000 cm",
+      "FOLGA-Viga e Pilar 2": "1.000 cm"
+     },
+     "Construção": {
+      "CASSOL-Linha de Produção": "VIGAS PROTENDIDAS",
+      "TECNOLOGIA-Aço": "ARMADO E PROTENDIDO",
+      "TECNOLOGIA-Forma": "METÁLICA",
+      "TECNOLOGIA-Concreto": "ADITIVADO",
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": ""
+     },
+     "Dados": {
+      "fck (MPa)": "45.000",
+      "Cobrimento": "3.000 cm",
+      "Rebaixo": "0.000 cm",
+      "Cortina": "Nao",
+      "fck": "Concreto C45"
+     },
+     "Cotas": {
+      "Comprimento": "336.000 cm",
+      "PEÇA-Altura Preo": "100.000 cm",
+      "PEÇA-Altura Total": "100.000 cm",
+      "PEÇA-Largura Preo": "40.000 cm",
+      "PEÇA-Largura Total": "40.000 cm",
+      "PEÇA-Comprimento": "265.655 cm",
+      "Volume": "0.969 m^3",
+      "Elevação no topo": "520.000 cm",
+      "Elevação na parte inferior": "369.000 cm",
+      "SEÇÃO-Altura": "100.000 cm",
+      "SEÇÃO-Largura": "40.000 cm",
+      "ASSENTO-Altura": "33.500 cm",
+      "ASSENTO-Largura": "20.000 cm",
+      "SOLIDARIZAÇÃO-Altura": "0.000 cm",
+      "SOLIDARIZAÇÃO-Largura": "20.000 cm",
+      "SOLIDARIZAÇÃO-Verificação": "0.100 cm"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "V01-03",
+      "Unique TQS ID": "-2058",
+      "Titulo": "V21",
+      "Chave": "-2058",
+      "Tipo Elemento": "Viga",
+      "SHA1": "57B061FAEA5BCDB58F2B1AEC7D6077D71E51C8BC",
+      "Principal": "Yes",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "L100-40x66.5cm-V01",
+      "Chave do nome do corte": "",
+      "Classificação de incêndio": "",
+      "Comentários de tipos": "",
+      "Custo": "0.000 ฿",
+      "Código de montagem": "V",
+      "Descrição": "VIGA",
+      "Fabricante": "",
+      "Modelo": "L",
+      "Nota-chave": "",
+      "TQS-Seção": "",
+      "Tipo de imagem": "",
+      "URL": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "V01",
+      "Número OmniClass": "23.25.30.11.14.14",
+      "Título OmniClass": "Beams",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido": "",
+      "Exportar para IFC como": "",
+      "Exportar para IFC": "Por tipo",
+      "IfcGUID": "3snT4m0bH4fPDJfK43HMrz",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "2vbCXy8VHEN9UwjuayBW4u"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum",
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "CONSOLO 1-Visibilidade": "Yes",
+      "CONSOLO 1-Altura 1": "20.000 cm",
+      "CONSOLO 1-Altura 2": "30.000 cm",
+      "CONSOLO 1-Profundidade": "30.000 cm",
+      "CONSOLO 1-Gerber": "No",
+      "CONSOLO 1-Gerber Altura": "0.000 cm",
+      "CONSOLO 2-Visibilidade": "Yes",
+      "CONSOLO 2-Altura 1": "20.000 cm",
+      "CONSOLO 2-Altura 2": "30.000 cm",
+      "CONSOLO 2-Profundidade": "30.000 cm",
+      "CONSOLO 2-Gerber": "No",
+      "CONSOLO 2-Gerber Altura": "0.000 cm",
+      "NEOPRENE 1-Visibilidade": "Yes",
+      "NEOPRENE 1-Posição": "15.000 cm",
+      "NEOPRENE 1-Tipo": "CASSOL-ACS-Neoprene : NP04-10x250x350mm",
+      "NEOPRENE 2-Visibilidade": "Yes",
+      "NEOPRENE 2-Posição": "15.000 cm",
+      "NEOPRENE 2-Tipo": "CASSOL-ACS-Neoprene : NP04-10x250x350mm",
+      "CONSOLO-Marca": "CP01",
+      "CONSOLO-Taxa CA": "200.000 kg/m³",
+      "NEOPRENE-Espessura": "1.000 cm"
+     },
+     "Extremidade secundária": {
+      "FURO DE FIXAÇÃO-Posição 1": "14.000 cm",
+      "FURO DE FIXAÇÃO-Posição 1 Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2": "14.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2 Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Abertura": "2.500 cm",
+      "FURO DE FIXAÇÃO-Poisção B'": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição AB": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição AB Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição A'": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição A' Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição B' Extra": "0.000 cm"
+     },
+     "Estrutural": {
+      "Comprimento do corte": "267.655 cm",
+      "Uso estrutural": "Outro",
+      "Tipo inicial de anexo": "Elevação final",
+      "Tipo final de anexo": "Elevação final",
+      "Recobrimento de vergalhão - Face superior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Fase inferior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Viga/Coluna) <25 mm>",
+      "TAXA-CA": "110.000 kg/m³",
+      "TAXA-CP": "7.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Posição geométrica": {
+      "Extensão inicial": "0.000 cm",
+      "Extensão final": "0.000 cm",
+      "Recuo do início da junta": "1.270 cm",
+      "Recorte da união final": "1.270 cm",
+      "Justificação yz": "Uniforme",
+      "Justificação y": "Origem",
+      "Valor do deslocamento y": "0.000 cm",
+      "Justificação z": "Topo",
+      "Valor do deslocamento z": "0.000 cm"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 40MPa",
+      "Material solidarização": "Concreto, Moldado in loco",
+      "Material consolo": "Concreto, Pré-moldado - 50MPa_Consolo"
+     },
+     "Visibilidade": {
+      "SOLIDARIZAÇÃO-Visibilidade": "No"
+     }
+    }
+   },
+   {
+    "objectid": 7254,
+    "name": "CASSOL-PREO-Viga-L [6662509]",
+    "externalId": "f6c5d130-0254-44a5-9353-a5410320f029-0065a96d",
+    "properties": {
+     "Outros": {
+      "Vao_Titulo": "V17",
+      "Vao": "1.000",
+      "Solidarizado": "Sim",
+      "Capa": "0.000 cm",
+      "Altura_Gerber_Esq": "30.000 cm",
+      "Largura_Gerber_Esq": "50.000 cm",
+      "Altura_Gerber_Dir": "30.000 cm",
+      "Largura_Gerber_Dir": "50.000 cm",
+      "Solidarizar_na_montagem": "Nao",
+      "Unir_com_o_proximo": "Nao",
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Restrições": {
+      "Nível de referência": "EMBARQUE",
+      "Deslocamento do nível inicial": "0.000 cm",
+      "Deslocamento do nível final": "0.000 cm",
+      "Rotação do corte transversal": "0.000 °",
+      "FOLGA-Viga e Pilar 1": "1.000 cm",
+      "FOLGA-Viga e Pilar 2": "1.000 cm"
+     },
+     "Construção": {
+      "CASSOL-Linha de Produção": "VIGAS PROTENDIDAS",
+      "TECNOLOGIA-Aço": "ARMADO E PROTENDIDO",
+      "TECNOLOGIA-Forma": "METÁLICA",
+      "TECNOLOGIA-Concreto": "ADITIVADO",
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": ""
+     },
+     "Dados": {
+      "fck (MPa)": "45.000",
+      "Cobrimento": "3.000 cm",
+      "Rebaixo": "0.000 cm",
+      "Cortina": "Nao",
+      "fck": "Concreto C45"
+     },
+     "Cotas": {
+      "Comprimento": "740.000 cm",
+      "PEÇA-Altura Preo": "100.000 cm",
+      "PEÇA-Altura Total": "100.000 cm",
+      "PEÇA-Largura Preo": "40.000 cm",
+      "PEÇA-Largura Total": "40.000 cm",
+      "PEÇA-Comprimento": "687.460 cm",
+      "Volume": "2.373 m^3",
+      "Elevação no topo": "520.000 cm",
+      "Elevação na parte inferior": "369.000 cm",
+      "SEÇÃO-Altura": "100.000 cm",
+      "SEÇÃO-Largura": "40.000 cm",
+      "ASSENTO-Altura": "33.500 cm",
+      "ASSENTO-Largura": "20.000 cm",
+      "SOLIDARIZAÇÃO-Altura": "0.000 cm",
+      "SOLIDARIZAÇÃO-Largura": "20.000 cm",
+      "SOLIDARIZAÇÃO-Verificação": "0.100 cm"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "V01-02",
+      "Unique TQS ID": "-2051",
+      "Titulo": "V17",
+      "Chave": "-2051",
+      "Tipo Elemento": "Viga",
+      "SHA1": "01BBC62E138012B587B4BFE4B70AA0F895C845AA",
+      "Principal": "Yes",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "L100-40x66.5cm-V01",
+      "Chave do nome do corte": "",
+      "Classificação de incêndio": "",
+      "Comentários de tipos": "",
+      "Custo": "0.000 ฿",
+      "Código de montagem": "V",
+      "Descrição": "VIGA",
+      "Fabricante": "",
+      "Modelo": "L",
+      "Nota-chave": "",
+      "TQS-Seção": "",
+      "Tipo de imagem": "",
+      "URL": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "V01",
+      "Número OmniClass": "23.25.30.11.14.14",
+      "Título OmniClass": "Beams",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido": "",
+      "Exportar para IFC como": "",
+      "Exportar para IFC": "Por tipo",
+      "IfcGUID": "3snT4m0bH4fPDJfK43HLb4",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "2vbCXy8VHEN9UwjuayBW4u"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum",
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "CONSOLO 1-Visibilidade": "Yes",
+      "CONSOLO 1-Altura 1": "20.000 cm",
+      "CONSOLO 1-Altura 2": "30.000 cm",
+      "CONSOLO 1-Profundidade": "30.000 cm",
+      "CONSOLO 1-Gerber": "No",
+      "CONSOLO 1-Gerber Altura": "0.000 cm",
+      "CONSOLO 2-Visibilidade": "Yes",
+      "CONSOLO 2-Altura 1": "20.000 cm",
+      "CONSOLO 2-Altura 2": "30.000 cm",
+      "CONSOLO 2-Profundidade": "30.000 cm",
+      "CONSOLO 2-Gerber": "No",
+      "CONSOLO 2-Gerber Altura": "0.000 cm",
+      "NEOPRENE 1-Visibilidade": "Yes",
+      "NEOPRENE 1-Posição": "15.000 cm",
+      "NEOPRENE 1-Tipo": "CASSOL-ACS-Neoprene : NP04-10x250x350mm",
+      "NEOPRENE 2-Visibilidade": "Yes",
+      "NEOPRENE 2-Posição": "15.000 cm",
+      "NEOPRENE 2-Tipo": "CASSOL-ACS-Neoprene : NP04-10x250x350mm",
+      "CONSOLO-Marca": "CP01",
+      "CONSOLO-Taxa CA": "200.000 kg/m³",
+      "NEOPRENE-Espessura": "1.000 cm"
+     },
+     "Extremidade secundária": {
+      "FURO DE FIXAÇÃO-Posição 1": "14.000 cm",
+      "FURO DE FIXAÇÃO-Posição 1 Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2": "14.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2 Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Abertura": "2.500 cm",
+      "FURO DE FIXAÇÃO-Poisção B'": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição AB": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição AB Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição A'": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição A' Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição B' Extra": "0.000 cm"
+     },
+     "Estrutural": {
+      "Comprimento do corte": "689.460 cm",
+      "Uso estrutural": "Outro",
+      "Tipo inicial de anexo": "Elevação final",
+      "Tipo final de anexo": "Elevação final",
+      "Recobrimento de vergalhão - Face superior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Fase inferior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Viga/Coluna) <25 mm>",
+      "TAXA-CA": "110.000 kg/m³",
+      "TAXA-CP": "7.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Posição geométrica": {
+      "Extensão inicial": "0.000 cm",
+      "Extensão final": "0.000 cm",
+      "Recuo do início da junta": "1.270 cm",
+      "Recorte da união final": "1.270 cm",
+      "Justificação yz": "Uniforme",
+      "Justificação y": "Origem",
+      "Valor do deslocamento y": "0.000 cm",
+      "Justificação z": "Topo",
+      "Valor do deslocamento z": "0.000 cm"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 40MPa",
+      "Material solidarização": "Concreto, Moldado in loco",
+      "Material consolo": "Concreto, Pré-moldado - 50MPa_Consolo"
+     },
+     "Visibilidade": {
+      "SOLIDARIZAÇÃO-Visibilidade": "No"
+     }
+    }
+   },
+   {
+    "objectid": 7248,
+    "name": "L100-40x66.5cm-V01",
+    "externalId": "b994c87c-21f4-4e5c-97ba-b7893c1d8489-003385b1",
+    "properties": {
+     "Restrições": {
+      "FOLGA-Viga e Pilar 1": "1.000 cm",
+      "FOLGA-Viga e Pilar 2": "1.000 cm"
+     },
+     "Cotas": {
+      "SEÇÃO-Altura": "100.000 cm",
+      "SEÇÃO-Largura": "40.000 cm",
+      "ASSENTO-Altura": "33.500 cm",
+      "ASSENTO-Largura": "20.000 cm",
+      "SOLIDARIZAÇÃO-Altura": "0.000 cm",
+      "SOLIDARIZAÇÃO-Largura": "20.000 cm",
+      "SOLIDARIZAÇÃO-Verificação": "0.100 cm"
+     },
+     "Dados de identidade": {
+      "Chave do nome do corte": "",
+      "Classificação de incêndio": "",
+      "Comentários de tipos": "",
+      "Custo": "0.000 ฿",
+      "Código de montagem": "V",
+      "Descrição": "VIGA",
+      "Fabricante": "",
+      "Modelo": "L",
+      "Nota-chave": "",
+      "TQS-Seção": "",
+      "Tipo de imagem": "",
+      "URL": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "V01",
+      "Número OmniClass": "23.25.30.11.14.14",
+      "Título OmniClass": "Beams",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "2vbCXy8VHEN9UwjuayBW4u"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 40MPa",
+      "Material solidarização": "Concreto, Moldado in loco",
+      "Material consolo": "Concreto, Pré-moldado - 50MPa_Consolo"
+     },
+     "Fases": {
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "CONSOLO-Marca": "CP01",
+      "CONSOLO-Taxa CA": "200.000 kg/m³",
+      "NEOPRENE-Espessura": "1.000 cm"
+     },
+     "Extremidade secundária": {
+      "FURO DE FIXAÇÃO-Abertura": "2.500 cm",
+      "FURO DE FIXAÇÃO-Poisção B'": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição AB": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição AB Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição A'": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição A' Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição B' Extra": "0.000 cm"
+     },
+     "Estrutural": {
+      "TAXA-CA": "110.000 kg/m³",
+      "TAXA-CP": "7.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Visibilidade": {
+      "SOLIDARIZAÇÃO-Visibilidade": "No"
+     }
+    }
+   },
+   {
+    "objectid": 7279,
+    "name": "CASSOL-PREO-Viga-L [6664987]",
+    "externalId": "f6c5d130-0254-44a5-9353-a5410320f029-0065b31b",
+    "properties": {
+     "Outros": {
+      "Vao_Titulo": "",
+      "Vao": "0.000",
+      "Solidarizado": "",
+      "Capa": "0.000 cm",
+      "Altura_Gerber_Esq": "0.000 cm",
+      "Largura_Gerber_Esq": "0.000 cm",
+      "Altura_Gerber_Dir": "0.000 cm",
+      "Largura_Gerber_Dir": "0.000 cm",
+      "Solidarizar_na_montagem": "",
+      "Unir_com_o_proximo": "",
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Restrições": {
+      "Nível de referência": "COBERTURA",
+      "Deslocamento do nível inicial": "-0.000 cm",
+      "Deslocamento do nível final": "-0.000 cm",
+      "Rotação do corte transversal": "0.000 °",
+      "FOLGA-Viga e Pilar 1": "1.000 cm",
+      "FOLGA-Viga e Pilar 2": "1.000 cm"
+     },
+     "Construção": {
+      "CASSOL-Linha de Produção": "PRÉ-FABRICADOS",
+      "TECNOLOGIA-Aço": "ARMADO",
+      "TECNOLOGIA-Forma": "CARPINTARIA",
+      "TECNOLOGIA-Concreto": "ADITIVADO",
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": ""
+     },
+     "Dados": {
+      "fck (MPa)": "0.000",
+      "Cobrimento": "0.000 cm",
+      "Rebaixo": "0.000 cm",
+      "Cortina": "",
+      "fck": ""
+     },
+     "Cotas": {
+      "Comprimento": "547.000 cm",
+      "PEÇA-Altura Preo": "60.000 cm",
+      "PEÇA-Altura Total": "60.000 cm",
+      "PEÇA-Largura Preo": "40.000 cm",
+      "PEÇA-Largura Total": "40.000 cm",
+      "PEÇA-Comprimento": "517.460 cm",
+      "Volume": "1.120 m^3",
+      "Elevação no topo": "1500.000 cm",
+      "Elevação na parte inferior": "1389.000 cm",
+      "SEÇÃO-Altura": "60.000 cm",
+      "SEÇÃO-Largura": "40.000 cm",
+      "ASSENTO-Altura": "20.000 cm",
+      "ASSENTO-Largura": "20.000 cm",
+      "SOLIDARIZAÇÃO-Altura": "0.000 cm",
+      "SOLIDARIZAÇÃO-Largura": "20.000 cm",
+      "SOLIDARIZAÇÃO-Verificação": "0.100 cm"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "V02-01",
+      "Unique TQS ID": "0",
+      "Titulo": "",
+      "Chave": "",
+      "Tipo Elemento": "",
+      "SHA1": "",
+      "Principal": "No",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "L60-40x40cm-V02",
+      "Chave do nome do corte": "",
+      "Classificação de incêndio": "",
+      "Comentários de tipos": "",
+      "Custo": "0.000 ฿",
+      "Código de montagem": "V",
+      "Descrição": "VIGA",
+      "Fabricante": "",
+      "Modelo": "L",
+      "Nota-chave": "",
+      "TQS-Seção": "",
+      "Tipo de imagem": "",
+      "URL": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "V02",
+      "Número OmniClass": "23.25.30.11.14.14",
+      "Título OmniClass": "Beams",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido": "",
+      "Exportar para IFC como": "",
+      "Exportar para IFC": "Por tipo",
+      "IfcGUID": "3snT4m0bH4fPDJfK43HKCo",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "2vbCXy8VHEN9UwjuayBW4m"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum",
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "CONSOLO 1-Visibilidade": "Yes",
+      "CONSOLO 1-Altura 1": "20.000 cm",
+      "CONSOLO 1-Altura 2": "30.000 cm",
+      "CONSOLO 1-Profundidade": "30.000 cm",
+      "CONSOLO 1-Gerber": "No",
+      "CONSOLO 1-Gerber Altura": "0.000 cm",
+      "CONSOLO 2-Visibilidade": "Yes",
+      "CONSOLO 2-Altura 1": "20.000 cm",
+      "CONSOLO 2-Altura 2": "30.000 cm",
+      "CONSOLO 2-Profundidade": "30.000 cm",
+      "CONSOLO 2-Gerber": "No",
+      "CONSOLO 2-Gerber Altura": "0.000 cm",
+      "NEOPRENE 1-Visibilidade": "Yes",
+      "NEOPRENE 1-Posição": "15.000 cm",
+      "NEOPRENE 1-Tipo": "CASSOL-ACS-Neoprene : NP04-10x250x350mm",
+      "NEOPRENE 2-Visibilidade": "Yes",
+      "NEOPRENE 2-Posição": "15.000 cm",
+      "NEOPRENE 2-Tipo": "CASSOL-ACS-Neoprene : NP04-10x250x350mm",
+      "CONSOLO-Marca": "CP01",
+      "CONSOLO-Taxa CA": "200.000 kg/m³",
+      "NEOPRENE-Espessura": "1.000 cm"
+     },
+     "Extremidade secundária": {
+      "FURO DE FIXAÇÃO-Posição 1": "14.000 cm",
+      "FURO DE FIXAÇÃO-Posição 1 Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2": "14.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2 Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Abertura": "2.500 cm",
+      "FURO DE FIXAÇÃO-Poisção B'": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição AB": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição AB Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição A'": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição A' Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição B' Extra": "0.000 cm"
+     },
+     "Estrutural": {
+      "Comprimento do corte": "519.460 cm",
+      "Uso estrutural": "Outro",
+      "Tipo inicial de anexo": "Elevação final",
+      "Tipo final de anexo": "Elevação final",
+      "Recobrimento de vergalhão - Face superior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Fase inferior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Viga/Coluna) <25 mm>",
+      "TAXA-CA": "80.000 kg/m³",
+      "TAXA-CP": "0.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Posição geométrica": {
+      "Extensão inicial": "0.000 cm",
+      "Extensão final": "0.000 cm",
+      "Recuo do início da junta": "1.270 cm",
+      "Recorte da união final": "1.270 cm",
+      "Justificação yz": "Uniforme",
+      "Justificação y": "Origem",
+      "Valor do deslocamento y": "0.000 cm",
+      "Justificação z": "Topo",
+      "Valor do deslocamento z": "0.000 cm"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 40MPa",
+      "Material solidarização": "Concreto, Moldado in loco",
+      "Material consolo": "Concreto, Pré-moldado - 50MPa_Consolo"
+     },
+     "Visibilidade": {
+      "SOLIDARIZAÇÃO-Visibilidade": "No"
+     }
+    }
+   },
+   {
+    "objectid": 7280,
+    "name": "CASSOL-PREO-Viga-L [6665002]",
+    "externalId": "f6c5d130-0254-44a5-9353-a5410320f029-0065b32a",
+    "properties": {
+     "Outros": {
+      "Vao_Titulo": "",
+      "Vao": "0.000",
+      "Solidarizado": "",
+      "Capa": "0.000 cm",
+      "Altura_Gerber_Esq": "0.000 cm",
+      "Largura_Gerber_Esq": "0.000 cm",
+      "Altura_Gerber_Dir": "0.000 cm",
+      "Largura_Gerber_Dir": "0.000 cm",
+      "Solidarizar_na_montagem": "",
+      "Unir_com_o_proximo": "",
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Restrições": {
+      "Nível de referência": "DESEMBARQUE",
+      "Deslocamento do nível inicial": "-0.000 cm",
+      "Deslocamento do nível final": "-0.000 cm",
+      "Rotação do corte transversal": "0.000 °",
+      "FOLGA-Viga e Pilar 1": "1.000 cm",
+      "FOLGA-Viga e Pilar 2": "1.000 cm"
+     },
+     "Construção": {
+      "CASSOL-Linha de Produção": "PRÉ-FABRICADOS",
+      "TECNOLOGIA-Aço": "ARMADO",
+      "TECNOLOGIA-Forma": "CARPINTARIA",
+      "TECNOLOGIA-Concreto": "ADITIVADO",
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": ""
+     },
+     "Dados": {
+      "fck (MPa)": "0.000",
+      "Cobrimento": "0.000 cm",
+      "Rebaixo": "0.000 cm",
+      "Cortina": "",
+      "fck": ""
+     },
+     "Cotas": {
+      "Comprimento": "555.998 cm",
+      "PEÇA-Altura Preo": "60.000 cm",
+      "PEÇA-Altura Total": "60.000 cm",
+      "PEÇA-Largura Preo": "40.000 cm",
+      "PEÇA-Largura Total": "40.000 cm",
+      "PEÇA-Comprimento": "517.460 cm",
+      "Volume": "1.120 m^3",
+      "Elevação no topo": "920.000 cm",
+      "Elevação na parte inferior": "809.000 cm",
+      "SEÇÃO-Altura": "60.000 cm",
+      "SEÇÃO-Largura": "40.000 cm",
+      "ASSENTO-Altura": "20.000 cm",
+      "ASSENTO-Largura": "20.000 cm",
+      "SOLIDARIZAÇÃO-Altura": "0.000 cm",
+      "SOLIDARIZAÇÃO-Largura": "20.000 cm",
+      "SOLIDARIZAÇÃO-Verificação": "0.100 cm"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "V02-01",
+      "Unique TQS ID": "0",
+      "Titulo": "",
+      "Chave": "",
+      "Tipo Elemento": "",
+      "SHA1": "",
+      "Principal": "No",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "L60-40x40cm-V02",
+      "Chave do nome do corte": "",
+      "Classificação de incêndio": "",
+      "Comentários de tipos": "",
+      "Custo": "0.000 ฿",
+      "Código de montagem": "V",
+      "Descrição": "VIGA",
+      "Fabricante": "",
+      "Modelo": "L",
+      "Nota-chave": "",
+      "TQS-Seção": "",
+      "Tipo de imagem": "",
+      "URL": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "V02",
+      "Número OmniClass": "23.25.30.11.14.14",
+      "Título OmniClass": "Beams",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido": "",
+      "Exportar para IFC como": "",
+      "Exportar para IFC": "Por tipo",
+      "IfcGUID": "3snT4m0bH4fPDJfK43HKC3",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "2vbCXy8VHEN9UwjuayBW4m"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum",
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "CONSOLO 1-Visibilidade": "Yes",
+      "CONSOLO 1-Altura 1": "20.000 cm",
+      "CONSOLO 1-Altura 2": "30.000 cm",
+      "CONSOLO 1-Profundidade": "30.000 cm",
+      "CONSOLO 1-Gerber": "No",
+      "CONSOLO 1-Gerber Altura": "0.000 cm",
+      "CONSOLO 2-Visibilidade": "Yes",
+      "CONSOLO 2-Altura 1": "20.000 cm",
+      "CONSOLO 2-Altura 2": "30.000 cm",
+      "CONSOLO 2-Profundidade": "30.000 cm",
+      "CONSOLO 2-Gerber": "No",
+      "CONSOLO 2-Gerber Altura": "0.000 cm",
+      "NEOPRENE 1-Visibilidade": "Yes",
+      "NEOPRENE 1-Posição": "15.000 cm",
+      "NEOPRENE 1-Tipo": "CASSOL-ACS-Neoprene : NP04-10x250x350mm",
+      "NEOPRENE 2-Visibilidade": "Yes",
+      "NEOPRENE 2-Posição": "15.000 cm",
+      "NEOPRENE 2-Tipo": "CASSOL-ACS-Neoprene : NP04-10x250x350mm",
+      "CONSOLO-Marca": "CP01",
+      "CONSOLO-Taxa CA": "200.000 kg/m³",
+      "NEOPRENE-Espessura": "1.000 cm"
+     },
+     "Extremidade secundária": {
+      "FURO DE FIXAÇÃO-Posição 1": "14.000 cm",
+      "FURO DE FIXAÇÃO-Posição 1 Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2": "14.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2 Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Abertura": "2.500 cm",
+      "FURO DE FIXAÇÃO-Poisção B'": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição AB": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição AB Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição A'": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição A' Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição B' Extra": "0.000 cm"
+     },
+     "Estrutural": {
+      "Comprimento do corte": "519.460 cm",
+      "Uso estrutural": "Outro",
+      "Tipo inicial de anexo": "Elevação final",
+      "Tipo final de anexo": "Elevação final",
+      "Recobrimento de vergalhão - Face superior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Fase inferior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Viga/Coluna) <25 mm>",
+      "TAXA-CA": "80.000 kg/m³",
+      "TAXA-CP": "0.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Posição geométrica": {
+      "Extensão inicial": "0.000 cm",
+      "Extensão final": "0.000 cm",
+      "Recuo do início da junta": "1.270 cm",
+      "Recorte da união final": "1.270 cm",
+      "Justificação yz": "Uniforme",
+      "Justificação y": "Origem",
+      "Valor do deslocamento y": "0.000 cm",
+      "Justificação z": "Topo",
+      "Valor do deslocamento z": "0.000 cm"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 40MPa",
+      "Material solidarização": "Concreto, Moldado in loco",
+      "Material consolo": "Concreto, Pré-moldado - 50MPa_Consolo"
+     },
+     "Visibilidade": {
+      "SOLIDARIZAÇÃO-Visibilidade": "No"
+     }
+    }
+   },
+   {
+    "objectid": 7281,
+    "name": "CASSOL-PREO-Viga-L [6665003]",
+    "externalId": "f6c5d130-0254-44a5-9353-a5410320f029-0065b32b",
+    "properties": {
+     "Outros": {
+      "Vao_Titulo": "",
+      "Vao": "0.000",
+      "Solidarizado": "",
+      "Capa": "0.000 cm",
+      "Altura_Gerber_Esq": "0.000 cm",
+      "Largura_Gerber_Esq": "0.000 cm",
+      "Altura_Gerber_Dir": "0.000 cm",
+      "Largura_Gerber_Dir": "0.000 cm",
+      "Solidarizar_na_montagem": "",
+      "Unir_com_o_proximo": "",
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Restrições": {
+      "Nível de referência": "DESEMBARQUE",
+      "Deslocamento do nível inicial": "-0.000 cm",
+      "Deslocamento do nível final": "-0.000 cm",
+      "Rotação do corte transversal": "0.000 °",
+      "FOLGA-Viga e Pilar 1": "1.000 cm",
+      "FOLGA-Viga e Pilar 2": "1.000 cm"
+     },
+     "Construção": {
+      "CASSOL-Linha de Produção": "PRÉ-FABRICADOS",
+      "TECNOLOGIA-Aço": "ARMADO",
+      "TECNOLOGIA-Forma": "CARPINTARIA",
+      "TECNOLOGIA-Concreto": "ADITIVADO",
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": ""
+     },
+     "Dados": {
+      "fck (MPa)": "0.000",
+      "Cobrimento": "0.000 cm",
+      "Rebaixo": "0.000 cm",
+      "Cortina": "",
+      "fck": ""
+     },
+     "Cotas": {
+      "Comprimento": "560.000 cm",
+      "PEÇA-Altura Preo": "60.000 cm",
+      "PEÇA-Altura Total": "60.000 cm",
+      "PEÇA-Largura Preo": "40.000 cm",
+      "PEÇA-Largura Total": "40.000 cm",
+      "PEÇA-Comprimento": "517.412 cm",
+      "Volume": "1.120 m^3",
+      "Elevação no topo": "920.000 cm",
+      "Elevação na parte inferior": "809.000 cm",
+      "SEÇÃO-Altura": "60.000 cm",
+      "SEÇÃO-Largura": "40.000 cm",
+      "ASSENTO-Altura": "20.000 cm",
+      "ASSENTO-Largura": "20.000 cm",
+      "SOLIDARIZAÇÃO-Altura": "0.000 cm",
+      "SOLIDARIZAÇÃO-Largura": "20.000 cm",
+      "SOLIDARIZAÇÃO-Verificação": "0.100 cm"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "V02-02",
+      "Unique TQS ID": "0",
+      "Titulo": "",
+      "Chave": "",
+      "Tipo Elemento": "",
+      "SHA1": "",
+      "Principal": "No",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "L60-40x40cm-V02",
+      "Chave do nome do corte": "",
+      "Classificação de incêndio": "",
+      "Comentários de tipos": "",
+      "Custo": "0.000 ฿",
+      "Código de montagem": "V",
+      "Descrição": "VIGA",
+      "Fabricante": "",
+      "Modelo": "L",
+      "Nota-chave": "",
+      "TQS-Seção": "",
+      "Tipo de imagem": "",
+      "URL": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "V02",
+      "Número OmniClass": "23.25.30.11.14.14",
+      "Título OmniClass": "Beams",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido": "",
+      "Exportar para IFC como": "",
+      "Exportar para IFC": "Por tipo",
+      "IfcGUID": "3snT4m0bH4fPDJfK43HKC2",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "2vbCXy8VHEN9UwjuayBW4m"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum",
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "CONSOLO 1-Visibilidade": "Yes",
+      "CONSOLO 1-Altura 1": "20.000 cm",
+      "CONSOLO 1-Altura 2": "30.000 cm",
+      "CONSOLO 1-Profundidade": "30.000 cm",
+      "CONSOLO 1-Gerber": "No",
+      "CONSOLO 1-Gerber Altura": "0.000 cm",
+      "CONSOLO 2-Visibilidade": "Yes",
+      "CONSOLO 2-Altura 1": "20.000 cm",
+      "CONSOLO 2-Altura 2": "30.000 cm",
+      "CONSOLO 2-Profundidade": "30.000 cm",
+      "CONSOLO 2-Gerber": "No",
+      "CONSOLO 2-Gerber Altura": "0.000 cm",
+      "NEOPRENE 1-Visibilidade": "Yes",
+      "NEOPRENE 1-Posição": "15.000 cm",
+      "NEOPRENE 1-Tipo": "CASSOL-ACS-Neoprene : NP04-10x250x350mm",
+      "NEOPRENE 2-Visibilidade": "Yes",
+      "NEOPRENE 2-Posição": "15.000 cm",
+      "NEOPRENE 2-Tipo": "CASSOL-ACS-Neoprene : NP04-10x250x350mm",
+      "CONSOLO-Marca": "CP01",
+      "CONSOLO-Taxa CA": "200.000 kg/m³",
+      "NEOPRENE-Espessura": "1.000 cm"
+     },
+     "Extremidade secundária": {
+      "FURO DE FIXAÇÃO-Posição 1": "14.000 cm",
+      "FURO DE FIXAÇÃO-Posição 1 Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2": "14.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2 Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Abertura": "2.500 cm",
+      "FURO DE FIXAÇÃO-Poisção B'": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição AB": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição AB Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição A'": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição A' Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição B' Extra": "0.000 cm"
+     },
+     "Estrutural": {
+      "Comprimento do corte": "519.412 cm",
+      "Uso estrutural": "Outro",
+      "Tipo inicial de anexo": "Elevação final",
+      "Tipo final de anexo": "Elevação final",
+      "Recobrimento de vergalhão - Face superior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Fase inferior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Viga/Coluna) <25 mm>",
+      "TAXA-CA": "80.000 kg/m³",
+      "TAXA-CP": "0.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Posição geométrica": {
+      "Extensão inicial": "0.000 cm",
+      "Extensão final": "0.000 cm",
+      "Recuo do início da junta": "1.270 cm",
+      "Recorte da união final": "1.270 cm",
+      "Justificação yz": "Uniforme",
+      "Justificação y": "Origem",
+      "Valor do deslocamento y": "0.000 cm",
+      "Justificação z": "Topo",
+      "Valor do deslocamento z": "0.000 cm"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 40MPa",
+      "Material solidarização": "Concreto, Moldado in loco",
+      "Material consolo": "Concreto, Pré-moldado - 50MPa_Consolo"
+     },
+     "Visibilidade": {
+      "SOLIDARIZAÇÃO-Visibilidade": "No"
+     }
+    }
+   },
+   {
+    "objectid": 7282,
+    "name": "CASSOL-PREO-Viga-L [6665004]",
+    "externalId": "f6c5d130-0254-44a5-9353-a5410320f029-0065b32c",
+    "properties": {
+     "Outros": {
+      "Vao_Titulo": "",
+      "Vao": "0.000",
+      "Solidarizado": "",
+      "Capa": "0.000 cm",
+      "Altura_Gerber_Esq": "0.000 cm",
+      "Largura_Gerber_Esq": "0.000 cm",
+      "Altura_Gerber_Dir": "0.000 cm",
+      "Largura_Gerber_Dir": "0.000 cm",
+      "Solidarizar_na_montagem": "",
+      "Unir_com_o_proximo": "",
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Restrições": {
+      "Nível de referência": "COBERTURA",
+      "Deslocamento do nível inicial": "-0.000 cm",
+      "Deslocamento do nível final": "-0.000 cm",
+      "Rotação do corte transversal": "0.000 °",
+      "FOLGA-Viga e Pilar 1": "1.000 cm",
+      "FOLGA-Viga e Pilar 2": "1.000 cm"
+     },
+     "Construção": {
+      "CASSOL-Linha de Produção": "PRÉ-FABRICADOS",
+      "TECNOLOGIA-Aço": "ARMADO",
+      "TECNOLOGIA-Forma": "CARPINTARIA",
+      "TECNOLOGIA-Concreto": "ADITIVADO",
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": ""
+     },
+     "Dados": {
+      "fck (MPa)": "0.000",
+      "Cobrimento": "0.000 cm",
+      "Rebaixo": "0.000 cm",
+      "Cortina": "",
+      "fck": ""
+     },
+     "Cotas": {
+      "Comprimento": "546.500 cm",
+      "PEÇA-Altura Preo": "60.000 cm",
+      "PEÇA-Altura Total": "60.000 cm",
+      "PEÇA-Largura Preo": "40.000 cm",
+      "PEÇA-Largura Total": "40.000 cm",
+      "PEÇA-Comprimento": "517.460 cm",
+      "Volume": "1.120 m^3",
+      "Elevação no topo": "1500.000 cm",
+      "Elevação na parte inferior": "1389.000 cm",
+      "SEÇÃO-Altura": "60.000 cm",
+      "SEÇÃO-Largura": "40.000 cm",
+      "ASSENTO-Altura": "20.000 cm",
+      "ASSENTO-Largura": "20.000 cm",
+      "SOLIDARIZAÇÃO-Altura": "0.000 cm",
+      "SOLIDARIZAÇÃO-Largura": "20.000 cm",
+      "SOLIDARIZAÇÃO-Verificação": "0.100 cm"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "V02-01",
+      "Unique TQS ID": "0",
+      "Titulo": "",
+      "Chave": "",
+      "Tipo Elemento": "",
+      "SHA1": "",
+      "Principal": "No",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "L60-40x40cm-V02",
+      "Chave do nome do corte": "",
+      "Classificação de incêndio": "",
+      "Comentários de tipos": "",
+      "Custo": "0.000 ฿",
+      "Código de montagem": "V",
+      "Descrição": "VIGA",
+      "Fabricante": "",
+      "Modelo": "L",
+      "Nota-chave": "",
+      "TQS-Seção": "",
+      "Tipo de imagem": "",
+      "URL": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "V02",
+      "Número OmniClass": "23.25.30.11.14.14",
+      "Título OmniClass": "Beams",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido": "",
+      "Exportar para IFC como": "",
+      "Exportar para IFC": "Por tipo",
+      "IfcGUID": "3snT4m0bH4fPDJfK43HKC5",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "2vbCXy8VHEN9UwjuayBW4m"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum",
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "CONSOLO 1-Visibilidade": "Yes",
+      "CONSOLO 1-Altura 1": "20.000 cm",
+      "CONSOLO 1-Altura 2": "30.000 cm",
+      "CONSOLO 1-Profundidade": "30.000 cm",
+      "CONSOLO 1-Gerber": "No",
+      "CONSOLO 1-Gerber Altura": "0.000 cm",
+      "CONSOLO 2-Visibilidade": "Yes",
+      "CONSOLO 2-Altura 1": "20.000 cm",
+      "CONSOLO 2-Altura 2": "30.000 cm",
+      "CONSOLO 2-Profundidade": "30.000 cm",
+      "CONSOLO 2-Gerber": "No",
+      "CONSOLO 2-Gerber Altura": "0.000 cm",
+      "NEOPRENE 1-Visibilidade": "Yes",
+      "NEOPRENE 1-Posição": "15.000 cm",
+      "NEOPRENE 1-Tipo": "CASSOL-ACS-Neoprene : NP04-10x250x350mm",
+      "NEOPRENE 2-Visibilidade": "Yes",
+      "NEOPRENE 2-Posição": "15.000 cm",
+      "NEOPRENE 2-Tipo": "CASSOL-ACS-Neoprene : NP04-10x250x350mm",
+      "CONSOLO-Marca": "CP01",
+      "CONSOLO-Taxa CA": "200.000 kg/m³",
+      "NEOPRENE-Espessura": "1.000 cm"
+     },
+     "Extremidade secundária": {
+      "FURO DE FIXAÇÃO-Posição 1": "14.000 cm",
+      "FURO DE FIXAÇÃO-Posição 1 Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2": "14.000 cm",
+      "FURO DE FIXAÇÃO-Posição 2 Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Abertura": "2.500 cm",
+      "FURO DE FIXAÇÃO-Poisção B'": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição AB": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição AB Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição A'": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição A' Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição B' Extra": "0.000 cm"
+     },
+     "Estrutural": {
+      "Comprimento do corte": "519.460 cm",
+      "Uso estrutural": "Outro",
+      "Tipo inicial de anexo": "Elevação final",
+      "Tipo final de anexo": "Elevação final",
+      "Recobrimento de vergalhão - Face superior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Fase inferior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Viga/Coluna) <25 mm>",
+      "TAXA-CA": "80.000 kg/m³",
+      "TAXA-CP": "0.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Posição geométrica": {
+      "Extensão inicial": "0.000 cm",
+      "Extensão final": "0.000 cm",
+      "Recuo do início da junta": "1.270 cm",
+      "Recorte da união final": "1.270 cm",
+      "Justificação yz": "Uniforme",
+      "Justificação y": "Origem",
+      "Valor do deslocamento y": "0.000 cm",
+      "Justificação z": "Topo",
+      "Valor do deslocamento z": "0.000 cm"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 40MPa",
+      "Material solidarização": "Concreto, Moldado in loco",
+      "Material consolo": "Concreto, Pré-moldado - 50MPa_Consolo"
+     },
+     "Visibilidade": {
+      "SOLIDARIZAÇÃO-Visibilidade": "No"
+     }
+    }
+   },
+   {
+    "objectid": 7249,
+    "name": "L60-40x40cm-V02",
+    "externalId": "b994c87c-21f4-4e5c-97ba-b7893c1d8489-003385b9",
+    "properties": {
+     "Restrições": {
+      "FOLGA-Viga e Pilar 1": "1.000 cm",
+      "FOLGA-Viga e Pilar 2": "1.000 cm"
+     },
+     "Cotas": {
+      "SEÇÃO-Altura": "60.000 cm",
+      "SEÇÃO-Largura": "40.000 cm",
+      "ASSENTO-Altura": "20.000 cm",
+      "ASSENTO-Largura": "20.000 cm",
+      "SOLIDARIZAÇÃO-Altura": "0.000 cm",
+      "SOLIDARIZAÇÃO-Largura": "20.000 cm",
+      "SOLIDARIZAÇÃO-Verificação": "0.100 cm"
+     },
+     "Dados de identidade": {
+      "Chave do nome do corte": "",
+      "Classificação de incêndio": "",
+      "Comentários de tipos": "",
+      "Custo": "0.000 ฿",
+      "Código de montagem": "V",
+      "Descrição": "VIGA",
+      "Fabricante": "",
+      "Modelo": "L",
+      "Nota-chave": "",
+      "TQS-Seção": "",
+      "Tipo de imagem": "",
+      "URL": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "V02",
+      "Número OmniClass": "23.25.30.11.14.14",
+      "Título OmniClass": "Beams",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "2vbCXy8VHEN9UwjuayBW4m"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 40MPa",
+      "Material solidarização": "Concreto, Moldado in loco",
+      "Material consolo": "Concreto, Pré-moldado - 50MPa_Consolo"
+     },
+     "Fases": {
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "CONSOLO-Marca": "CP01",
+      "CONSOLO-Taxa CA": "200.000 kg/m³",
+      "NEOPRENE-Espessura": "1.000 cm"
+     },
+     "Extremidade secundária": {
+      "FURO DE FIXAÇÃO-Abertura": "2.500 cm",
+      "FURO DE FIXAÇÃO-Poisção B'": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição AB": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição AB Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição A'": "10.000 cm",
+      "FURO DE FIXAÇÃO-Posição A' Extra": "0.000 cm",
+      "FURO DE FIXAÇÃO-Posição B' Extra": "0.000 cm"
+     },
+     "Estrutural": {
+      "TAXA-CA": "80.000 kg/m³",
+      "TAXA-CP": "0.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Visibilidade": {
+      "SOLIDARIZAÇÃO-Visibilidade": "No"
+     }
+    }
+   },
+   {
+    "objectid": 7080,
+    "name": "CASSOL-PREO-Viga-L",
+    "externalId": "CASSOL-PREO-Viga-L:Quadro estrutural",
+    "properties": {}
+   },
+   {
+    "objectid": 80,
+    "name": "Quadro estrutural",
+    "externalId": "Quadro estrutural:",
+    "properties": {}
+   },
+   {
+    "objectid": 86,
+    "name": "CASSOL-PREO-Pilar-R [6657283]",
+    "externalId": "f6c5d130-0254-44a5-9353-a5410320f029-00659503",
+    "properties": {
+     "Outros": {
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Restrições": {
+      "Nível base": "TÉRREO",
+      "Deslocamento da base": "0.000 cm",
+      "Nível superior": "EMBARQUE",
+      "Deslocamento superior": "0.000 cm",
+      "Estilo de coluna": "Vertical",
+      "Move com eixos": "Yes",
+      "Delimitação de ambientes": "Yes",
+      "Marca da localização da coluna": "C-31",
+      "PEÇA-Altura Engastamento": "140.000 cm"
+     },
+     "Construção": {
+      "CASSOL-Linha de Produção": "PRÉ-FABRICADO",
+      "TECNOLOGIA-Forma": "CARPINTARIA",
+      "TECNOLOGIA-Aço": "ARMADO",
+      "TECNOLOGIA-Concreto": "ADITIVADO",
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": ""
+     },
+     "Dados": {
+      "fck (MPa)": "0.000",
+      "Cobrimento": "0.000 cm",
+      "Cortina": "",
+      "fck": ""
+     },
+     "Cotas": {
+      "PEÇA-Largura Preo": "60.000 cm",
+      "PEÇA-Largura Total": "60.000 cm",
+      "PEÇA-Altura Preo": "60.000 cm",
+      "PEÇA-Altura Total": "60.000 cm",
+      "PEÇA-Comprimento": "660.000 cm",
+      "Comprimento": "520.000 cm",
+      "Volume": "2.376 m^3",
+      "SEÇÃO-Largura": "60.000 cm",
+      "SEÇÃO-Altura": "60.000 cm"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "P01-01",
+      "Unique TQS ID": "0",
+      "Titulo": "",
+      "Chave": "",
+      "Tipo Elemento": "",
+      "SHA1": "",
+      "Principal": "No",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "R-60x60cm-P01",
+      "Tipo de imagem": "",
+      "Nota-chave": "",
+      "Modelo": "R",
+      "Fabricante": "",
+      "Comentários de tipos": "",
+      "URL": "",
+      "Descrição": "",
+      "Código de montagem": "P",
+      "Custo": "0.000 ฿",
+      "Chave do nome do corte": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "P01",
+      "Número OmniClass": "23.25.30.11.14.11",
+      "Título OmniClass": "Columns",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido": "",
+      "Exportar para IFC como": "",
+      "Exportar para IFC": "Por tipo",
+      "IfcGUID": "3snT4m0bH4fPDJfK43HMKg",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "38oIXicvnEDvYo5emOSEgh"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum",
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "FURO DE MONTAGEM-Padrão": "Yes",
+      "FURO DE MONTAGEM-Posição": "50.000 cm",
+      "FURO DE MONTAGEM-Comprimento": "60.000 cm",
+      "FURO DE MONTAGEM-Ângulo": "0.000 °",
+      "FURO DE MONTAGEM-Diâmetro": "0.100 cm"
+     },
+     "Estrutural": {
+      "Recobrimento de vergalhão - Face superior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Fase inferior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Viga/Coluna) <25 mm>",
+      "TAXA-CA": "190.000 kg/m³",
+      "TAXA-CP": "0.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Elétrica": {
+      "ATERRAMENTO-Visibilidade": "No"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 50MPa"
+     },
+     "Segmentos e conexões": {
+      "CONTINUIDADE-Quantidade": "0",
+      "CONTINUIDADE-Bitola": "0.000 mm"
+     }
+    }
+   },
+   {
+    "objectid": 87,
+    "name": "CASSOL-PREO-Pilar-R [6657284]",
+    "externalId": "f6c5d130-0254-44a5-9353-a5410320f029-00659504",
+    "properties": {
+     "Outros": {
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Restrições": {
+      "Nível base": "TÉRREO",
+      "Deslocamento da base": "0.000 cm",
+      "Nível superior": "EMBARQUE",
+      "Deslocamento superior": "0.000 cm",
+      "Estilo de coluna": "Vertical",
+      "Move com eixos": "Yes",
+      "Delimitação de ambientes": "Yes",
+      "Marca da localização da coluna": "C-30",
+      "PEÇA-Altura Engastamento": "140.000 cm"
+     },
+     "Construção": {
+      "CASSOL-Linha de Produção": "PRÉ-FABRICADO",
+      "TECNOLOGIA-Forma": "CARPINTARIA",
+      "TECNOLOGIA-Aço": "ARMADO",
+      "TECNOLOGIA-Concreto": "ADITIVADO",
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": ""
+     },
+     "Dados": {
+      "fck (MPa)": "0.000",
+      "Cobrimento": "0.000 cm",
+      "Cortina": "",
+      "fck": ""
+     },
+     "Cotas": {
+      "PEÇA-Largura Preo": "60.000 cm",
+      "PEÇA-Largura Total": "60.000 cm",
+      "PEÇA-Altura Preo": "60.000 cm",
+      "PEÇA-Altura Total": "60.000 cm",
+      "PEÇA-Comprimento": "660.000 cm",
+      "Comprimento": "520.000 cm",
+      "Volume": "2.376 m^3",
+      "SEÇÃO-Largura": "60.000 cm",
+      "SEÇÃO-Altura": "60.000 cm"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "P01-01",
+      "Unique TQS ID": "0",
+      "Titulo": "",
+      "Chave": "",
+      "Tipo Elemento": "",
+      "SHA1": "",
+      "Principal": "No",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "R-60x60cm-P01",
+      "Tipo de imagem": "",
+      "Nota-chave": "",
+      "Modelo": "R",
+      "Fabricante": "",
+      "Comentários de tipos": "",
+      "URL": "",
+      "Descrição": "",
+      "Código de montagem": "P",
+      "Custo": "0.000 ฿",
+      "Chave do nome do corte": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "P01",
+      "Número OmniClass": "23.25.30.11.14.11",
+      "Título OmniClass": "Columns",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido": "",
+      "Exportar para IFC como": "",
+      "Exportar para IFC": "Por tipo",
+      "IfcGUID": "3snT4m0bH4fPDJfK43HMKj",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "38oIXicvnEDvYo5emOSEgh"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum",
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "FURO DE MONTAGEM-Padrão": "Yes",
+      "FURO DE MONTAGEM-Posição": "50.000 cm",
+      "FURO DE MONTAGEM-Comprimento": "60.000 cm",
+      "FURO DE MONTAGEM-Ângulo": "0.000 °",
+      "FURO DE MONTAGEM-Diâmetro": "0.100 cm"
+     },
+     "Estrutural": {
+      "Recobrimento de vergalhão - Face superior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Fase inferior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Viga/Coluna) <25 mm>",
+      "TAXA-CA": "190.000 kg/m³",
+      "TAXA-CP": "0.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Elétrica": {
+      "ATERRAMENTO-Visibilidade": "No"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 50MPa"
+     },
+     "Segmentos e conexões": {
+      "CONTINUIDADE-Quantidade": "0",
+      "CONTINUIDADE-Bitola": "0.000 mm"
+     }
+    }
+   },
+   {
+    "objectid": 88,
+    "name": "CASSOL-PREO-Pilar-R [6657285]",
+    "externalId": "f6c5d130-0254-44a5-9353-a5410320f029-00659505",
+    "properties": {
+     "Outros": {
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Restrições": {
+      "Nível base": "TÉRREO",
+      "Deslocamento da base": "0.000 cm",
+      "Nível superior": "EMBARQUE",
+      "Deslocamento superior": "0.000 cm",
+      "Estilo de coluna": "Vertical",
+      "Move com eixos": "Yes",
+      "Delimitação de ambientes": "Yes",
+      "Marca da localização da coluna": "C-29",
+      "PEÇA-Altura Engastamento": "140.000 cm"
+     },
+     "Construção": {
+      "CASSOL-Linha de Produção": "PRÉ-FABRICADO",
+      "TECNOLOGIA-Forma": "CARPINTARIA",
+      "TECNOLOGIA-Aço": "ARMADO",
+      "TECNOLOGIA-Concreto": "ADITIVADO",
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": ""
+     },
+     "Dados": {
+      "fck (MPa)": "0.000",
+      "Cobrimento": "0.000 cm",
+      "Cortina": "",
+      "fck": ""
+     },
+     "Cotas": {
+      "PEÇA-Largura Preo": "60.000 cm",
+      "PEÇA-Largura Total": "60.000 cm",
+      "PEÇA-Altura Preo": "60.000 cm",
+      "PEÇA-Altura Total": "60.000 cm",
+      "PEÇA-Comprimento": "660.000 cm",
+      "Comprimento": "520.000 cm",
+      "Volume": "2.376 m^3",
+      "SEÇÃO-Largura": "60.000 cm",
+      "SEÇÃO-Altura": "60.000 cm"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "P01-01",
+      "Unique TQS ID": "0",
+      "Titulo": "",
+      "Chave": "",
+      "Tipo Elemento": "",
+      "SHA1": "",
+      "Principal": "No",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "R-60x60cm-P01",
+      "Tipo de imagem": "",
+      "Nota-chave": "",
+      "Modelo": "R",
+      "Fabricante": "",
+      "Comentários de tipos": "",
+      "URL": "",
+      "Descrição": "",
+      "Código de montagem": "P",
+      "Custo": "0.000 ฿",
+      "Chave do nome do corte": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "P01",
+      "Número OmniClass": "23.25.30.11.14.11",
+      "Título OmniClass": "Columns",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido": "",
+      "Exportar para IFC como": "",
+      "Exportar para IFC": "Por tipo",
+      "IfcGUID": "3snT4m0bH4fPDJfK43HMKi",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "38oIXicvnEDvYo5emOSEgh"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum",
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "FURO DE MONTAGEM-Padrão": "Yes",
+      "FURO DE MONTAGEM-Posição": "50.000 cm",
+      "FURO DE MONTAGEM-Comprimento": "60.000 cm",
+      "FURO DE MONTAGEM-Ângulo": "0.000 °",
+      "FURO DE MONTAGEM-Diâmetro": "0.100 cm"
+     },
+     "Estrutural": {
+      "Recobrimento de vergalhão - Face superior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Fase inferior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Viga/Coluna) <25 mm>",
+      "TAXA-CA": "190.000 kg/m³",
+      "TAXA-CP": "0.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Elétrica": {
+      "ATERRAMENTO-Visibilidade": "No"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 50MPa"
+     },
+     "Segmentos e conexões": {
+      "CONTINUIDADE-Quantidade": "0",
+      "CONTINUIDADE-Bitola": "0.000 mm"
+     }
+    }
+   },
+   {
+    "objectid": 89,
+    "name": "CASSOL-PREO-Pilar-R [6657286]",
+    "externalId": "f6c5d130-0254-44a5-9353-a5410320f029-00659506",
+    "properties": {
+     "Outros": {
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Restrições": {
+      "Nível base": "TÉRREO",
+      "Deslocamento da base": "0.000 cm",
+      "Nível superior": "EMBARQUE",
+      "Deslocamento superior": "0.000 cm",
+      "Estilo de coluna": "Vertical",
+      "Move com eixos": "Yes",
+      "Delimitação de ambientes": "Yes",
+      "Marca da localização da coluna": "C-28",
+      "PEÇA-Altura Engastamento": "140.000 cm"
+     },
+     "Construção": {
+      "CASSOL-Linha de Produção": "PRÉ-FABRICADO",
+      "TECNOLOGIA-Forma": "CARPINTARIA",
+      "TECNOLOGIA-Aço": "ARMADO",
+      "TECNOLOGIA-Concreto": "ADITIVADO",
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": ""
+     },
+     "Dados": {
+      "fck (MPa)": "0.000",
+      "Cobrimento": "0.000 cm",
+      "Cortina": "",
+      "fck": ""
+     },
+     "Cotas": {
+      "PEÇA-Largura Preo": "60.000 cm",
+      "PEÇA-Largura Total": "60.000 cm",
+      "PEÇA-Altura Preo": "60.000 cm",
+      "PEÇA-Altura Total": "60.000 cm",
+      "PEÇA-Comprimento": "660.000 cm",
+      "Comprimento": "520.000 cm",
+      "Volume": "2.376 m^3",
+      "SEÇÃO-Largura": "60.000 cm",
+      "SEÇÃO-Altura": "60.000 cm"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "P01-01",
+      "Unique TQS ID": "0",
+      "Titulo": "",
+      "Chave": "",
+      "Tipo Elemento": "",
+      "SHA1": "",
+      "Principal": "No",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "R-60x60cm-P01",
+      "Tipo de imagem": "",
+      "Nota-chave": "",
+      "Modelo": "R",
+      "Fabricante": "",
+      "Comentários de tipos": "",
+      "URL": "",
+      "Descrição": "",
+      "Código de montagem": "P",
+      "Custo": "0.000 ฿",
+      "Chave do nome do corte": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "P01",
+      "Número OmniClass": "23.25.30.11.14.11",
+      "Título OmniClass": "Columns",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido": "",
+      "Exportar para IFC como": "",
+      "Exportar para IFC": "Por tipo",
+      "IfcGUID": "3snT4m0bH4fPDJfK43HMKl",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "38oIXicvnEDvYo5emOSEgh"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum",
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "FURO DE MONTAGEM-Padrão": "Yes",
+      "FURO DE MONTAGEM-Posição": "50.000 cm",
+      "FURO DE MONTAGEM-Comprimento": "60.000 cm",
+      "FURO DE MONTAGEM-Ângulo": "0.000 °",
+      "FURO DE MONTAGEM-Diâmetro": "0.100 cm"
+     },
+     "Estrutural": {
+      "Recobrimento de vergalhão - Face superior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Fase inferior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Viga/Coluna) <25 mm>",
+      "TAXA-CA": "190.000 kg/m³",
+      "TAXA-CP": "0.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Elétrica": {
+      "ATERRAMENTO-Visibilidade": "No"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 50MPa"
+     },
+     "Segmentos e conexões": {
+      "CONTINUIDADE-Quantidade": "0",
+      "CONTINUIDADE-Bitola": "0.000 mm"
+     }
+    }
+   },
+   {
+    "objectid": 7152,
+    "name": "R-60x60cm-P01",
+    "externalId": "c8c9286c-9b9c-4e37-98b2-168c183b9073-004b7ad8",
+    "properties": {
+     "Restrições": {
+      "PEÇA-Altura Engastamento": "140.000 cm"
+     },
+     "Cotas": {
+      "SEÇÃO-Largura": "60.000 cm",
+      "SEÇÃO-Altura": "60.000 cm"
+     },
+     "Elétrica": {
+      "ATERRAMENTO-Visibilidade": "No"
+     },
+     "Dados de identidade": {
+      "Tipo de imagem": "",
+      "Nota-chave": "",
+      "Modelo": "R",
+      "Fabricante": "",
+      "Comentários de tipos": "",
+      "URL": "",
+      "Descrição": "",
+      "Código de montagem": "P",
+      "Custo": "0.000 ฿",
+      "Chave do nome do corte": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "P01",
+      "Número OmniClass": "23.25.30.11.14.11",
+      "Título OmniClass": "Columns",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "38oIXicvnEDvYo5emOSEgh"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 50MPa"
+     },
+     "Fases": {
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "FURO DE MONTAGEM-Diâmetro": "0.100 cm"
+     },
+     "Segmentos e conexões": {
+      "CONTINUIDADE-Quantidade": "0",
+      "CONTINUIDADE-Bitola": "0.000 mm"
+     },
+     "Estrutural": {
+      "TAXA-CA": "190.000 kg/m³",
+      "TAXA-CP": "0.000 kg/m³",
+      "Forma da seção": "Não definido"
+     }
+    }
+   },
+   {
+    "objectid": 125,
+    "name": "CASSOL-PREO-Pilar-R [6658414]",
+    "externalId": "f6c5d130-0254-44a5-9353-a5410320f029-0065996e",
+    "properties": {
+     "Outros": {
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Restrições": {
+      "Nível base": "TÉRREO",
+      "Deslocamento da base": "0.000 cm",
+      "Nível superior": "COBERTURA",
+      "Deslocamento superior": "0.000 cm",
+      "Estilo de coluna": "Vertical",
+      "Move com eixos": "Yes",
+      "Delimitação de ambientes": "Yes",
+      "Marca da localização da coluna": "D-06",
+      "PEÇA-Altura Engastamento": "120.000 cm"
+     },
+     "Construção": {
+      "CASSOL-Linha de Produção": "PRÉ-FABRICADO",
+      "TECNOLOGIA-Forma": "CARPINTARIA",
+      "TECNOLOGIA-Aço": "ARMADO",
+      "TECNOLOGIA-Concreto": "ADITIVADO",
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": ""
+     },
+     "Dados": {
+      "fck (MPa)": "0.000",
+      "Cobrimento": "0.000 cm",
+      "Cortina": "",
+      "fck": ""
+     },
+     "Cotas": {
+      "PEÇA-Largura Preo": "40.000 cm",
+      "PEÇA-Largura Total": "40.000 cm",
+      "PEÇA-Altura Preo": "40.000 cm",
+      "PEÇA-Altura Total": "40.000 cm",
+      "PEÇA-Comprimento": "1620.000 cm",
+      "Comprimento": "1500.000 cm",
+      "Volume": "2.592 m^3",
+      "SEÇÃO-Largura": "40.000 cm",
+      "SEÇÃO-Altura": "40.000 cm"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "P02-01",
+      "Unique TQS ID": "0",
+      "Titulo": "",
+      "Chave": "",
+      "Tipo Elemento": "",
+      "SHA1": "",
+      "Principal": "No",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "R-40x40cm-P02",
+      "Tipo de imagem": "",
+      "Nota-chave": "",
+      "Modelo": "R",
+      "Fabricante": "",
+      "Comentários de tipos": "",
+      "URL": "",
+      "Descrição": "",
+      "Código de montagem": "P",
+      "Custo": "0.000 ฿",
+      "Chave do nome do corte": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "P02",
+      "Número OmniClass": "23.25.30.11.14.11",
+      "Título OmniClass": "Columns",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido": "",
+      "Exportar para IFC como": "",
+      "Exportar para IFC": "Por tipo",
+      "IfcGUID": "3snT4m0bH4fPDJfK43HMb7",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "3snT4m0bH4fPDJfK43Hikb"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum",
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "FURO DE MONTAGEM-Padrão": "Yes",
+      "FURO DE MONTAGEM-Posição": "50.000 cm",
+      "FURO DE MONTAGEM-Comprimento": "40.000 cm",
+      "FURO DE MONTAGEM-Ângulo": "0.000 °",
+      "FURO DE MONTAGEM-Diâmetro": "0.100 cm"
+     },
+     "Estrutural": {
+      "Recobrimento de vergalhão - Face superior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Fase inferior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Viga/Coluna) <25 mm>",
+      "TAXA-CA": "180.000 kg/m³",
+      "TAXA-CP": "0.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Elétrica": {
+      "ATERRAMENTO-Visibilidade": "No"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 50MPa"
+     },
+     "Segmentos e conexões": {
+      "CONTINUIDADE-Quantidade": "0",
+      "CONTINUIDADE-Bitola": "0.000 mm"
+     }
+    }
+   },
+   {
+    "objectid": 161,
+    "name": "CASSOL-PREO-Pilar-R [6662568]",
+    "externalId": "f6c5d130-0254-44a5-9353-a5410320f029-0065a9a8",
+    "properties": {
+     "Outros": {
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Restrições": {
+      "Nível base": "TÉRREO",
+      "Deslocamento da base": "0.000 cm",
+      "Nível superior": "EMBARQUE",
+      "Deslocamento superior": "0.000 cm",
+      "Estilo de coluna": "Vertical",
+      "Move com eixos": "Yes",
+      "Delimitação de ambientes": "Yes",
+      "Marca da localização da coluna": "H-02",
+      "PEÇA-Altura Engastamento": "120.000 cm"
+     },
+     "Construção": {
+      "CASSOL-Linha de Produção": "PRÉ-FABRICADO",
+      "TECNOLOGIA-Forma": "CARPINTARIA",
+      "TECNOLOGIA-Aço": "ARMADO",
+      "TECNOLOGIA-Concreto": "ADITIVADO",
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": ""
+     },
+     "Dados": {
+      "fck (MPa)": "0.000",
+      "Cobrimento": "0.000 cm",
+      "Cortina": "",
+      "fck": ""
+     },
+     "Cotas": {
+      "PEÇA-Largura Preo": "40.000 cm",
+      "PEÇA-Largura Total": "40.000 cm",
+      "PEÇA-Altura Preo": "40.000 cm",
+      "PEÇA-Altura Total": "40.000 cm",
+      "PEÇA-Comprimento": "640.000 cm",
+      "Comprimento": "520.000 cm",
+      "Volume": "0.997 m^3",
+      "SEÇÃO-Largura": "40.000 cm",
+      "SEÇÃO-Altura": "40.000 cm"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "P02-02",
+      "Unique TQS ID": "0",
+      "Titulo": "",
+      "Chave": "",
+      "Tipo Elemento": "",
+      "SHA1": "",
+      "Principal": "No",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "R-40x40cm-P02",
+      "Tipo de imagem": "",
+      "Nota-chave": "",
+      "Modelo": "R",
+      "Fabricante": "",
+      "Comentários de tipos": "",
+      "URL": "",
+      "Descrição": "",
+      "Código de montagem": "P",
+      "Custo": "0.000 ฿",
+      "Chave do nome do corte": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "P02",
+      "Número OmniClass": "23.25.30.11.14.11",
+      "Título OmniClass": "Columns",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido": "",
+      "Exportar para IFC como": "",
+      "Exportar para IFC": "Por tipo",
+      "IfcGUID": "3snT4m0bH4fPDJfK43HLc1",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "3snT4m0bH4fPDJfK43Hikb"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum",
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "FURO DE MONTAGEM-Padrão": "Yes",
+      "FURO DE MONTAGEM-Posição": "50.000 cm",
+      "FURO DE MONTAGEM-Comprimento": "40.000 cm",
+      "FURO DE MONTAGEM-Ângulo": "0.000 °",
+      "FURO DE MONTAGEM-Diâmetro": "0.100 cm"
+     },
+     "Estrutural": {
+      "Recobrimento de vergalhão - Face superior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Fase inferior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Viga/Coluna) <25 mm>",
+      "TAXA-CA": "180.000 kg/m³",
+      "TAXA-CP": "0.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Elétrica": {
+      "ATERRAMENTO-Visibilidade": "No"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 50MPa"
+     },
+     "Segmentos e conexões": {
+      "CONTINUIDADE-Quantidade": "0",
+      "CONTINUIDADE-Bitola": "0.000 mm"
+     }
+    }
+   },
+   {
+    "objectid": 162,
+    "name": "CASSOL-PREO-Pilar-R [6662569]",
+    "externalId": "f6c5d130-0254-44a5-9353-a5410320f029-0065a9a9",
+    "properties": {
+     "Outros": {
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Restrições": {
+      "Nível base": "TÉRREO",
+      "Deslocamento da base": "0.000 cm",
+      "Nível superior": "EMBARQUE",
+      "Deslocamento superior": "0.000 cm",
+      "Estilo de coluna": "Vertical",
+      "Move com eixos": "Yes",
+      "Delimitação de ambientes": "Yes",
+      "Marca da localização da coluna": "H(47,22)-3",
+      "PEÇA-Altura Engastamento": "120.000 cm"
+     },
+     "Construção": {
+      "CASSOL-Linha de Produção": "PRÉ-FABRICADO",
+      "TECNOLOGIA-Forma": "CARPINTARIA",
+      "TECNOLOGIA-Aço": "ARMADO",
+      "TECNOLOGIA-Concreto": "ADITIVADO",
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": ""
+     },
+     "Dados": {
+      "fck (MPa)": "0.000",
+      "Cobrimento": "0.000 cm",
+      "Cortina": "",
+      "fck": ""
+     },
+     "Cotas": {
+      "PEÇA-Largura Preo": "40.000 cm",
+      "PEÇA-Largura Total": "40.000 cm",
+      "PEÇA-Altura Preo": "40.000 cm",
+      "PEÇA-Altura Total": "40.000 cm",
+      "PEÇA-Comprimento": "640.000 cm",
+      "Comprimento": "520.000 cm",
+      "Volume": "0.997 m^3",
+      "SEÇÃO-Largura": "40.000 cm",
+      "SEÇÃO-Altura": "40.000 cm"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "P02-02",
+      "Unique TQS ID": "0",
+      "Titulo": "",
+      "Chave": "",
+      "Tipo Elemento": "",
+      "SHA1": "",
+      "Principal": "No",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "R-40x40cm-P02",
+      "Tipo de imagem": "",
+      "Nota-chave": "",
+      "Modelo": "R",
+      "Fabricante": "",
+      "Comentários de tipos": "",
+      "URL": "",
+      "Descrição": "",
+      "Código de montagem": "P",
+      "Custo": "0.000 ฿",
+      "Chave do nome do corte": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "P02",
+      "Número OmniClass": "23.25.30.11.14.11",
+      "Título OmniClass": "Columns",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido": "",
+      "Exportar para IFC como": "",
+      "Exportar para IFC": "Por tipo",
+      "IfcGUID": "3snT4m0bH4fPDJfK43HLc0",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "3snT4m0bH4fPDJfK43Hikb"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum",
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "FURO DE MONTAGEM-Padrão": "Yes",
+      "FURO DE MONTAGEM-Posição": "50.000 cm",
+      "FURO DE MONTAGEM-Comprimento": "40.000 cm",
+      "FURO DE MONTAGEM-Ângulo": "0.000 °",
+      "FURO DE MONTAGEM-Diâmetro": "0.100 cm"
+     },
+     "Estrutural": {
+      "Recobrimento de vergalhão - Face superior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Fase inferior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Viga/Coluna) <25 mm>",
+      "TAXA-CA": "180.000 kg/m³",
+      "TAXA-CP": "0.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Elétrica": {
+      "ATERRAMENTO-Visibilidade": "No"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 50MPa"
+     },
+     "Segmentos e conexões": {
+      "CONTINUIDADE-Quantidade": "0",
+      "CONTINUIDADE-Bitola": "0.000 mm"
+     }
+    }
+   },
+   {
+    "objectid": 163,
+    "name": "CASSOL-PREO-Pilar-R [6662618]",
+    "externalId": "f6c5d130-0254-44a5-9353-a5410320f029-0065a9da",
+    "properties": {
+     "Outros": {
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Restrições": {
+      "Nível base": "TÉRREO",
+      "Deslocamento da base": "0.000 cm",
+      "Nível superior": "EMBARQUE",
+      "Deslocamento superior": "0.000 cm",
+      "Estilo de coluna": "Vertical",
+      "Move com eixos": "Yes",
+      "Delimitação de ambientes": "Yes",
+      "Marca da localização da coluna": "I-02",
+      "PEÇA-Altura Engastamento": "120.000 cm"
+     },
+     "Construção": {
+      "CASSOL-Linha de Produção": "PRÉ-FABRICADO",
+      "TECNOLOGIA-Forma": "CARPINTARIA",
+      "TECNOLOGIA-Aço": "ARMADO",
+      "TECNOLOGIA-Concreto": "ADITIVADO",
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": ""
+     },
+     "Dados": {
+      "fck (MPa)": "0.000",
+      "Cobrimento": "0.000 cm",
+      "Cortina": "",
+      "fck": ""
+     },
+     "Cotas": {
+      "PEÇA-Largura Preo": "40.000 cm",
+      "PEÇA-Largura Total": "40.000 cm",
+      "PEÇA-Altura Preo": "40.000 cm",
+      "PEÇA-Altura Total": "40.000 cm",
+      "PEÇA-Comprimento": "640.000 cm",
+      "Comprimento": "520.000 cm",
+      "Volume": "0.997 m^3",
+      "SEÇÃO-Largura": "40.000 cm",
+      "SEÇÃO-Altura": "40.000 cm"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "P02-02",
+      "Unique TQS ID": "0",
+      "Titulo": "",
+      "Chave": "",
+      "Tipo Elemento": "",
+      "SHA1": "",
+      "Principal": "No",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "R-40x40cm-P02",
+      "Tipo de imagem": "",
+      "Nota-chave": "",
+      "Modelo": "R",
+      "Fabricante": "",
+      "Comentários de tipos": "",
+      "URL": "",
+      "Descrição": "",
+      "Código de montagem": "P",
+      "Custo": "0.000 ฿",
+      "Chave do nome do corte": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "P02",
+      "Número OmniClass": "23.25.30.11.14.11",
+      "Título OmniClass": "Columns",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido": "",
+      "Exportar para IFC como": "",
+      "Exportar para IFC": "Por tipo",
+      "IfcGUID": "3snT4m0bH4fPDJfK43HLdp",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "3snT4m0bH4fPDJfK43Hikb"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum",
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "FURO DE MONTAGEM-Padrão": "Yes",
+      "FURO DE MONTAGEM-Posição": "50.000 cm",
+      "FURO DE MONTAGEM-Comprimento": "40.000 cm",
+      "FURO DE MONTAGEM-Ângulo": "0.000 °",
+      "FURO DE MONTAGEM-Diâmetro": "0.100 cm"
+     },
+     "Estrutural": {
+      "Recobrimento de vergalhão - Face superior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Fase inferior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Viga/Coluna) <25 mm>",
+      "TAXA-CA": "180.000 kg/m³",
+      "TAXA-CP": "0.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Elétrica": {
+      "ATERRAMENTO-Visibilidade": "No"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 50MPa"
+     },
+     "Segmentos e conexões": {
+      "CONTINUIDADE-Quantidade": "0",
+      "CONTINUIDADE-Bitola": "0.000 mm"
+     }
+    }
+   },
+   {
+    "objectid": 7153,
+    "name": "R-40x40cm-P02",
+    "externalId": "f6c5d130-0254-44a5-9353-a5410320f029-00663b8c",
+    "properties": {
+     "Restrições": {
+      "PEÇA-Altura Engastamento": "120.000 cm"
+     },
+     "Cotas": {
+      "SEÇÃO-Largura": "40.000 cm",
+      "SEÇÃO-Altura": "40.000 cm"
+     },
+     "Elétrica": {
+      "ATERRAMENTO-Visibilidade": "No"
+     },
+     "Dados de identidade": {
+      "Tipo de imagem": "",
+      "Nota-chave": "",
+      "Modelo": "R",
+      "Fabricante": "",
+      "Comentários de tipos": "",
+      "URL": "",
+      "Descrição": "",
+      "Código de montagem": "P",
+      "Custo": "0.000 ฿",
+      "Chave do nome do corte": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "P02",
+      "Número OmniClass": "23.25.30.11.14.11",
+      "Título OmniClass": "Columns",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "3snT4m0bH4fPDJfK43Hikb"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 50MPa"
+     },
+     "Fases": {
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "FURO DE MONTAGEM-Diâmetro": "0.100 cm"
+     },
+     "Segmentos e conexões": {
+      "CONTINUIDADE-Quantidade": "0",
+      "CONTINUIDADE-Bitola": "0.000 mm"
+     },
+     "Estrutural": {
+      "TAXA-CA": "180.000 kg/m³",
+      "TAXA-CP": "0.000 kg/m³",
+      "Forma da seção": "Não definido"
+     }
+    }
+   },
+   {
+    "objectid": 7150,
+    "name": "CASSOL-PREO-Pilar-R",
+    "externalId": "CASSOL-PREO-Pilar-R:Pilares estruturais",
+    "properties": {}
+   },
+   {
+    "objectid": 196,
+    "name": "CASSOL-PREO-Pilar-C-duplo [6719241]",
+    "externalId": "efe16979-11e1-4f55-86a9-6299eaaefb36-00668709",
+    "properties": {
+     "Outros": {
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Restrições": {
+      "Nível base": "TÉRREO",
+      "Deslocamento da base": "0.000 cm",
+      "Nível superior": "EMBARQUE",
+      "Deslocamento superior": "0.000 cm",
+      "Estilo de coluna": "Vertical",
+      "Move com eixos": "Yes",
+      "Delimitação de ambientes": "Yes",
+      "Marca da localização da coluna": "2-12",
+      "PEÇA-Altura Engastamento": "140.000 cm"
+     },
+     "Construção": {
+      "CASSOL-Linha de Produção": "PRÉ-FABRICADO",
+      "TECNOLOGIA-Forma": "CARPINTARIA",
+      "TECNOLOGIA-Aço": "ARMADO",
+      "TECNOLOGIA-Concreto": "ADITIVADO",
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": ""
+     },
+     "Dados": {
+      "fck (MPa)": "0.000",
+      "Cobrimento": "0.000 cm",
+      "Cortina": "",
+      "fck": ""
+     },
+     "Cotas": {
+      "PEÇA-Largura Preo": "60.000 cm",
+      "PEÇA-Largura Total": "60.000 cm",
+      "PEÇA-Altura Preo": "60.000 cm",
+      "PEÇA-Altura Total": "60.000 cm",
+      "PEÇA-Comprimento": "660.000 cm",
+      "Comprimento": "520.000 cm",
+      "Volume": "5.252 m^3",
+      "SEÇÃO-Largura": "60.000 cm",
+      "SEÇÃO-Altura": "60.000 cm"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "P03-01",
+      "Unique TQS ID": "0",
+      "Titulo": "",
+      "Chave": "",
+      "Tipo Elemento": "",
+      "SHA1": "",
+      "Principal": "No",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "C-2xØ60cm_PILAR 03",
+      "Tipo de imagem": "",
+      "Nota-chave": "",
+      "Modelo": "C",
+      "Fabricante": "",
+      "Comentários de tipos": "",
+      "URL": "",
+      "Descrição": "",
+      "Código de montagem": "P",
+      "Custo": "0.000 ฿",
+      "Chave do nome do corte": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "P03",
+      "Número OmniClass": "23.25.30.11.14.11",
+      "Título OmniClass": "Columns",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido": "",
+      "Exportar para IFC como": "",
+      "Exportar para IFC": "Por tipo",
+      "IfcGUID": "3luMbv4U5FLOQfOfdgo7m$",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "3luMbv4U5FLOQfOfdgo7tE"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum",
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "FURO DE MONTAGEM-Padrão": "Yes",
+      "FURO DE MONTAGEM-Posição": "50.000 cm",
+      "FURO DE MONTAGEM-Comprimento": "60.000 cm",
+      "FURO DE MONTAGEM-Ângulo": "0.000 °",
+      "FURO DE MONTAGEM-Diâmetro": "0.100 cm"
+     },
+     "Estrutural": {
+      "Recobrimento de vergalhão - Face superior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Fase inferior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Viga/Coluna) <25 mm>",
+      "TAXA-CA": "190.000 kg/m³",
+      "TAXA-CP": "0.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Elétrica": {
+      "ATERRAMENTO-Visibilidade": "No"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 50MPa"
+     },
+     "Segmentos e conexões": {
+      "CONTINUIDADE-Quantidade": "0",
+      "CONTINUIDADE-Bitola": "0.000 mm"
+     }
+    }
+   },
+   {
+    "objectid": 197,
+    "name": "CASSOL-PREO-Pilar-C-duplo [6722479]",
+    "externalId": "efe16979-11e1-4f55-86a9-6299eaaefb36-006693af",
+    "properties": {
+     "Outros": {
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Restrições": {
+      "Nível base": "TÉRREO",
+      "Deslocamento da base": "0.000 cm",
+      "Nível superior": "EMBARQUE",
+      "Deslocamento superior": "0.000 cm",
+      "Estilo de coluna": "Vertical",
+      "Move com eixos": "Yes",
+      "Delimitação de ambientes": "Yes",
+      "Marca da localização da coluna": "2-13",
+      "PEÇA-Altura Engastamento": "140.000 cm"
+     },
+     "Construção": {
+      "CASSOL-Linha de Produção": "PRÉ-FABRICADO",
+      "TECNOLOGIA-Forma": "CARPINTARIA",
+      "TECNOLOGIA-Aço": "ARMADO",
+      "TECNOLOGIA-Concreto": "ADITIVADO",
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": ""
+     },
+     "Dados": {
+      "fck (MPa)": "0.000",
+      "Cobrimento": "0.000 cm",
+      "Cortina": "",
+      "fck": ""
+     },
+     "Cotas": {
+      "PEÇA-Largura Preo": "60.000 cm",
+      "PEÇA-Largura Total": "60.000 cm",
+      "PEÇA-Altura Preo": "60.000 cm",
+      "PEÇA-Altura Total": "60.000 cm",
+      "PEÇA-Comprimento": "660.000 cm",
+      "Comprimento": "520.000 cm",
+      "Volume": "5.252 m^3",
+      "SEÇÃO-Largura": "60.000 cm",
+      "SEÇÃO-Altura": "60.000 cm"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "P03-01",
+      "Unique TQS ID": "0",
+      "Titulo": "",
+      "Chave": "",
+      "Tipo Elemento": "",
+      "SHA1": "",
+      "Principal": "No",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "C-2xØ60cm_PILAR 03",
+      "Tipo de imagem": "",
+      "Nota-chave": "",
+      "Modelo": "C",
+      "Fabricante": "",
+      "Comentários de tipos": "",
+      "URL": "",
+      "Descrição": "",
+      "Código de montagem": "P",
+      "Custo": "0.000 ฿",
+      "Chave do nome do corte": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "P03",
+      "Número OmniClass": "23.25.30.11.14.11",
+      "Título OmniClass": "Columns",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido": "",
+      "Exportar para IFC como": "",
+      "Exportar para IFC": "Por tipo",
+      "IfcGUID": "3luMbv4U5FLOQfOfdgo6YP",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "3luMbv4U5FLOQfOfdgo7tE"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum",
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "FURO DE MONTAGEM-Padrão": "Yes",
+      "FURO DE MONTAGEM-Posição": "50.000 cm",
+      "FURO DE MONTAGEM-Comprimento": "60.000 cm",
+      "FURO DE MONTAGEM-Ângulo": "0.000 °",
+      "FURO DE MONTAGEM-Diâmetro": "0.100 cm"
+     },
+     "Estrutural": {
+      "Recobrimento de vergalhão - Face superior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Fase inferior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Viga/Coluna) <25 mm>",
+      "TAXA-CA": "190.000 kg/m³",
+      "TAXA-CP": "0.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Elétrica": {
+      "ATERRAMENTO-Visibilidade": "No"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 50MPa"
+     },
+     "Segmentos e conexões": {
+      "CONTINUIDADE-Quantidade": "0",
+      "CONTINUIDADE-Bitola": "0.000 mm"
+     }
+    }
+   },
+   {
+    "objectid": 198,
+    "name": "CASSOL-PREO-Pilar-C-duplo [6722491]",
+    "externalId": "efe16979-11e1-4f55-86a9-6299eaaefb36-006693bb",
+    "properties": {
+     "Outros": {
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Restrições": {
+      "Nível base": "TÉRREO",
+      "Deslocamento da base": "0.000 cm",
+      "Nível superior": "EMBARQUE",
+      "Deslocamento superior": "0.000 cm",
+      "Estilo de coluna": "Vertical",
+      "Move com eixos": "Yes",
+      "Delimitação de ambientes": "Yes",
+      "Marca da localização da coluna": "2-14",
+      "PEÇA-Altura Engastamento": "140.000 cm"
+     },
+     "Construção": {
+      "CASSOL-Linha de Produção": "PRÉ-FABRICADO",
+      "TECNOLOGIA-Forma": "CARPINTARIA",
+      "TECNOLOGIA-Aço": "ARMADO",
+      "TECNOLOGIA-Concreto": "ADITIVADO",
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": ""
+     },
+     "Dados": {
+      "fck (MPa)": "0.000",
+      "Cobrimento": "0.000 cm",
+      "Cortina": "",
+      "fck": ""
+     },
+     "Cotas": {
+      "PEÇA-Largura Preo": "60.000 cm",
+      "PEÇA-Largura Total": "60.000 cm",
+      "PEÇA-Altura Preo": "60.000 cm",
+      "PEÇA-Altura Total": "60.000 cm",
+      "PEÇA-Comprimento": "660.000 cm",
+      "Comprimento": "520.000 cm",
+      "Volume": "5.252 m^3",
+      "SEÇÃO-Largura": "60.000 cm",
+      "SEÇÃO-Altura": "60.000 cm"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "P03-01",
+      "Unique TQS ID": "0",
+      "Titulo": "",
+      "Chave": "",
+      "Tipo Elemento": "",
+      "SHA1": "",
+      "Principal": "No",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "C-2xØ60cm_PILAR 03",
+      "Tipo de imagem": "",
+      "Nota-chave": "",
+      "Modelo": "C",
+      "Fabricante": "",
+      "Comentários de tipos": "",
+      "URL": "",
+      "Descrição": "",
+      "Código de montagem": "P",
+      "Custo": "0.000 ฿",
+      "Chave do nome do corte": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "P03",
+      "Número OmniClass": "23.25.30.11.14.11",
+      "Título OmniClass": "Columns",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido": "",
+      "Exportar para IFC como": "",
+      "Exportar para IFC": "Por tipo",
+      "IfcGUID": "3luMbv4U5FLOQfOfdgo6YD",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "3luMbv4U5FLOQfOfdgo7tE"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum",
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "FURO DE MONTAGEM-Padrão": "Yes",
+      "FURO DE MONTAGEM-Posição": "50.000 cm",
+      "FURO DE MONTAGEM-Comprimento": "60.000 cm",
+      "FURO DE MONTAGEM-Ângulo": "0.000 °",
+      "FURO DE MONTAGEM-Diâmetro": "0.100 cm"
+     },
+     "Estrutural": {
+      "Recobrimento de vergalhão - Face superior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Fase inferior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Viga/Coluna) <25 mm>",
+      "TAXA-CA": "190.000 kg/m³",
+      "TAXA-CP": "0.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Elétrica": {
+      "ATERRAMENTO-Visibilidade": "No"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 50MPa"
+     },
+     "Segmentos e conexões": {
+      "CONTINUIDADE-Quantidade": "0",
+      "CONTINUIDADE-Bitola": "0.000 mm"
+     }
+    }
+   },
+   {
+    "objectid": 199,
+    "name": "CASSOL-PREO-Pilar-C-duplo [6722503]",
+    "externalId": "efe16979-11e1-4f55-86a9-6299eaaefb36-006693c7",
+    "properties": {
+     "Outros": {
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Restrições": {
+      "Nível base": "TÉRREO",
+      "Deslocamento da base": "0.000 cm",
+      "Nível superior": "EMBARQUE",
+      "Deslocamento superior": "0.000 cm",
+      "Estilo de coluna": "Vertical",
+      "Move com eixos": "Yes",
+      "Delimitação de ambientes": "Yes",
+      "Marca da localização da coluna": "2-15",
+      "PEÇA-Altura Engastamento": "140.000 cm"
+     },
+     "Construção": {
+      "CASSOL-Linha de Produção": "PRÉ-FABRICADO",
+      "TECNOLOGIA-Forma": "CARPINTARIA",
+      "TECNOLOGIA-Aço": "ARMADO",
+      "TECNOLOGIA-Concreto": "ADITIVADO",
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": ""
+     },
+     "Dados": {
+      "fck (MPa)": "0.000",
+      "Cobrimento": "0.000 cm",
+      "Cortina": "",
+      "fck": ""
+     },
+     "Cotas": {
+      "PEÇA-Largura Preo": "60.000 cm",
+      "PEÇA-Largura Total": "60.000 cm",
+      "PEÇA-Altura Preo": "60.000 cm",
+      "PEÇA-Altura Total": "60.000 cm",
+      "PEÇA-Comprimento": "660.000 cm",
+      "Comprimento": "520.000 cm",
+      "Volume": "5.252 m^3",
+      "SEÇÃO-Largura": "60.000 cm",
+      "SEÇÃO-Altura": "60.000 cm"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "P03-01",
+      "Unique TQS ID": "0",
+      "Titulo": "",
+      "Chave": "",
+      "Tipo Elemento": "",
+      "SHA1": "",
+      "Principal": "No",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "C-2xØ60cm_PILAR 03",
+      "Tipo de imagem": "",
+      "Nota-chave": "",
+      "Modelo": "C",
+      "Fabricante": "",
+      "Comentários de tipos": "",
+      "URL": "",
+      "Descrição": "",
+      "Código de montagem": "P",
+      "Custo": "0.000 ฿",
+      "Chave do nome do corte": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "P03",
+      "Número OmniClass": "23.25.30.11.14.11",
+      "Título OmniClass": "Columns",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido": "",
+      "Exportar para IFC como": "",
+      "Exportar para IFC": "Por tipo",
+      "IfcGUID": "3luMbv4U5FLOQfOfdgo6Zn",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "3luMbv4U5FLOQfOfdgo7tE"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum",
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "FURO DE MONTAGEM-Padrão": "Yes",
+      "FURO DE MONTAGEM-Posição": "50.000 cm",
+      "FURO DE MONTAGEM-Comprimento": "60.000 cm",
+      "FURO DE MONTAGEM-Ângulo": "0.000 °",
+      "FURO DE MONTAGEM-Diâmetro": "0.100 cm"
+     },
+     "Estrutural": {
+      "Recobrimento de vergalhão - Face superior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Fase inferior": "I. (Viga/Coluna) <25 mm>",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Viga/Coluna) <25 mm>",
+      "TAXA-CA": "190.000 kg/m³",
+      "TAXA-CP": "0.000 kg/m³",
+      "Forma da seção": "Não definido"
+     },
+     "Elétrica": {
+      "ATERRAMENTO-Visibilidade": "No"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 50MPa"
+     },
+     "Segmentos e conexões": {
+      "CONTINUIDADE-Quantidade": "0",
+      "CONTINUIDADE-Bitola": "0.000 mm"
+     }
+    }
+   },
+   {
+    "objectid": 7391,
+    "name": "C-2xØ60cm_PILAR 03",
+    "externalId": "efe16979-11e1-4f55-86a9-6299eaaefb36-006686f8",
+    "properties": {
+     "Restrições": {
+      "PEÇA-Altura Engastamento": "140.000 cm"
+     },
+     "Cotas": {
+      "SEÇÃO-Largura": "60.000 cm",
+      "SEÇÃO-Altura": "60.000 cm"
+     },
+     "Elétrica": {
+      "ATERRAMENTO-Visibilidade": "No"
+     },
+     "Dados de identidade": {
+      "Tipo de imagem": "",
+      "Nota-chave": "",
+      "Modelo": "C",
+      "Fabricante": "",
+      "Comentários de tipos": "",
+      "URL": "",
+      "Descrição": "",
+      "Código de montagem": "P",
+      "Custo": "0.000 ฿",
+      "Chave do nome do corte": "",
+      "Descrição de montagem": "",
+      "Marca de tipo": "P03",
+      "Número OmniClass": "23.25.30.11.14.11",
+      "Título OmniClass": "Columns",
+      "Nome do código": ""
+     },
+     "Parâmetros IFC": {
+      "Tipo IFC predefinido [Tipo]": "",
+      "Exportar tipo para IFC como": "",
+      "Exportar tipo para IFC": "Padrão",
+      "Tipo IfcGUID": "3luMbv4U5FLOQfOfdgo7tE"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 50MPa"
+     },
+     "Fases": {
+      "CASSOL-A.C.C.": "No"
+     },
+     "Extremidade principal": {
+      "FURO DE MONTAGEM-Diâmetro": "0.100 cm"
+     },
+     "Segmentos e conexões": {
+      "CONTINUIDADE-Quantidade": "0",
+      "CONTINUIDADE-Bitola": "0.000 mm"
+     },
+     "Estrutural": {
+      "TAXA-CA": "190.000 kg/m³",
+      "TAXA-CP": "0.000 kg/m³",
+      "Forma da seção": "Não definido"
+     }
+    }
+   },
+   {
+    "objectid": 7151,
+    "name": "CASSOL-PREO-Pilar-C-duplo",
+    "externalId": "CASSOL-PREO-Pilar-C-duplo:Pilares estruturais",
+    "properties": {}
+   },
+   {
+    "objectid": 81,
+    "name": "Pilares estruturais",
+    "externalId": "Pilares estruturais:",
+    "properties": {}
+   },
+   {
+    "objectid": 231,
+    "name": "Piso [6665472]",
+    "externalId": "f6c5d130-0254-44a5-9353-a5410320f029-0065b500",
+    "properties": {
+     "Restrições": {
+      "Nível": "EMBARQUE",
+      "Altura do deslocamento do nível": "0.000 cm",
+      "Delimitação de ambientes": "Yes",
+      "Relativo à massa": "No"
+     },
+     "Estrutural": {
+      "Estrutural": "Yes",
+      "Recobrimento de vergalhão - Face superior": "I. (Laje/Parede) <20 mm>",
+      "Recobrimento de vergalhão - Fase inferior": "I. (Laje/Parede) <20 mm>",
+      "Recobrimento de vergalhão - Outras Faces": "I. (Laje/Parede) <20 mm>",
+      "TAXA-CA": "0.000 kg/m³"
+     },
+     "Dados de identidade": {
+      "Imagem": "",
+      "Comentários": "",
+      "Marca": "LA01-01",
+      "Unique TQS ID": "0",
+      "Titulo": "",
+      "Chave": "",
+      "Tipo Elemento": "",
+      "SHA1": "",
+      "Principal": "No",
+      "Revisão": "",
+      "Existe associação": "No",
+      "Nome do tipo": "LA01-LP26.5 SC=500",
+      "Tipo de imagem": "",
+      "Nota-chave": "",
+      "Modelo": "LP26,5",
+      "Fabricante": "",
+      "Comentários de tipos": "",
+      "URL": "",
+      "Descrição": "",
+      "Descrição de montagem": "",
+      "Código de montagem": "LA",
+      "Marca de tipo": "LA01",
+      "Custo": "0.000 ฿"
+     },
+     "Parâmetros IFC": {
+      "Exportar para IFC": "Por tipo",
+      "Exportar para IFC como": "",
+      "Tipo IFC predefinido": "",
+      "IfcGUID": "3snT4m0bH4fPDJfK43HKKf",
+      "Exportar tipo para IFC": "Padrão",
+      "Exportar tipo para IFC como": "",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Tipo IfcGUID": "0ydDUlMrH6URLFweD8$qQn"
+     },
+     "Construção": {
+      "PEÇA-Status": "",
+      "PEÇA-Quadrante de Montagem": "",
+      "Estrutura": "",
+      "Espessura-padrão": "33.500 cm",
+      "Função": "Interior"
+     },
+     "Dados": {
+      "fck (MPa)": "0.000",
+      "Cobrimento": "0.000 cm",
+      "Rebaixo": "0.000 cm",
+      "fck": ""
+     },
+     "Outros": {
+      "Regiao_construtiva_pre": "0.000"
+     },
+     "Fases": {
+      "Fase criada": "Construção nova",
+      "Fase demolida": "Nenhum"
+     },
+     "Cotas": {
+      "Inclinação": "0.000 %",
+      "Perímetro": "87787.877 cm",
+      "Área": "8501.804 m^2",
+      "Volume": "2848.104 m^3",
+      "Elevação no topo": "520.000 cm",
+      "Elevação na parte inferior": "486.500 cm",
+      "Espessura": "33.500 cm",
+      "ALVEOLO-Quantidade Preenchida": "0",
+      "ALVEOLO-Comprimento Preenchido": "0.000 cm",
+      "ALVEOLO-Tipo de Alveolo Preenchido": "0.000 cm"
+     },
+     "Gráficos": {
+      "Padrão de preenchimento em escala de baixa resolução": "",
+      "Preenchimento de cor em escala de baixa resolução": "0"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 40MPa"
+     },
+     "Conjunto de vergalhões": {
+      "LAJE-Diâmetro dos Cabos": "12.700 mm",
+      "LAJE-Número de Cabos": "6"
+     },
+     "Análise estrutural": {
+      "LAJE-Vão": "980.000 cm",
+      "LAJE-Sobrecarga": "500.000 kgf/m²"
+     },
+     "Propriedades analíticas": {
+      "Coeficiente de transferência de calor (U)": "3.122 W/(m²·K)",
+      "Resistência térmica (R)": "0.320 (m²·K)/W",
+      "Massa térmica": "506.218 kJ/(m²·K)",
+      "Absorção": "0.700",
+      "Rugosidade": "3"
+     }
+    }
+   },
+   {
+    "objectid": 7379,
+    "name": "LA01-LP26.5 SC=500",
+    "externalId": "3c9cd7af-5b54-4679-b54f-ea8348c4a968-003befd9",
+    "properties": {
+     "Construção": {
+      "Estrutura": "",
+      "Espessura-padrão": "33.500 cm",
+      "Função": "Interior"
+     },
+     "Gráficos": {
+      "Padrão de preenchimento em escala de baixa resolução": "",
+      "Preenchimento de cor em escala de baixa resolução": "0"
+     },
+     "Dados de identidade": {
+      "Tipo de imagem": "",
+      "Nota-chave": "",
+      "Modelo": "LP26,5",
+      "Fabricante": "",
+      "Comentários de tipos": "",
+      "URL": "",
+      "Descrição": "",
+      "Descrição de montagem": "",
+      "Código de montagem": "LA",
+      "Marca de tipo": "LA01",
+      "Custo": "0.000 ฿"
+     },
+     "Parâmetros IFC": {
+      "Exportar tipo para IFC": "Padrão",
+      "Exportar tipo para IFC como": "",
+      "Tipo IFC predefinido [Tipo]": "",
+      "Tipo IfcGUID": "0ydDUlMrH6URLFweD8$qQn"
+     },
+     "Materiais e acabamentos": {
+      "Material estrutural": "Concreto, Pré-moldado - 40MPa"
+     },
+     "Estrutural": {
+      "TAXA-CA": "0.000 kg/m³"
+     },
+     "Conjunto de vergalhões": {
+      "LAJE-Diâmetro dos Cabos": "12.700 mm",
+      "LAJE-Número de Cabos": "6"
+     },
+     "Análise estrutural": {
+      "LAJE-Vão": "980.000 cm",
+      "LAJE-Sobrecarga": "500.000 kgf/m²"
+     },
+     "Cotas": {
+      "ALVEOLO-Quantidade Preenchida": "0",
+      "ALVEOLO-Comprimento Preenchido": "0.000 cm",
+      "ALVEOLO-Tipo de Alveolo Preenchido": "0.000 cm"
+     },
+     "Propriedades analíticas": {
+      "Coeficiente de transferência de calor (U)": "3.122 W/(m²·K)",
+      "Resistência térmica (R)": "0.320 (m²·K)/W",
+      "Massa térmica": "506.218 kJ/(m²·K)",
+      "Absorção": "0.700",
+      "Rugosidade": "3"
+     }
+    }
+   },
+   {
+    "objectid": 7378,
+    "name": "Piso",
+    "externalId": "Piso:Pisos",
+    "properties": {}
+   },
+   {
+    "objectid": 85,
+    "name": "Pisos",
+    "externalId": "Pisos:",
+    "properties": {}
+   },
+   {
+    "objectid": 1,
+    "name": "Model",
+    "externalId": "doc",
+    "properties": {}
+   }
+  ]
+ }
+}

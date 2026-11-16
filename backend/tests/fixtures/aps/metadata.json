@@ -1,0 +1,23 @@
+{
+  "data": {
+    "type": "metadata",
+    "metadata": [
+      {
+        "name": "Folha A01",
+        "role": "2d",
+        "guid": "00000000-2d00-0000-0000-000000000000"
+      },
+      {
+        "name": "{3D}",
+        "role": "3d",
+        "guid": "00000000-3d00-0000-0000-000000000001",
+        "isMasterView": true
+      },
+      {
+        "name": "Vista 3D auxiliar",
+        "role": "3d",
+        "guid": "00000000-3d00-0000-0000-000000000002"
+      }
+    ]
+  }
+}

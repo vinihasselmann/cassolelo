@@ -1,0 +1,27 @@
+{
+  "jsonapi": {
+    "version": "1.0"
+  },
+  "links": {
+    "self": {
+      "href": "https://developer.api.autodesk.com/project/v1/hubs"
+    }
+  },
+  "data": [
+    {
+      "type": "hubs",
+      "id": "b.00000000-0000-0000-0000-000000000001",
+      "attributes": {
+        "name": "Cassol (sanitizado)",
+        "region": "US",
+        "extension": {
+          "type": "hubs:autodesk.bim360:Account",
+          "version": "1.0"
+        }
+      }
+    }
+  ],
+  "meta": {
+    "warnings": []
+  }
+}

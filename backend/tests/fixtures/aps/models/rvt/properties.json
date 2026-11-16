@@ -1,0 +1,96 @@
+{
+  "data": {
+    "type": "properties",
+    "collection": [
+      {
+        "objectid": 4,
+        "name": "V 30x60",
+        "properties": {
+          "Dados de identidade": {"Marca de tipo": "VT-30"}
+        }
+      },
+      {
+        "objectid": 10,
+        "name": "Viga Pré-moldada [100001]",
+        "externalId": "aaaaaaaa-0000-0000-0000-000000000000-000186a1",
+        "properties": {
+          "Dados de identidade": {"Marca": "V-101", "Comentários": ""},
+          "Dimensões": {"Comprimento": "600.0 cm"},
+          "Other": {"Category": "Revit Structural Framing"}
+        }
+      },
+      {
+        "objectid": 11,
+        "name": "Viga Pré-moldada [100002]",
+        "externalId": "aaaaaaaa-0000-0000-0000-000000000000-000186a2",
+        "properties": {
+          "Dados de identidade": {"Marca": " v-101 "},
+          "Dimensões": {"Comprimento": "600.0 cm"},
+          "Other": {"Category": "Revit Structural Framing"}
+        }
+      },
+      {
+        "objectid": 12,
+        "name": "Viga Pré-moldada [100003]",
+        "externalId": "aaaaaaaa-0000-0000-0000-000000000000-000186a3",
+        "properties": {
+          "Dados de identidade": {"Marca": "V-102"},
+          "Dimensões": {"Comprimento": "750.0 cm"},
+          "Other": {"Category": "Revit Structural Framing"}
+        }
+      },
+      {
+        "objectid": 13,
+        "name": "Insert metálico [100004]",
+        "externalId": "aaaaaaaa-0000-0000-0000-000000000000-000186a4",
+        "properties": {
+          "Other": {"Category": "Revit Specialty Equipment"}
+        }
+      },
+      {
+        "objectid": 14,
+        "name": "Insert metálico [100005]",
+        "externalId": "aaaaaaaa-0000-0000-0000-000000000000-000186a5",
+        "properties": {
+          "Other": {"Category": "Revit Specialty Equipment"}
+        }
+      },
+      {
+        "objectid": 20,
+        "name": "Pilar [200001]",
+        "externalId": "bbbbbbbb-0000-0000-0000-000000000000-00030d41",
+        "properties": {
+          "Identity Data": {"Mark": "P-01"},
+          "Other": {"Category": "Revit Structural Columns"}
+        }
+      },
+      {
+        "objectid": 21,
+        "name": "Pilar [200002]",
+        "externalId": "bbbbbbbb-0000-0000-0000-000000000000-00030d42",
+        "properties": {
+          "Identity Data": {"Mark": "   "},
+          "Other": {"Category": "Revit Structural Columns"}
+        }
+      },
+      {
+        "objectid": 30,
+        "name": "Laje alveolar [300001]",
+        "externalId": "cccccccc-0000-0000-0000-000000000000-000493e1",
+        "properties": {
+          "Dados de identidade": {"Marca": "LA-01"},
+          "Other": {"Category": "Revit Floors"}
+        }
+      },
+      {
+        "objectid": 31,
+        "name": "Laje alveolar [300002]",
+        "externalId": "cccccccc-0000-0000-0000-000000000000-000493e2",
+        "properties": {
+          "Dados de identidade": {"Marca": "P-01"},
+          "Other": {"Category": "Revit Floors"}
+        }
+      }
+    ]
+  }
+}

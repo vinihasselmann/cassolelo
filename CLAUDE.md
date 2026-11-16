@@ -8,7 +8,7 @@ App web interno (PWA) que liga o escritório de projetos à fábrica de pré-mol
 - APIs permitidas: Authentication v2 (2-legged client_credentials com escopos data:read viewables:read; 3-legged só na Fase 11), Data Management, Model Derivative apenas GET (manifest, metadata, properties), Webhooks, Viewer v7 (SVF2).
 - A fonte da verdade dos parâmetros da fábrica é o PostgreSQL do app. Nunca escrever no arquivo BIM.
 - Entidade central: MARCA = (obra, código da marca, categoria). Uma marca agrupa N peças físicas idênticas. Marcas podem se repetir entre obras. Valores de parâmetros ligam-se à marca, nunca à versão.
-- O nome do parâmetro de marca no modelo é configurável (env MARK_PROPERTY_NAMES, padrão "Marca,Mark").
+- O nome do parâmetro de marca no modelo é configurável: padrão do servidor no env MARK_PROPERTY_NAMES ("Marca,Mark"); cada obra pode ter a sua regra de identificação (lista de parâmetros em ordem de prioridade, ex.: "Nome da montagem, Marca"), definida por qualquer papel e auditada. Trocar a regra reprocessa a versão ativa; marcas com valores que somem viram órfãs (decisão de 2026-11-13).
 - Reconciliação entre versões por obra + marca + categoria. Marca que some com valores vira ÓRFÃ (nunca apagar dados em silêncio). Toda alteração vai para audit_log.
 - O frontend só acessa o visualizador pela interface ViewerAdapter.
 - Até a Fase 11 não há login: usuário simulado pelo header X-Dev-User (id, nome, papel: projetos | fabrica | admin | leitura). Toda tabela tem created_by/updated_by.

@@ -1,0 +1,35 @@
+{
+  "data": {
+    "type": "objects",
+    "objects": [
+      {
+        "objectid": 1,
+        "name": "Projeto",
+        "objects": [
+          {
+            "objectid": 2,
+            "name": "Terreno",
+            "objects": [
+              {
+                "objectid": 3,
+                "name": "Edifício",
+                "objects": [
+                  {
+                    "objectid": 4,
+                    "name": "Térreo",
+                    "objects": [
+                      {"objectid": 10, "name": "Viga:V30x60:1"},
+                      {"objectid": 11, "name": "Viga:V30x60:2"},
+                      {"objectid": 12, "name": "Pilar:P40x40:1"},
+                      {"objectid": 13, "name": "Laje:L20:1"}
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

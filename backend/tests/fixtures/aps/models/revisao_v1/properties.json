@@ -1,0 +1,308 @@
+{
+ "data": {
+  "type": "properties",
+  "collection": [
+   {
+    "objectid": 10,
+    "name": "Pilar pré-moldado [10]",
+    "externalId": "r1-10",
+    "properties": {
+     "Dados de identidade": {
+      "Tipo": "Pilar 40x60",
+      "Seção": "40x60",
+      "Marca": "PP001"
+     },
+     "Dimensões": {
+      "Largura": "40.0 cm",
+      "Altura": "60.0 cm",
+      "Comprimento": "600.0 cm"
+     },
+     "Restrições": {
+      "Nível base": "TÉRREO"
+     },
+     "Localização": {
+      "Ponto": "0,0,0"
+     },
+     "Other": {
+      "Category": "Revit Structural Columns"
+     }
+    }
+   },
+   {
+    "objectid": 11,
+    "name": "Pilar pré-moldado [11]",
+    "externalId": "r1-11",
+    "properties": {
+     "Dados de identidade": {
+      "Tipo": "Pilar 40x60",
+      "Seção": "40x60",
+      "Marca": "PP001"
+     },
+     "Dimensões": {
+      "Largura": "40.0 cm",
+      "Altura": "60.0 cm",
+      "Comprimento": "600.0 cm"
+     },
+     "Restrições": {
+      "Nível base": "TÉRREO"
+     },
+     "Localização": {
+      "Ponto": "0,0,0"
+     },
+     "Other": {
+      "Category": "Revit Structural Columns"
+     }
+    }
+   },
+   {
+    "objectid": 12,
+    "name": "Pilar pré-moldado [12]",
+    "externalId": "r1-12",
+    "properties": {
+     "Dados de identidade": {
+      "Tipo": "Pilar 40x60",
+      "Seção": "40x60",
+      "Marca": "PP002"
+     },
+     "Dimensões": {
+      "Largura": "40.0 cm",
+      "Altura": "60.0 cm",
+      "Comprimento": "600.0 cm"
+     },
+     "Restrições": {
+      "Nível base": "TÉRREO"
+     },
+     "Localização": {
+      "Ponto": "100,0,0"
+     },
+     "Other": {
+      "Category": "Revit Structural Columns"
+     }
+    }
+   },
+   {
+    "objectid": 13,
+    "name": "Pilar pré-moldado [13]",
+    "externalId": "r1-13",
+    "properties": {
+     "Dados de identidade": {
+      "Tipo": "Pilar 40x60",
+      "Seção": "40x60",
+      "Marca": "PP002"
+     },
+     "Dimensões": {
+      "Largura": "40.0 cm",
+      "Altura": "60.0 cm",
+      "Comprimento": "600.0 cm"
+     },
+     "Restrições": {
+      "Nível base": "TÉRREO"
+     },
+     "Localização": {
+      "Ponto": "200,0,0"
+     },
+     "Other": {
+      "Category": "Revit Structural Columns"
+     }
+    }
+   },
+   {
+    "objectid": 14,
+    "name": "Pilar pré-moldado [14]",
+    "externalId": "r1-14",
+    "properties": {
+     "Dados de identidade": {
+      "Tipo": "Pilar 40x60",
+      "Seção": "40x60",
+      "Marca": "PP003"
+     },
+     "Dimensões": {
+      "Largura": "40.0 cm",
+      "Altura": "60.0 cm",
+      "Comprimento": "600.0 cm"
+     },
+     "Restrições": {
+      "Nível base": "TÉRREO"
+     },
+     "Localização": {
+      "Ponto": "0,0,0"
+     },
+     "Other": {
+      "Category": "Revit Structural Columns"
+     }
+    }
+   },
+   {
+    "objectid": 15,
+    "name": "Pilar pré-moldado [15]",
+    "externalId": "r1-15",
+    "properties": {
+     "Dados de identidade": {
+      "Tipo": "Pilar 40x60",
+      "Seção": "40x60",
+      "Marca": "PP003"
+     },
+     "Dimensões": {
+      "Largura": "40.0 cm",
+      "Altura": "60.0 cm",
+      "Comprimento": "600.0 cm"
+     },
+     "Restrições": {
+      "Nível base": "TÉRREO"
+     },
+     "Localização": {
+      "Ponto": "0,0,0"
+     },
+     "Other": {
+      "Category": "Revit Structural Columns"
+     }
+    }
+   },
+   {
+    "objectid": 17,
+    "name": "Pilar pré-moldado [17]",
+    "externalId": "r1-17",
+    "properties": {
+     "Dados de identidade": {
+      "Tipo": "Pilar 40x60",
+      "Seção": "40x60",
+      "Marca": "PP004"
+     },
+     "Dimensões": {
+      "Largura": "40.0 cm",
+      "Altura": "60.0 cm",
+      "Comprimento": "600.0 cm"
+     },
+     "Restrições": {
+      "Nível base": "TÉRREO"
+     },
+     "Localização": {
+      "Ponto": "0,0,0"
+     },
+     "Other": {
+      "Category": "Revit Structural Columns"
+     }
+    }
+   },
+   {
+    "objectid": 18,
+    "name": "Pilar pré-moldado [18]",
+    "externalId": "r1-18",
+    "properties": {
+     "Dados de identidade": {
+      "Tipo": "Pilar 40x60",
+      "Seção": "40x60",
+      "Marca": "PP005"
+     },
+     "Dimensões": {
+      "Largura": "40.0 cm",
+      "Altura": "60.0 cm",
+      "Comprimento": "600.0 cm"
+     },
+     "Restrições": {
+      "Nível base": "TÉRREO"
+     },
+     "Localização": {
+      "Ponto": "0,0,0"
+     },
+     "Other": {
+      "Category": "Revit Structural Columns"
+     }
+    }
+   },
+   {
+    "objectid": 22,
+    "name": "Pilar pré-moldado [22]",
+    "externalId": "r1-22",
+    "properties": {
+     "Dados de identidade": {
+      "Tipo": "Pilar 40x60",
+      "Seção": "40x60",
+      "Marca": "PP006"
+     },
+     "Dimensões": {
+      "Largura": "40.0 cm",
+      "Altura": "60.0 cm",
+      "Comprimento": "600.0 cm"
+     },
+     "Restrições": {
+      "Nível base": "TÉRREO"
+     },
+     "Localização": {
+      "Ponto": "0,0,0"
+     },
+     "Other": {
+      "Category": "Revit Structural Columns"
+     }
+    }
+   },
+   {
+    "objectid": 30,
+    "name": "Pilar pré-moldado [30]",
+    "externalId": "r1-30",
+    "properties": {
+     "Dados de identidade": {
+      "Tipo": "Pilar 40x60",
+      "Seção": "40x60"
+     },
+     "Dimensões": {
+      "Largura": "40.0 cm",
+      "Altura": "60.0 cm",
+      "Comprimento": "600.0 cm"
+     },
+     "Restrições": {
+      "Nível base": "TÉRREO"
+     },
+     "Localização": {
+      "Ponto": "0,0,0"
+     },
+     "Other": {
+      "Category": "Revit Structural Columns"
+     }
+    }
+   },
+   {
+    "objectid": 20,
+    "name": "Viga [20]",
+    "externalId": "r1-20",
+    "properties": {
+     "Dados de identidade": {
+      "Marca": "V-01",
+      "Tipo": "Viga 30x60",
+      "Seção": "30x60"
+     },
+     "Dimensões": {
+      "Comprimento": "6000 mm"
+     },
+     "Restrições": {
+      "Nível base": "TÉRREO"
+     },
+     "Other": {
+      "Category": "Revit Structural Framing"
+     }
+    }
+   },
+   {
+    "objectid": 21,
+    "name": "Viga [21]",
+    "externalId": "r1-21",
+    "properties": {
+     "Dados de identidade": {
+      "Marca": "V-01",
+      "Tipo": "Viga 30x60",
+      "Seção": "30x60"
+     },
+     "Dimensões": {
+      "Comprimento": "6000 mm"
+     },
+     "Restrições": {
+      "Nível base": "TÉRREO"
+     },
+     "Other": {
+      "Category": "Revit Structural Framing"
+     }
+    }
+   }
+  ]
+ }
+}

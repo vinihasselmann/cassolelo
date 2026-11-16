@@ -1,0 +1,112 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: bim
+          POSTGRES_PASSWORD: bim_ci
+          POSTGRES_DB: bim
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U bim -d bim"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+      redis:
+        image: redis:7
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      APP_ENV: test
+      DATABASE_URL: postgresql+asyncpg://bim:bim_ci@localhost:5432/bim
+      REDIS_URL: redis://localhost:6379/0
+      REQUIRE_DB: "1" # testes de banco falham (não são pulados) se o Postgres sumir
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+          enable-cache: true
+      - name: Instalar dependências
+        working-directory: backend
+        run: uv sync --locked
+      - name: Lint e typecheck
+        run: make lint-backend
+      - name: Migrações (upgrade a partir do zero)
+        run: make migrate
+      - name: Testes
+        run: make test-backend
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Instalar dependências
+        working-directory: frontend
+        run: npm ci
+      - name: Lint e typecheck
+        run: make lint-frontend
+      - name: Testes
+        run: make test-frontend
+
+  e2e:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: bim
+          POSTGRES_PASSWORD: bim_ci
+          POSTGRES_DB: bim
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U bim -d bim"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      APP_ENV: dev # usuário simulado (X-Dev-User) usado pelo E2E
+      DATABASE_URL: postgresql+asyncpg://bim:bim_ci@localhost:5432/bim
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+          enable-cache: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Instalar dependências
+        run: |
+          cd backend && uv sync --locked
+          cd ../frontend && npm ci && npx playwright install --with-deps chromium
+      - name: Migrações
+        run: make migrate
+      - name: Playwright (Viewer falso, sem APS)
+        run: make e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: frontend/playwright-report

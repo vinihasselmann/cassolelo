@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 494 494">
+  <!-- Ícone Cassol Elo: os dois quadrados do logotipo, centralizados -->
+  <defs>
+    <mask id="l"><rect width="240" height="240" fill="#fff"/><circle cx="120" cy="120" r="67" fill="#000"/><rect x="175" y="91" width="66" height="57" fill="#000"/></mask>
+    <mask id="r"><rect x="254" width="240" height="240" fill="#fff"/><circle cx="374" cy="120" r="67" fill="#000"/><rect x="253" y="91" width="66" height="57" fill="#000"/></mask>
+  </defs>
+  <g transform="translate(0 127)">
+    <rect width="240" height="240" fill="#F2A31B" mask="url(#l)"/>
+    <rect x="254" width="240" height="240" fill="#3C3C3C" mask="url(#r)"/>
+  </g>
+</svg>

@@ -1,0 +1,85 @@
+{
+ "data": {
+  "type": "objects",
+  "objects": [
+   {
+    "objectid": 1,
+    "name": "Model",
+    "objects": [
+     {
+      "objectid": 2,
+      "name": "Structural Columns",
+      "objects": [
+       {
+        "objectid": 3,
+        "name": "Pilar pré-moldado",
+        "objects": [
+         {
+          "objectid": 10,
+          "name": "Pilar pré-moldado [10]"
+         },
+         {
+          "objectid": 11,
+          "name": "Pilar pré-moldado [11]"
+         },
+         {
+          "objectid": 40,
+          "name": "Pilar pré-moldado [40]"
+         },
+         {
+          "objectid": 41,
+          "name": "Pilar pré-moldado [41]"
+         },
+         {
+          "objectid": 14,
+          "name": "Pilar pré-moldado [14]"
+         },
+         {
+          "objectid": 15,
+          "name": "Pilar pré-moldado [15]"
+         },
+         {
+          "objectid": 16,
+          "name": "Pilar pré-moldado [16]"
+         },
+         {
+          "objectid": 17,
+          "name": "Pilar pré-moldado [17]"
+         },
+         {
+          "objectid": 19,
+          "name": "Pilar pré-moldado [19]"
+         },
+         {
+          "objectid": 30,
+          "name": "Pilar pré-moldado [30]"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "objectid": 4,
+      "name": "Structural Framing",
+      "objects": [
+       {
+        "objectid": 5,
+        "name": "Viga",
+        "objects": [
+         {
+          "objectid": 20,
+          "name": "Viga [20]"
+         },
+         {
+          "objectid": 21,
+          "name": "Viga [21]"
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

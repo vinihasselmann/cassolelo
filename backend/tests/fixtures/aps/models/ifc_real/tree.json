@@ -1,0 +1,1873 @@
+{
+ "data": {
+  "type": "objects",
+  "objects": [
+   {
+    "objectid": 1,
+    "name": "MODELO-TESTE",
+    "objects": [
+     {
+      "objectid": 2,
+      "name": "IfcProject::XXXX",
+      "objects": [
+       {
+        "objectid": 3,
+        "name": "IfcSite::Default",
+        "objects": [
+         {
+          "objectid": 4,
+          "name": "IfcBuilding",
+          "objects": [
+           {
+            "objectid": 5,
+            "name": "IfcBuildingStorey::TÉRREO",
+            "objects": [
+             {
+              "objectid": 10,
+              "name": "IfcGrid",
+              "objects": [
+               {
+                "objectid": 12,
+                "name": "IfcGrid::Default Grid",
+                "objects": [
+                 {
+                  "objectid": 15,
+                  "name": "uaxes",
+                  "objects": [
+                   {
+                    "objectid": 17,
+                    "name": "2"
+                   },
+                   {
+                    "objectid": 18,
+                    "name": "B"
+                   },
+                   {
+                    "objectid": 19,
+                    "name": "D"
+                   },
+                   {
+                    "objectid": 20,
+                    "name": "C"
+                   }
+                  ]
+                 },
+                 {
+                  "objectid": 16,
+                  "name": "vaxes",
+                  "objects": [
+                   {
+                    "objectid": 21,
+                    "name": "10"
+                   },
+                   {
+                    "objectid": 22,
+                    "name": "11"
+                   },
+                   {
+                    "objectid": 23,
+                    "name": "12"
+                   },
+                   {
+                    "objectid": 24,
+                    "name": "13"
+                   },
+                   {
+                    "objectid": 25,
+                    "name": "14"
+                   },
+                   {
+                    "objectid": 26,
+                    "name": "15"
+                   },
+                   {
+                    "objectid": 27,
+                    "name": "16"
+                   },
+                   {
+                    "objectid": 28,
+                    "name": "17"
+                   },
+                   {
+                    "objectid": 29,
+                    "name": "18"
+                   },
+                   {
+                    "objectid": 30,
+                    "name": "19"
+                   },
+                   {
+                    "objectid": 31,
+                    "name": "20"
+                   },
+                   {
+                    "objectid": 32,
+                    "name": "21"
+                   },
+                   {
+                    "objectid": 33,
+                    "name": "22"
+                   },
+                   {
+                    "objectid": 34,
+                    "name": "23"
+                   },
+                   {
+                    "objectid": 35,
+                    "name": "24"
+                   },
+                   {
+                    "objectid": 36,
+                    "name": "25"
+                   },
+                   {
+                    "objectid": 37,
+                    "name": "26"
+                   },
+                   {
+                    "objectid": 38,
+                    "name": "27"
+                   },
+                   {
+                    "objectid": 39,
+                    "name": "28"
+                   },
+                   {
+                    "objectid": 40,
+                    "name": "29"
+                   },
+                   {
+                    "objectid": 41,
+                    "name": "30"
+                   },
+                   {
+                    "objectid": 42,
+                    "name": "31"
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "objectid": 13,
+                "name": "IfcGrid::Default Grid",
+                "objects": [
+                 {
+                  "objectid": 43,
+                  "name": "uaxes",
+                  "objects": [
+                   {
+                    "objectid": 45,
+                    "name": "09"
+                   }
+                  ]
+                 },
+                 {
+                  "objectid": 44,
+                  "name": "vaxes",
+                  "objects": [
+                   {
+                    "objectid": 46,
+                    "name": "08"
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "objectid": 14,
+                "name": "IfcGrid::Default Grid",
+                "objects": [
+                 {
+                  "objectid": 363,
+                  "name": "uaxes",
+                  "objects": [
+                   {
+                    "objectid": 365,
+                    "name": "H"
+                   },
+                   {
+                    "objectid": 366,
+                    "name": "I"
+                   },
+                   {
+                    "objectid": 367,
+                    "name": "J"
+                   },
+                   {
+                    "objectid": 368,
+                    "name": "K"
+                   },
+                   {
+                    "objectid": 369,
+                    "name": "L"
+                   },
+                   {
+                    "objectid": 370,
+                    "name": "M"
+                   },
+                   {
+                    "objectid": 371,
+                    "name": "2"
+                   },
+                   {
+                    "objectid": 372,
+                    "name": "B"
+                   },
+                   {
+                    "objectid": 373,
+                    "name": "D"
+                   },
+                   {
+                    "objectid": 374,
+                    "name": "E"
+                   },
+                   {
+                    "objectid": 375,
+                    "name": "F"
+                   },
+                   {
+                    "objectid": 376,
+                    "name": "G"
+                   },
+                   {
+                    "objectid": 377,
+                    "name": "C"
+                   }
+                  ]
+                 },
+                 {
+                  "objectid": 364,
+                  "name": "vaxes",
+                  "objects": [
+                   {
+                    "objectid": 378,
+                    "name": "00"
+                   },
+                   {
+                    "objectid": 379,
+                    "name": "01"
+                   },
+                   {
+                    "objectid": 380,
+                    "name": "03"
+                   },
+                   {
+                    "objectid": 381,
+                    "name": "04"
+                   },
+                   {
+                    "objectid": 382,
+                    "name": "05"
+                   },
+                   {
+                    "objectid": 383,
+                    "name": "06"
+                   },
+                   {
+                    "objectid": 384,
+                    "name": "07"
+                   },
+                   {
+                    "objectid": 385,
+                    "name": "02"
+                   },
+                   {
+                    "objectid": 386,
+                    "name": "3"
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             },
+             {
+              "objectid": 11,
+              "name": "IfcColumn",
+              "objects": [
+               {
+                "objectid": 47,
+                "name": "IfcColumn::CASSOL-PREO-Pilar-R:R-40x40cm-P02:6743697",
+                "objects": [
+                 {
+                  "objectid": 192,
+                  "name": "IfcMappedItem",
+                  "objects": [
+                   {
+                    "objectid": 193,
+                    "name": "IfcExtrudedAreaSolid::Concreto, Pré-moldado - 50MPa_Engastamento"
+                   },
+                   {
+                    "objectid": 194,
+                    "name": "IfcExtrudedAreaSolid::Concreto, Pré-moldado - 50MPa"
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "objectid": 48,
+                "name": "IfcColumn::CASSOL-PREO-Pilar-R:R-60x60cm-P01:6730526",
+                "objects": [
+                 {
+                  "objectid": 195,
+                  "name": "IfcMappedItem",
+                  "objects": [
+                   {
+                    "objectid": 196,
+                    "name": "IfcExtrudedAreaSolid::Concreto, Pré-moldado - 50MPa"
+                   },
+                   {
+                    "objectid": 197,
+                    "name": "IfcExtrudedAreaSolid::Concreto, Pré-moldado - 50MPa_Engastamento"
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "objectid": 49,
+                "name": "IfcColumn::CASSOL-PREO-Pilar-C-duplo:C-2xØ60cm_PILAR 03:6729544",
+                "objects": [
+                 {
+                  "objectid": 198,
+                  "name": "IfcMappedItem",
+                  "objects": [
+                   {
+                    "objectid": 199,
+                    "name": "IfcFacetedBrep::Concreto, Pré-moldado - 50MPa_Engastamento"
+                   },
+                   {
+                    "objectid": 200,
+                    "name": "IfcFacetedBrep::Concreto, Pré-moldado - 50MPa"
+                   },
+                   {
+                    "objectid": 201,
+                    "name": "IfcFacetedBrep::Concreto, Pré-moldado - 50MPa"
+                   },
+                   {
+                    "objectid": 202,
+                    "name": "IfcFacetedBrep::Concreto, Pré-moldado - 50MPa_Engastamento"
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "objectid": 50,
+                "name": "IfcColumn::CASSOL-PREO-Pilar-C-duplo:C-2xØ60cm_PILAR 03:6722809",
+                "objects": [
+                 {
+                  "objectid": 203,
+                  "name": "IfcMappedItem",
+                  "objects": [
+                   {
+                    "objectid": 204,
+                    "name": "IfcFacetedBrep::Concreto, Pré-moldado - 50MPa_Engastamento"
+                   },
+                   {
+                    "objectid": 205,
+                    "name": "IfcFacetedBrep::Concreto, Pré-moldado - 50MPa"
+                   },
+                   {
+                    "objectid": 206,
+                    "name": "IfcFacetedBrep::Concreto, Pré-moldado - 50MPa"
+                   },
+                   {
+                    "objectid": 207,
+                    "name": "IfcFacetedBrep::Concreto, Pré-moldado - 50MPa_Engastamento"
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           },
+           {
+            "objectid": 6,
+            "name": "IfcBuildingStorey::Nível 2",
+            "objects": [
+             {
+              "objectid": 717,
+              "name": "IfcGrid",
+              "objects": [
+               {
+                "objectid": 718,
+                "name": "IfcGrid::Default Grid",
+                "objects": [
+                 {
+                  "objectid": 721,
+                  "name": "uaxes",
+                  "objects": [
+                   {
+                    "objectid": 723,
+                    "name": "H"
+                   },
+                   {
+                    "objectid": 724,
+                    "name": "I"
+                   },
+                   {
+                    "objectid": 725,
+                    "name": "J"
+                   },
+                   {
+                    "objectid": 726,
+                    "name": "K"
+                   },
+                   {
+                    "objectid": 727,
+                    "name": "L"
+                   },
+                   {
+                    "objectid": 728,
+                    "name": "M"
+                   },
+                   {
+                    "objectid": 729,
+                    "name": "2"
+                   },
+                   {
+                    "objectid": 730,
+                    "name": "B"
+                   },
+                   {
+                    "objectid": 731,
+                    "name": "D"
+                   },
+                   {
+                    "objectid": 732,
+                    "name": "E"
+                   },
+                   {
+                    "objectid": 733,
+                    "name": "F"
+                   },
+                   {
+                    "objectid": 734,
+                    "name": "G"
+                   },
+                   {
+                    "objectid": 735,
+                    "name": "C"
+                   }
+                  ]
+                 },
+                 {
+                  "objectid": 722,
+                  "name": "vaxes",
+                  "objects": [
+                   {
+                    "objectid": 736,
+                    "name": "00"
+                   },
+                   {
+                    "objectid": 737,
+                    "name": "01"
+                   },
+                   {
+                    "objectid": 738,
+                    "name": "03"
+                   },
+                   {
+                    "objectid": 739,
+                    "name": "04"
+                   },
+                   {
+                    "objectid": 740,
+                    "name": "05"
+                   },
+                   {
+                    "objectid": 741,
+                    "name": "06"
+                   },
+                   {
+                    "objectid": 742,
+                    "name": "07"
+                   },
+                   {
+                    "objectid": 743,
+                    "name": "02"
+                   },
+                   {
+                    "objectid": 744,
+                    "name": "3"
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "objectid": 719,
+                "name": "IfcGrid::Default Grid",
+                "objects": [
+                 {
+                  "objectid": 745,
+                  "name": "uaxes",
+                  "objects": [
+                   {
+                    "objectid": 747,
+                    "name": "09"
+                   }
+                  ]
+                 },
+                 {
+                  "objectid": 746,
+                  "name": "vaxes",
+                  "objects": [
+                   {
+                    "objectid": 748,
+                    "name": "08"
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "objectid": 720,
+                "name": "IfcGrid::Default Grid",
+                "objects": [
+                 {
+                  "objectid": 749,
+                  "name": "uaxes",
+                  "objects": [
+                   {
+                    "objectid": 751,
+                    "name": "2"
+                   },
+                   {
+                    "objectid": 752,
+                    "name": "B"
+                   },
+                   {
+                    "objectid": 753,
+                    "name": "D"
+                   },
+                   {
+                    "objectid": 754,
+                    "name": "C"
+                   }
+                  ]
+                 },
+                 {
+                  "objectid": 750,
+                  "name": "vaxes",
+                  "objects": [
+                   {
+                    "objectid": 755,
+                    "name": "10"
+                   },
+                   {
+                    "objectid": 756,
+                    "name": "11"
+                   },
+                   {
+                    "objectid": 757,
+                    "name": "12"
+                   },
+                   {
+                    "objectid": 758,
+                    "name": "13"
+                   },
+                   {
+                    "objectid": 759,
+                    "name": "14"
+                   },
+                   {
+                    "objectid": 760,
+                    "name": "15"
+                   },
+                   {
+                    "objectid": 761,
+                    "name": "16"
+                   },
+                   {
+                    "objectid": 762,
+                    "name": "17"
+                   },
+                   {
+                    "objectid": 763,
+                    "name": "18"
+                   },
+                   {
+                    "objectid": 764,
+                    "name": "19"
+                   },
+                   {
+                    "objectid": 765,
+                    "name": "20"
+                   },
+                   {
+                    "objectid": 766,
+                    "name": "21"
+                   },
+                   {
+                    "objectid": 767,
+                    "name": "22"
+                   },
+                   {
+                    "objectid": 768,
+                    "name": "23"
+                   },
+                   {
+                    "objectid": 769,
+                    "name": "24"
+                   },
+                   {
+                    "objectid": 770,
+                    "name": "25"
+                   },
+                   {
+                    "objectid": 771,
+                    "name": "26"
+                   },
+                   {
+                    "objectid": 772,
+                    "name": "27"
+                   },
+                   {
+                    "objectid": 773,
+                    "name": "28"
+                   },
+                   {
+                    "objectid": 774,
+                    "name": "29"
+                   },
+                   {
+                    "objectid": 775,
+                    "name": "30"
+                   },
+                   {
+                    "objectid": 776,
+                    "name": "31"
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           },
+           {
+            "objectid": 7,
+            "name": "IfcBuildingStorey::EMBARQUE",
+            "objects": [
+             {
+              "objectid": 777,
+              "name": "IfcGrid",
+              "objects": [
+               {
+                "objectid": 780,
+                "name": "IfcGrid::Default Grid",
+                "objects": [
+                 {
+                  "objectid": 783,
+                  "name": "uaxes",
+                  "objects": [
+                   {
+                    "objectid": 785,
+                    "name": "09"
+                   }
+                  ]
+                 },
+                 {
+                  "objectid": 784,
+                  "name": "vaxes",
+                  "objects": [
+                   {
+                    "objectid": 786,
+                    "name": "08"
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "objectid": 781,
+                "name": "IfcGrid::Default Grid",
+                "objects": [
+                 {
+                  "objectid": 787,
+                  "name": "uaxes",
+                  "objects": [
+                   {
+                    "objectid": 789,
+                    "name": "2"
+                   },
+                   {
+                    "objectid": 790,
+                    "name": "B"
+                   },
+                   {
+                    "objectid": 791,
+                    "name": "D"
+                   },
+                   {
+                    "objectid": 792,
+                    "name": "C"
+                   }
+                  ]
+                 },
+                 {
+                  "objectid": 788,
+                  "name": "vaxes",
+                  "objects": [
+                   {
+                    "objectid": 793,
+                    "name": "10"
+                   },
+                   {
+                    "objectid": 794,
+                    "name": "11"
+                   },
+                   {
+                    "objectid": 795,
+                    "name": "12"
+                   },
+                   {
+                    "objectid": 796,
+                    "name": "13"
+                   },
+                   {
+                    "objectid": 797,
+                    "name": "14"
+                   },
+                   {
+                    "objectid": 798,
+                    "name": "15"
+                   },
+                   {
+                    "objectid": 799,
+                    "name": "16"
+                   },
+                   {
+                    "objectid": 800,
+                    "name": "17"
+                   },
+                   {
+                    "objectid": 801,
+                    "name": "18"
+                   },
+                   {
+                    "objectid": 802,
+                    "name": "19"
+                   },
+                   {
+                    "objectid": 803,
+                    "name": "20"
+                   },
+                   {
+                    "objectid": 804,
+                    "name": "21"
+                   },
+                   {
+                    "objectid": 805,
+                    "name": "22"
+                   },
+                   {
+                    "objectid": 806,
+                    "name": "23"
+                   },
+                   {
+                    "objectid": 807,
+                    "name": "24"
+                   },
+                   {
+                    "objectid": 808,
+                    "name": "25"
+                   },
+                   {
+                    "objectid": 809,
+                    "name": "26"
+                   },
+                   {
+                    "objectid": 810,
+                    "name": "27"
+                   },
+                   {
+                    "objectid": 811,
+                    "name": "28"
+                   },
+                   {
+                    "objectid": 812,
+                    "name": "29"
+                   },
+                   {
+                    "objectid": 813,
+                    "name": "30"
+                   },
+                   {
+                    "objectid": 814,
+                    "name": "31"
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "objectid": 782,
+                "name": "IfcGrid::Default Grid",
+                "objects": [
+                 {
+                  "objectid": 1776,
+                  "name": "uaxes",
+                  "objects": [
+                   {
+                    "objectid": 1778,
+                    "name": "H"
+                   },
+                   {
+                    "objectid": 1779,
+                    "name": "I"
+                   },
+                   {
+                    "objectid": 1780,
+                    "name": "J"
+                   },
+                   {
+                    "objectid": 1781,
+                    "name": "K"
+                   },
+                   {
+                    "objectid": 1782,
+                    "name": "L"
+                   },
+                   {
+                    "objectid": 1783,
+                    "name": "M"
+                   },
+                   {
+                    "objectid": 1784,
+                    "name": "2"
+                   },
+                   {
+                    "objectid": 1785,
+                    "name": "B"
+                   },
+                   {
+                    "objectid": 1786,
+                    "name": "D"
+                   },
+                   {
+                    "objectid": 1787,
+                    "name": "E"
+                   },
+                   {
+                    "objectid": 1788,
+                    "name": "F"
+                   },
+                   {
+                    "objectid": 1789,
+                    "name": "G"
+                   },
+                   {
+                    "objectid": 1790,
+                    "name": "C"
+                   }
+                  ]
+                 },
+                 {
+                  "objectid": 1777,
+                  "name": "vaxes",
+                  "objects": [
+                   {
+                    "objectid": 1791,
+                    "name": "00"
+                   },
+                   {
+                    "objectid": 1792,
+                    "name": "01"
+                   },
+                   {
+                    "objectid": 1793,
+                    "name": "03"
+                   },
+                   {
+                    "objectid": 1794,
+                    "name": "04"
+                   },
+                   {
+                    "objectid": 1795,
+                    "name": "05"
+                   },
+                   {
+                    "objectid": 1796,
+                    "name": "06"
+                   },
+                   {
+                    "objectid": 1797,
+                    "name": "07"
+                   },
+                   {
+                    "objectid": 1798,
+                    "name": "02"
+                   },
+                   {
+                    "objectid": 1799,
+                    "name": "3"
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             },
+             {
+              "objectid": 778,
+              "name": "IfcBeam",
+              "objects": [
+               {
+                "objectid": 815,
+                "name": "IfcBeam::CASSOL-PREO-Viga-I:I90-50x90cm-V05:6706698",
+                "objects": [
+                 {
+                  "objectid": 1004,
+                  "name": "IfcMappedItem",
+                  "objects": [
+                   {
+                    "objectid": 1005,
+                    "name": "IfcFacetedBrep::Concreto, Pré-moldado - 40MPa"
+                   },
+                   {
+                    "objectid": 1006,
+                    "name": "IfcFacetedBrep::Concreto, Moldado in loco"
+                   },
+                   {
+                    "objectid": 1007,
+                    "name": "IfcFacetedBrep::Concreto, Pré-moldado - 50MPa_Consolo"
+                   },
+                   {
+                    "objectid": 1008,
+                    "name": "IfcFacetedBrep::Neoprene"
+                   },
+                   {
+                    "objectid": 1009,
+                    "name": "IfcFacetedBrep::Neoprene"
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "objectid": 816,
+                "name": "IfcBeam::CASSOL-PREO-Viga-I:I90-50x90cm-V05:6744433",
+                "objects": [
+                 {
+                  "objectid": 1010,
+                  "name": "IfcMappedItem",
+                  "objects": [
+                   {
+                    "objectid": 1011,
+                    "name": "IfcFacetedBrep::Concreto, Pré-moldado - 40MPa"
+                   },
+                   {
+                    "objectid": 1012,
+                    "name": "IfcFacetedBrep::Concreto, Moldado in loco"
+                   },
+                   {
+                    "objectid": 1013,
+                    "name": "IfcFacetedBrep::Concreto, Pré-moldado - 50MPa_Consolo"
+                   },
+                   {
+                    "objectid": 1014,
+                    "name": "IfcFacetedBrep::Neoprene"
+                   },
+                   {
+                    "objectid": 1015,
+                    "name": "IfcFacetedBrep::Neoprene"
+                   },
+                   {
+                    "objectid": 1016,
+                    "name": "IfcFacetedBrep::Concreto, Pré-moldado - 50MPa_Consolo"
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "objectid": 817,
+                "name": "IfcBeam::CASSOL-PREO-Viga-I:I90-50x90cm-V05:6744562",
+                "objects": [
+                 {
+                  "objectid": 1017,
+                  "name": "IfcMappedItem",
+                  "objects": [
+                   {
+                    "objectid": 1018,
+                    "name": "IfcFacetedBrep::Concreto, Pré-moldado - 40MPa"
+                   },
+                   {
+                    "objectid": 1019,
+                    "name": "IfcFacetedBrep::Concreto, Moldado in loco"
+                   },
+                   {
+                    "objectid": 1020,
+                    "name": "IfcFacetedBrep::Concreto, Pré-moldado - 50MPa_Consolo"
+                   },
+                   {
+                    "objectid": 1021,
+                    "name": "IfcFacetedBrep::Neoprene"
+                   },
+                   {
+                    "objectid": 1022,
+                    "name": "IfcFacetedBrep::Neoprene"
+                   },
+                   {
+                    "objectid": 1023,
+                    "name": "IfcFacetedBrep::Concreto, Pré-moldado - 50MPa_Consolo"
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "objectid": 818,
+                "name": "IfcBeam::CASSOL-PREO-Viga-I:I90-50x90cm-V05:6744688",
+                "objects": [
+                 {
+                  "objectid": 1024,
+                  "name": "IfcMappedItem",
+                  "objects": [
+                   {
+                    "objectid": 1025,
+                    "name": "IfcFacetedBrep::Concreto, Pré-moldado - 40MPa"
+                   },
+                   {
+                    "objectid": 1026,
+                    "name": "IfcFacetedBrep::Concreto, Moldado in loco"
+                   },
+                   {
+                    "objectid": 1027,
+                    "name": "IfcFacetedBrep::Concreto, Pré-moldado - 50MPa_Consolo"
+                   },
+                   {
+                    "objectid": 1028,
+                    "name": "IfcFacetedBrep::Neoprene"
+                   },
+                   {
+                    "objectid": 1029,
+                    "name": "IfcFacetedBrep::Neoprene"
+                   },
+                   {
+                    "objectid": 1030,
+                    "name": "IfcFacetedBrep::Concreto, Pré-moldado - 50MPa_Consolo"
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             },
+             {
+              "objectid": 779,
+              "name": "IfcSlab",
+              "objects": [
+               {
+                "objectid": 2016,
+                "name": "IfcSlab::Piso:LA01-LP26.5 SC=500:6665472",
+                "objects": [
+                 {
+                  "objectid": 2017,
+                  "name": "Concreto, Capeamento - 40MPa"
+                 },
+                 {
+                  "objectid": 2018,
+                  "name": "Concreto, Pré-moldado - 40MPa"
+                 },
+                 {
+                  "objectid": 2019,
+                  "name": "IfcOpeningElement::Piso:LA01-LP26.5 SC=500:3928025"
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           },
+           {
+            "objectid": 8,
+            "name": "IfcBuildingStorey::DESEMBARQUE",
+            "objects": [
+             {
+              "objectid": 2408,
+              "name": "IfcGrid",
+              "objects": [
+               {
+                "objectid": 2410,
+                "name": "IfcGrid::Default Grid",
+                "objects": [
+                 {
+                  "objectid": 2413,
+                  "name": "uaxes",
+                  "objects": [
+                   {
+                    "objectid": 2415,
+                    "name": "09"
+                   }
+                  ]
+                 },
+                 {
+                  "objectid": 2414,
+                  "name": "vaxes",
+                  "objects": [
+                   {
+                    "objectid": 2416,
+                    "name": "08"
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "objectid": 2411,
+                "name": "IfcGrid::Default Grid",
+                "objects": [
+                 {
+                  "objectid": 2417,
+                  "name": "uaxes",
+                  "objects": [
+                   {
+                    "objectid": 2419,
+                    "name": "H"
+                   },
+                   {
+                    "objectid": 2420,
+                    "name": "I"
+                   },
+                   {
+                    "objectid": 2421,
+                    "name": "J"
+                   },
+                   {
+                    "objectid": 2422,
+                    "name": "K"
+                   },
+                   {
+                    "objectid": 2423,
+                    "name": "L"
+                   },
+                   {
+                    "objectid": 2424,
+                    "name": "M"
+                   },
+                   {
+                    "objectid": 2425,
+                    "name": "2"
+                   },
+                   {
+                    "objectid": 2426,
+                    "name": "B"
+                   },
+                   {
+                    "objectid": 2427,
+                    "name": "E"
+                   },
+                   {
+                    "objectid": 2428,
+                    "name": "F"
+                   },
+                   {
+                    "objectid": 2429,
+                    "name": "G"
+                   },
+                   {
+                    "objectid": 2430,
+                    "name": "C"
+                   }
+                  ]
+                 },
+                 {
+                  "objectid": 2418,
+                  "name": "vaxes",
+                  "objects": [
+                   {
+                    "objectid": 2431,
+                    "name": "00"
+                   },
+                   {
+                    "objectid": 2432,
+                    "name": "01"
+                   },
+                   {
+                    "objectid": 2433,
+                    "name": "03"
+                   },
+                   {
+                    "objectid": 2434,
+                    "name": "04"
+                   },
+                   {
+                    "objectid": 2435,
+                    "name": "05"
+                   },
+                   {
+                    "objectid": 2436,
+                    "name": "06"
+                   },
+                   {
+                    "objectid": 2437,
+                    "name": "07"
+                   },
+                   {
+                    "objectid": 2438,
+                    "name": "02"
+                   },
+                   {
+                    "objectid": 2439,
+                    "name": "3"
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "objectid": 2412,
+                "name": "IfcGrid::Default Grid",
+                "objects": [
+                 {
+                  "objectid": 2440,
+                  "name": "uaxes",
+                  "objects": [
+                   {
+                    "objectid": 2442,
+                    "name": "2"
+                   },
+                   {
+                    "objectid": 2443,
+                    "name": "B"
+                   },
+                   {
+                    "objectid": 2444,
+                    "name": "C"
+                   }
+                  ]
+                 },
+                 {
+                  "objectid": 2441,
+                  "name": "vaxes",
+                  "objects": [
+                   {
+                    "objectid": 2445,
+                    "name": "10"
+                   },
+                   {
+                    "objectid": 2446,
+                    "name": "11"
+                   },
+                   {
+                    "objectid": 2447,
+                    "name": "12"
+                   },
+                   {
+                    "objectid": 2448,
+                    "name": "13"
+                   },
+                   {
+                    "objectid": 2449,
+                    "name": "14"
+                   },
+                   {
+                    "objectid": 2450,
+                    "name": "15"
+                   },
+                   {
+                    "objectid": 2451,
+                    "name": "16"
+                   },
+                   {
+                    "objectid": 2452,
+                    "name": "17"
+                   },
+                   {
+                    "objectid": 2453,
+                    "name": "18"
+                   },
+                   {
+                    "objectid": 2454,
+                    "name": "19"
+                   },
+                   {
+                    "objectid": 2455,
+                    "name": "20"
+                   },
+                   {
+                    "objectid": 2456,
+                    "name": "21"
+                   },
+                   {
+                    "objectid": 2457,
+                    "name": "22"
+                   },
+                   {
+                    "objectid": 2458,
+                    "name": "23"
+                   },
+                   {
+                    "objectid": 2459,
+                    "name": "24"
+                   },
+                   {
+                    "objectid": 2460,
+                    "name": "25"
+                   },
+                   {
+                    "objectid": 2461,
+                    "name": "26"
+                   },
+                   {
+                    "objectid": 2462,
+                    "name": "27"
+                   },
+                   {
+                    "objectid": 2463,
+                    "name": "28"
+                   },
+                   {
+                    "objectid": 2464,
+                    "name": "29"
+                   },
+                   {
+                    "objectid": 2465,
+                    "name": "30"
+                   },
+                   {
+                    "objectid": 2466,
+                    "name": "31"
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             },
+             {
+              "objectid": 2409,
+              "name": "IfcBeam",
+              "objects": [
+               {
+                "objectid": 2467,
+                "name": "IfcBeam::CASSOL-PREO-Viga-L:L60-40x40cm-V02:6665003",
+                "objects": [
+                 {
+                  "objectid": 2482,
+                  "name": "IfcMappedItem",
+                  "objects": [
+                   {
+                    "objectid": 2483,
+                    "name": "IfcBooleanResult::Concreto, Pré-moldado - 40MPa"
+                   },
+                   {
+                    "objectid": 2484,
+                    "name": "IfcBooleanClippingResult::Concreto, Pré-moldado - 50MPa_Consolo"
+                   },
+                   {
+                    "objectid": 2485,
+                    "name": "IfcExtrudedAreaSolid::Neoprene"
+                   },
+                   {
+                    "objectid": 2486,
+                    "name": "IfcExtrudedAreaSolid::Neoprene"
+                   },
+                   {
+                    "objectid": 2487,
+                    "name": "IfcBooleanClippingResult::Concreto, Pré-moldado - 50MPa_Consolo"
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "objectid": 2468,
+                "name": "IfcBeam::CASSOL-PREO-Viga-L:L60-40x40cm-V02:6665002",
+                "objects": [
+                 {
+                  "objectid": 2488,
+                  "name": "IfcMappedItem",
+                  "objects": [
+                   {
+                    "objectid": 2489,
+                    "name": "IfcBooleanResult::Concreto, Pré-moldado - 40MPa"
+                   },
+                   {
+                    "objectid": 2490,
+                    "name": "IfcBooleanClippingResult::Concreto, Pré-moldado - 50MPa_Consolo"
+                   },
+                   {
+                    "objectid": 2491,
+                    "name": "IfcExtrudedAreaSolid::Neoprene"
+                   },
+                   {
+                    "objectid": 2492,
+                    "name": "IfcExtrudedAreaSolid::Neoprene"
+                   },
+                   {
+                    "objectid": 2493,
+                    "name": "IfcBooleanClippingResult::Concreto, Pré-moldado - 50MPa_Consolo"
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "objectid": 2469,
+                "name": "IfcBeam::CASSOL-PREO-Viga-R:R60-20x60cm-V11:6664993",
+                "objects": [
+                 {
+                  "objectid": 2494,
+                  "name": "Concreto, Pré-moldado - 40MPa"
+                 },
+                 {
+                  "objectid": 2495,
+                  "name": "Neoprene"
+                 },
+                 {
+                  "objectid": 2496,
+                  "name": "Neoprene"
+                 },
+                 {
+                  "objectid": 2497,
+                  "name": "IfcOpeningElement::CASSOL-PREO-Viga-R:R60-20x60cm-V11:6664993:1"
+                 },
+                 {
+                  "objectid": 2498,
+                  "name": "IfcOpeningElement::CASSOL-PREO-Viga-R:R60-20x60cm-V11:6664993:2"
+                 }
+                ]
+               },
+               {
+                "objectid": 2470,
+                "name": "IfcBeam::CASSOL-PREO-Viga-R:R60-20x60cm-V11:6664995",
+                "objects": [
+                 {
+                  "objectid": 2499,
+                  "name": "IfcMappedItem",
+                  "objects": [
+                   {
+                    "objectid": 2500,
+                    "name": "IfcBooleanResult::Concreto, Pré-moldado - 40MPa"
+                   },
+                   {
+                    "objectid": 2501,
+                    "name": "IfcBooleanClippingResult::Concreto, Pré-moldado - 50MPa_Consolo"
+                   },
+                   {
+                    "objectid": 2502,
+                    "name": "IfcBooleanClippingResult::Concreto, Pré-moldado - 50MPa_Consolo"
+                   },
+                   {
+                    "objectid": 2503,
+                    "name": "IfcExtrudedAreaSolid::Neoprene"
+                   },
+                   {
+                    "objectid": 2504,
+                    "name": "IfcExtrudedAreaSolid::Neoprene"
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           },
+           {
+            "objectid": 9,
+            "name": "IfcBuildingStorey::COBERTURA",
+            "objects": [
+             {
+              "objectid": 2570,
+              "name": "IfcGrid",
+              "objects": [
+               {
+                "objectid": 2572,
+                "name": "IfcGrid::Default Grid",
+                "objects": [
+                 {
+                  "objectid": 2575,
+                  "name": "uaxes",
+                  "objects": [
+                   {
+                    "objectid": 2577,
+                    "name": "2"
+                   },
+                   {
+                    "objectid": 2578,
+                    "name": "B"
+                   },
+                   {
+                    "objectid": 2579,
+                    "name": "C"
+                   }
+                  ]
+                 },
+                 {
+                  "objectid": 2576,
+                  "name": "vaxes",
+                  "objects": [
+                   {
+                    "objectid": 2580,
+                    "name": "10"
+                   },
+                   {
+                    "objectid": 2581,
+                    "name": "11"
+                   },
+                   {
+                    "objectid": 2582,
+                    "name": "12"
+                   },
+                   {
+                    "objectid": 2583,
+                    "name": "13"
+                   },
+                   {
+                    "objectid": 2584,
+                    "name": "14"
+                   },
+                   {
+                    "objectid": 2585,
+                    "name": "15"
+                   },
+                   {
+                    "objectid": 2586,
+                    "name": "16"
+                   },
+                   {
+                    "objectid": 2587,
+                    "name": "17"
+                   },
+                   {
+                    "objectid": 2588,
+                    "name": "18"
+                   },
+                   {
+                    "objectid": 2589,
+                    "name": "19"
+                   },
+                   {
+                    "objectid": 2590,
+                    "name": "20"
+                   },
+                   {
+                    "objectid": 2591,
+                    "name": "21"
+                   },
+                   {
+                    "objectid": 2592,
+                    "name": "22"
+                   },
+                   {
+                    "objectid": 2593,
+                    "name": "23"
+                   },
+                   {
+                    "objectid": 2594,
+                    "name": "24"
+                   },
+                   {
+                    "objectid": 2595,
+                    "name": "25"
+                   },
+                   {
+                    "objectid": 2596,
+                    "name": "26"
+                   },
+                   {
+                    "objectid": 2597,
+                    "name": "27"
+                   },
+                   {
+                    "objectid": 2598,
+                    "name": "28"
+                   },
+                   {
+                    "objectid": 2599,
+                    "name": "29"
+                   },
+                   {
+                    "objectid": 2600,
+                    "name": "30"
+                   },
+                   {
+                    "objectid": 2601,
+                    "name": "31"
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "objectid": 2573,
+                "name": "IfcGrid::Default Grid",
+                "objects": [
+                 {
+                  "objectid": 2602,
+                  "name": "uaxes",
+                  "objects": [
+                   {
+                    "objectid": 2604,
+                    "name": "09"
+                   }
+                  ]
+                 },
+                 {
+                  "objectid": 2603,
+                  "name": "vaxes",
+                  "objects": [
+                   {
+                    "objectid": 2605,
+                    "name": "08"
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "objectid": 2574,
+                "name": "IfcGrid::Default Grid",
+                "objects": [
+                 {
+                  "objectid": 2606,
+                  "name": "uaxes",
+                  "objects": [
+                   {
+                    "objectid": 2608,
+                    "name": "H"
+                   },
+                   {
+                    "objectid": 2609,
+                    "name": "I"
+                   },
+                   {
+                    "objectid": 2610,
+                    "name": "J"
+                   },
+                   {
+                    "objectid": 2611,
+                    "name": "K"
+                   },
+                   {
+                    "objectid": 2612,
+                    "name": "L"
+                   },
+                   {
+                    "objectid": 2613,
+                    "name": "M"
+                   },
+                   {
+                    "objectid": 2614,
+                    "name": "2"
+                   },
+                   {
+                    "objectid": 2615,
+                    "name": "B"
+                   },
+                   {
+                    "objectid": 2616,
+                    "name": "E"
+                   },
+                   {
+                    "objectid": 2617,
+                    "name": "F"
+                   },
+                   {
+                    "objectid": 2618,
+                    "name": "G"
+                   },
+                   {
+                    "objectid": 2619,
+                    "name": "C"
+                   }
+                  ]
+                 },
+                 {
+                  "objectid": 2607,
+                  "name": "vaxes",
+                  "objects": [
+                   {
+                    "objectid": 2620,
+                    "name": "00"
+                   },
+                   {
+                    "objectid": 2621,
+                    "name": "01"
+                   },
+                   {
+                    "objectid": 2622,
+                    "name": "03"
+                   },
+                   {
+                    "objectid": 2623,
+                    "name": "04"
+                   },
+                   {
+                    "objectid": 2624,
+                    "name": "05"
+                   },
+                   {
+                    "objectid": 2625,
+                    "name": "06"
+                   },
+                   {
+                    "objectid": 2626,
+                    "name": "07"
+                   },
+                   {
+                    "objectid": 2627,
+                    "name": "02"
+                   },
+                   {
+                    "objectid": 2628,
+                    "name": "3"
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             },
+             {
+              "objectid": 2571,
+              "name": "IfcBeam",
+              "objects": [
+               {
+                "objectid": 2629,
+                "name": "IfcBeam::CASSOL-PREO-Viga-L:L60-40x40cm-V02:6665004",
+                "objects": [
+                 {
+                  "objectid": 2638,
+                  "name": "IfcMappedItem",
+                  "objects": [
+                   {
+                    "objectid": 2639,
+                    "name": "IfcBooleanResult::Concreto, Pré-moldado - 40MPa"
+                   },
+                   {
+                    "objectid": 2640,
+                    "name": "IfcBooleanClippingResult::Concreto, Pré-moldado - 50MPa_Consolo"
+                   },
+                   {
+                    "objectid": 2641,
+                    "name": "IfcExtrudedAreaSolid::Neoprene"
+                   },
+                   {
+                    "objectid": 2642,
+                    "name": "IfcExtrudedAreaSolid::Neoprene"
+                   },
+                   {
+                    "objectid": 2643,
+                    "name": "IfcBooleanClippingResult::Concreto, Pré-moldado - 50MPa_Consolo"
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "objectid": 2630,
+                "name": "IfcBeam::CASSOL-PREO-Viga-R:R60-20x60cm-V11:6664994",
+                "objects": [
+                 {
+                  "objectid": 2644,
+                  "name": "Concreto, Pré-moldado - 40MPa"
+                 },
+                 {
+                  "objectid": 2645,
+                  "name": "Neoprene"
+                 },
+                 {
+                  "objectid": 2646,
+                  "name": "Neoprene"
+                 },
+                 {
+                  "objectid": 2647,
+                  "name": "IfcOpeningElement::CASSOL-PREO-Viga-R:R60-20x60cm-V11:6664994:2"
+                 },
+                 {
+                  "objectid": 2648,
+                  "name": "IfcOpeningElement::CASSOL-PREO-Viga-R:R60-20x60cm-V11:6664994:1"
+                 }
+                ]
+               },
+               {
+                "objectid": 2631,
+                "name": "IfcBeam::CASSOL-PREO-Viga-R:R60-20x60cm-V11:6664997",
+                "objects": [
+                 {
+                  "objectid": 2649,
+                  "name": "IfcMappedItem",
+                  "objects": [
+                   {
+                    "objectid": 2650,
+                    "name": "IfcBooleanResult::Concreto, Pré-moldado - 40MPa"
+                   },
+                   {
+                    "objectid": 2651,
+                    "name": "IfcBooleanClippingResult::Concreto, Pré-moldado - 50MPa_Consolo"
+                   },
+                   {
+                    "objectid": 2652,
+                    "name": "IfcBooleanClippingResult::Concreto, Pré-moldado - 50MPa_Consolo"
+                   },
+                   {
+                    "objectid": 2653,
+                    "name": "IfcExtrudedAreaSolid::Neoprene"
+                   },
+                   {
+                    "objectid": 2654,
+                    "name": "IfcExtrudedAreaSolid::Neoprene"
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "objectid": 2632,
+                "name": "IfcBeam::CASSOL-PREO-Viga-L:L60-40x40cm-V02:6664987",
+                "objects": [
+                 {
+                  "objectid": 2655,
+                  "name": "IfcMappedItem",
+                  "objects": [
+                   {
+                    "objectid": 2656,
+                    "name": "IfcBooleanResult::Concreto, Pré-moldado - 40MPa"
+                   },
+                   {
+                    "objectid": 2657,
+                    "name": "IfcBooleanClippingResult::Concreto, Pré-moldado - 50MPa_Consolo"
+                   },
+                   {
+                    "objectid": 2658,
+                    "name": "IfcExtrudedAreaSolid::Neoprene"
+                   },
+                   {
+                    "objectid": 2659,
+                    "name": "IfcExtrudedAreaSolid::Neoprene"
+                   },
+                   {
+                    "objectid": 2660,
+                    "name": "IfcBooleanClippingResult::Concreto, Pré-moldado - 50MPa_Consolo"
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

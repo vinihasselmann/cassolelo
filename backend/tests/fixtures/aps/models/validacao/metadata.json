@@ -1,0 +1,13 @@
+{
+  "data": {
+    "type": "metadata",
+    "metadata": [
+      {
+        "name": "{3D}",
+        "role": "3d",
+        "guid": "val-3d-0001",
+        "isMasterView": true
+      }
+    ]
+  }
+}

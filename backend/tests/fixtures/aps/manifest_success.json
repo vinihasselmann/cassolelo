@@ -1,0 +1,18 @@
+{
+  "type": "manifest",
+  "hasThumbnail": "true",
+  "status": "success",
+  "progress": "complete",
+  "region": "US",
+  "urn": "dXJuOmFkc2sud2lwcHJvZDpmcy5maWxlOnZmLlNBTklUSVpFRF9GSUxFX0lEP3ZlcnNpb249Mg",
+  "derivatives": [
+    {
+      "name": "OBRA-001-PRE.rvt",
+      "hasThumbnail": "true",
+      "status": "success",
+      "progress": "complete",
+      "outputType": "svf2",
+      "children": []
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "data": {
+    "type": "properties",
+    "collection": [
+      {
+        "objectid": 10,
+        "name": "Viga Pré-moldada [100001]",
+        "externalId": "00000000-aaaa-0000-0000-000000100001-000186a1",
+        "properties": {
+          "Dados de identidade": {
+            "Marca": "V-101",
+            "Comentários": ""
+          },
+          "Dimensões": {
+            "Comprimento": "600.0 cm"
+          },
+          "Other": {
+            "Category": "Revit Structural Framing"
+          }
+        }
+      },
+      {
+        "objectid": 11,
+        "name": "Viga Pré-moldada [100002]",
+        "externalId": "00000000-aaaa-0000-0000-000000100002-000186a2",
+        "properties": {
+          "Dados de identidade": {
+            "Marca": "V-101"
+          },
+          "Dimensões": {
+            "Comprimento": "600.0 cm"
+          },
+          "Other": {
+            "Category": "Revit Structural Framing"
+          }
+        }
+      },
+      {
+        "objectid": 20,
+        "name": "Pilar [200001]",
+        "externalId": "00000000-bbbb-0000-0000-000000200001-00030d41",
+        "properties": {
+          "Dados de identidade": {
+            "Mark": "P-01"
+          },
+          "Other": {
+            "Category": "Revit Structural Columns"
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,552 @@
+<title>Guia dos Parâmetros da Fábrica</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: manual de chão de fábrica. Índice fixo à esquerda em telas largas, coluna única no tablet/celular;
+   cada seção é uma "ficha" numerada porque o guia segue a ordem real do trabalho. */
+:root {
+  --bg: #f3f5f7;          /* concreto claro, puxado para o azul do app */
+  --surface: #ffffff;
+  --ink: #1c2430;
+  --muted: #5b6676;
+  --line: #d9dee5;
+  --navy: #1f3b57;        /* cabeçalho do app */
+  --navy-soft: #e6edf4;
+  --code-bg: #eef1f5;
+  --pending: #B9BEC6;     /* mesmas cores do 3D */
+  --partial: #E3B341;
+  --complete: #33A06F;
+  --review: #E8743B;
+  --danger: #b3261e;
+  --danger-soft: #fbeceb;
+  --warn-soft: #fdf4e0;
+  --ok-soft: #e7f4ed;
+  --f-display: "IBM Plex Sans Condensed", "Arial Narrow", "Segoe UI", sans-serif;
+  --f-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11161d; --surface: #18202a; --ink: #e5eaf0; --muted: #9aa6b5; --line: #2a3542;
+    --navy: #8fb4d9; --navy-soft: #1d2b3a; --code-bg: #212b37;
+    --danger: #f08a82; --danger-soft: #3a1f1d; --warn-soft: #3a3020; --ok-soft: #1c3328;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11161d; --surface: #18202a; --ink: #e5eaf0; --muted: #9aa6b5; --line: #2a3542;
+  --navy: #8fb4d9; --navy-soft: #1d2b3a; --code-bg: #212b37;
+  --danger: #f08a82; --danger-soft: #3a1f1d; --warn-soft: #3a3020; --ok-soft: #1c3328;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--f-body); font-size: 16px; line-height: 1.6;
+}
+.wrap {
+  max-width: 1180px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* Cabeçalho */
+.mast { background: var(--surface); border-bottom: 1px solid var(--line); }
+.mast .wrap { padding-block: 28px 24px; display: grid; gap: 10px; }
+.eyebrow {
+  font-family: var(--f-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 16px;
+}
+h1 {
+  font-family: var(--f-display); font-weight: 700; font-size: clamp(30px, 5vw, 44px);
+  line-height: 1.1; margin: 0; color: var(--navy); text-wrap: balance;
+}
+.lede { max-width: 68ch; margin: 0; color: var(--ink); font-size: 17px; }
+
+/* Grade principal */
+.grid { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 40px; padding-block: 32px 64px; }
+@media (max-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr); gap: 24px; } }
+
+nav.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); align-self: start; }
+@media (max-width: 900px) { nav.toc { position: static; } }
+nav.toc h2 {
+  font-family: var(--f-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted); margin: 0 0 8px; font-weight: 500;
+}
+nav.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; counter-reset: toc; }
+nav.toc li { counter-increment: toc; }
+nav.toc a {
+  display: grid; grid-template-columns: 2.2em 1fr; padding: 5px 8px; border-radius: 6px;
+  color: var(--ink); text-decoration: none; font-size: 14.5px; line-height: 1.35;
+}
+nav.toc a::before { content: counter(toc, decimal-leading-zero); font-family: var(--f-mono); color: var(--muted); font-size: 12.5px; padding-top: 1px; }
+nav.toc a:hover, nav.toc a:focus-visible { background: var(--navy-soft); outline: none; }
+@media (max-width: 900px) {
+  nav.toc { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
+  nav.toc ol { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+}
+
+main { min-width: 0; display: grid; gap: 56px; }
+section { display: grid; gap: 16px; scroll-margin-top: 16px; }
+.sec-head { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; align-items: baseline; border-bottom: 2px solid var(--navy); padding-bottom: 8px; }
+.sec-num { font-family: var(--f-mono); font-size: 14px; color: var(--navy); font-weight: 500; }
+h2 { font-family: var(--f-display); font-weight: 600; font-size: 27px; line-height: 1.2; margin: 0; text-wrap: balance; }
+h3 { font-family: var(--f-display); font-weight: 600; font-size: 19.5px; margin: 8px 0 0; color: var(--ink); }
+p { margin: 0; max-width: 70ch; }
+ul.plain, ol.steps { margin: 0; padding-left: 1.3em; display: grid; gap: 6px; max-width: 70ch; }
+ol.steps li::marker { font-family: var(--f-mono); color: var(--navy); font-weight: 500; }
+b, strong { font-weight: 600; }
+.muted { color: var(--muted); }
+code, .ui {
+  font-family: var(--f-mono); font-size: .88em; background: var(--code-bg);
+  padding: 1px 6px; border-radius: 4px; white-space: nowrap;
+}
+.ui { font-family: var(--f-body); font-weight: 600; font-size: .92em; border: 1px solid var(--line); }
+
+/* Ideia central */
+.core {
+  background: var(--navy-soft); border: 1px solid var(--line); border-left: 4px solid var(--navy);
+  border-radius: 8px; padding: 18px 20px; display: grid; gap: 10px;
+}
+.core p { max-width: none; }
+.flow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-family: var(--f-mono); font-size: 13.5px; }
+.flow span { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 4px 10px; }
+.flow i { font-style: normal; color: var(--muted); }
+
+/* Tabelas */
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 15px; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-family: var(--f-mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 500; background: var(--bg); }
+tr:last-child td { border-bottom: 0; }
+td.c { text-align: center; font-family: var(--f-mono); }
+.yes { color: var(--complete); font-weight: 600; }
+.no { color: var(--muted); }
+
+/* Maquete do formulário */
+.mock {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+  box-shadow: 0 1px 0 var(--line), 0 6px 18px rgba(20, 35, 55, .06);
+  max-width: 560px; overflow: hidden;
+}
+.mock-title { background: var(--navy); color: #fff; font-family: var(--f-display); font-weight: 600; padding: 10px 16px; font-size: 16px; }
+:root[data-theme="dark"] .mock-title { color: #11161d; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .mock-title { color: #11161d; } }
+.mock-body { padding: 14px 16px; display: grid; gap: 12px; }
+.mfield { display: grid; grid-template-columns: 9.5em minmax(0, 1fr); gap: 4px 12px; align-items: start; font-size: 14.5px; }
+@media (max-width: 480px) { .mfield { grid-template-columns: minmax(0, 1fr); } }
+.mfield .lbl { font-weight: 600; }
+.mfield .lbl .req { color: var(--danger); }
+.mfield .val { color: var(--muted); }
+.mfield .val b { color: var(--ink); }
+
+/* Tipos */
+.types { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.type { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; display: grid; gap: 6px; align-content: start; }
+.type h4 { margin: 0; font-family: var(--f-display); font-size: 17px; font-weight: 600; display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.type h4 small { font-family: var(--f-mono); font-size: 11.5px; color: var(--muted); font-weight: 400; letter-spacing: .04em; }
+.type p { font-size: 14.5px; }
+.type .ex { font-family: var(--f-mono); font-size: 13px; color: var(--muted); }
+
+/* Status */
+.status-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+.st { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; display: grid; gap: 4px; }
+.st .dot { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-family: var(--f-display); font-size: 17px; }
+.st .dot::before { content: ""; width: 14px; height: 14px; border-radius: 50%; background: var(--c); flex: none; border: 1px solid rgba(0,0,0,.12); }
+.st p { font-size: 14px; color: var(--muted); }
+
+/* Avisos */
+.note { border-radius: 8px; padding: 12px 16px; border: 1px solid var(--line); display: grid; gap: 4px; max-width: 74ch; }
+.note.tip { background: var(--ok-soft); }
+.note.warn { background: var(--warn-soft); }
+.note.stop { background: var(--danger-soft); }
+.note strong { font-family: var(--f-display); font-size: 15.5px; }
+.note p { max-width: none; font-size: 15px; }
+
+/* Confirmação do lote */
+.confirm { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; max-width: 560px; overflow: hidden; }
+.confirm .mock-body p { font-size: 14.5px; }
+.btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn { font-family: var(--f-body); font-size: 14px; font-weight: 600; padding: 6px 14px; border-radius: 6px; border: 1px solid var(--navy); }
+.btn.primary { background: var(--navy); color: var(--surface); }
+.btn.secondary { background: transparent; color: var(--navy); }
+
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; align-items: start; }
+.two > * { min-width: 0; }
+
+footer { border-top: 1px solid var(--line); }
+footer .wrap { padding-block: 20px 32px; font-size: 13.5px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
+
+a { color: var(--navy); }
+:focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+
+<header class="mast">
+  <div class="wrap">
+    <div class="eyebrow"><span>Visualizador BIM · Cassol Pré-Fabricados</span><span>Guia de uso · versão de 12/11/2026</span></div>
+    <h1>Parâmetros da fábrica</h1>
+    <p class="lede">Como criar os parâmetros de produção (tipo de forma, ciclo de cura, insert…), preencher os valores por marca, trabalhar em lote e acompanhar o andamento da obra. Este guia não trata de como navegar no modelo 3D nem no Autodesk Docs.</p>
+  </div>
+</header>
+
+<div class="wrap grid">
+  <nav class="toc" aria-label="Índice">
+    <h2>Neste guia</h2>
+    <ol>
+      <li><a href="#ideia">A ideia em 1 minuto</a></li>
+      <li><a href="#papeis">Quem pode fazer o quê</a></li>
+      <li><a href="#criar">Criar um parâmetro</a></li>
+      <li><a href="#tipos">Os 5 tipos de parâmetro</a></li>
+      <li><a href="#catalogo">Catálogo: editar e excluir</a></li>
+      <li><a href="#preencher">Preencher os valores de uma marca</a></li>
+      <li><a href="#lote">Edição em lote</a></li>
+      <li><a href="#status">Status, cores e progresso</a></li>
+      <li><a href="#buscar">Encontrar o que falta</a></li>
+      <li><a href="#versao">Quando chega uma versão nova</a></li>
+      <li><a href="#excel">Exportar para o Excel</a></li>
+      <li><a href="#mensagens">Mensagens e o que fazer</a></li>
+      <li><a href="#dicas">Boas práticas</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <!-- 01 -->
+    <section id="ideia">
+      <div class="sec-head"><span class="sec-num">01</span><h2>A ideia em 1 minuto</h2></div>
+      <div class="core">
+        <p><b>Parâmetro</b> é uma informação de produção que <b>não está no projeto</b> e que a fábrica precisa registrar. Exemplos: “Tipo de forma”, “Ciclo de cura (h)”, “Peça com insert”, “Data de concretagem”.</p>
+        <div class="flow" aria-label="Como a informação se organiza">
+          <span>Parâmetro</span><i>é preenchido na</i><span>Marca</span><i>e vale para</i><span>todas as peças da marca</span>
+        </div>
+        <p>Uma <b>marca</b> (ex.: <code>PP001</code>, categoria Pilares estruturais) agrupa as peças físicas idênticas. Preencher “Tipo de forma = F-12” na marca PP001 vale de uma vez para as 4 peças PP001. Não existe valor por peça.</p>
+      </div>
+      <ul class="plain">
+        <li>Os valores ficam no <b>banco do app</b>, nunca no arquivo do Revit. O escritório pode publicar quantas versões quiser: os valores continuam ligados à marca.</li>
+        <li>A marca é identificada por <b>obra + código da marca + categoria</b>. A mesma marca “V01” em duas obras são marcas diferentes, cada uma com seus valores.</li>
+        <li>Peças <b>sem Marca</b> no modelo não recebem valores (o app avisa “peças sem Marca ficam de fora”). Peça a marca ao escritório de projetos.</li>
+        <li>Tudo o que muda fica no <b>histórico</b>: quem, quando, valor antigo e novo. Nada some em silêncio.</li>
+      </ul>
+    </section>
+
+    <!-- 02 -->
+    <section id="papeis">
+      <div class="sec-head"><span class="sec-num">02</span><h2>Quem pode fazer o quê</h2></div>
+      <p>No teste, o usuário é escolhido no seletor <span class="ui">Usuário (simulado)</span> no topo da tela. O papel define os botões que aparecem.</p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Ação</th><th>Fábrica</th><th>Admin</th><th>Projetos</th><th>Leitura</th></tr></thead>
+          <tbody>
+            <tr><td>Ver parâmetros, valores, histórico, cores e progresso</td><td class="c yes">sim</td><td class="c yes">sim</td><td class="c yes">sim</td><td class="c yes">sim</td></tr>
+            <tr><td>Criar, editar e excluir parâmetros</td><td class="c yes">sim</td><td class="c yes">sim</td><td class="c no">não</td><td class="c no">não</td></tr>
+            <tr><td>Preencher valores (uma marca ou em lote) e desfazer lote</td><td class="c yes">sim</td><td class="c yes">sim</td><td class="c no">não</td><td class="c no">não</td></tr>
+            <tr><td>Resolver “Revisar” e a fila de órfãs</td><td class="c yes">sim</td><td class="c yes">sim</td><td class="c no">não</td><td class="c no">não</td></tr>
+            <tr><td>Exportar para o Excel</td><td class="c yes">sim</td><td class="c yes">sim</td><td class="c yes">sim</td><td class="c yes">sim</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 03 -->
+    <section id="criar">
+      <div class="sec-head"><span class="sec-num">03</span><h2>Criar um parâmetro</h2></div>
+      <p>Com o modelo da obra aberto, há três caminhos para o mesmo formulário:</p>
+      <ul class="plain">
+        <li>Painel lateral › <b>Parâmetros da fábrica</b> › <span class="ui">+ Novo parâmetro</span>.</li>
+        <li>Com uma peça selecionada, no painel da peça › <span class="ui">+ Novo parâmetro</span>. A categoria da peça já vem marcada em “Aplica-se a”.</li>
+        <li><span class="ui">Catálogo</span> › <span class="ui">+ Novo parâmetro</span>.</li>
+      </ul>
+
+      <div class="two">
+        <div class="mock" role="img" aria-label="Exemplo do formulário Novo parâmetro da fábrica preenchido">
+          <div class="mock-title">Novo parâmetro da fábrica</div>
+          <div class="mock-body">
+            <div class="mfield"><span class="lbl">Nome <span class="req">*</span></span><span class="val"><b>Tipo de forma</b></span></div>
+            <div class="mfield"><span class="lbl">Tipo</span><span class="val"><b>Lista de opções</b></span></div>
+            <div class="mfield"><span class="lbl">Opções <span class="req">*</span></span><span class="val"><b>F-01 · F-02 · F-12</b> (uma por linha)</span></div>
+            <div class="mfield"><span class="lbl">Aplica-se a</span><span class="val">☑ <b>Pilares estruturais</b> &nbsp;☐ Quadro estrutural</span></div>
+            <div class="mfield"><span class="lbl">Escopo</span><span class="val"><b>Todas as obras (catálogo global)</b></span></div>
+            <div class="mfield"><span class="lbl">Obrigatório</span><span class="val">☑ <b>sim</b></span></div>
+          </div>
+        </div>
+        <div class="tbl">
+          <table>
+            <thead><tr><th>Campo</th><th>O que faz</th></tr></thead>
+            <tbody>
+              <tr><td><b>Nome</b></td><td>Como o parâmetro aparece no painel, na busca, nas cores e no Excel. Até 200 caracteres.</td></tr>
+              <tr><td><b>Tipo</b></td><td>Que tipo de valor será aceito (seção 04). <b>Escolha com cuidado</b>: depois que alguma marca tiver valor, o tipo fica travado.</td></tr>
+              <tr><td><b>Unidade</b></td><td>Só para Número: <code>h</code>, <code>kg</code>, <code>MPa</code>, <code>un</code>… Aparece ao lado do nome. Até 30 caracteres.</td></tr>
+              <tr><td><b>Opções</b></td><td>Só para Lista: uma por linha, de 2 a 200, sem repetir.</td></tr>
+              <tr><td><b>Aplica-se a</b></td><td>As categorias que recebem o parâmetro. <b>Nenhuma marcada = todas</b>. Ex.: “Tipo de forma” só em pilares; “Ciclo de cura” em tudo.</td></tr>
+              <tr><td><b>Escopo</b></td><td><b>Todas as obras</b> (global): aparece em toda obra, atual e futura. <b>Somente esta obra</b>: só nela. Também trava depois de ter valores.</td></tr>
+              <tr><td><b>Obrigatório</b></td><td>Define quando a marca está <b>Completa</b> (seção 08). Pode ser ligado e desligado a qualquer momento.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <h3>Regra dos nomes</h3>
+      <p>Não pode haver dois parâmetros ativos com o mesmo nome no mesmo alcance. Maiúsculas e minúsculas contam como iguais (“Tipo de forma” = “tipo de forma”).</p>
+      <ul class="plain">
+        <li>Um parâmetro <b>global</b> não pode ter o nome de nenhum outro, global ou de qualquer obra.</li>
+        <li>Um parâmetro <b>de obra</b> não pode repetir um global nem outro da mesma obra. Duas obras diferentes podem, cada uma, ter seu próprio “Insert” de obra.</li>
+        <li>Mensagem: <i>Já existe um parâmetro "Tipo de forma" no catálogo global.</i> Use o que já existe ou escolha outro nome.</li>
+      </ul>
+    </section>
+
+    <!-- 04 -->
+    <section id="tipos">
+      <div class="sec-head"><span class="sec-num">04</span><h2>Os 5 tipos de parâmetro</h2></div>
+      <div class="types">
+        <div class="type">
+          <h4>Lista de opções <small>RECOMENDADO</small></h4>
+          <p>Escolhe-se uma opção numa lista fixa. Evita erros de digitação e dá cores e contagens limpas.</p>
+          <p class="ex">Tipo de forma: F-01 · F-02 · F-12<br>Acabamento: Liso · Aparente</p>
+        </div>
+        <div class="type">
+          <h4>Número</h4>
+          <p>Aceita inteiros e decimais. Use <b>vírgula</b> para decimais. Pode ter unidade.</p>
+          <p class="ex">Ciclo de cura (h): 12 · 8,5<br>Peso (kg): 2350</p>
+        </div>
+        <div class="type">
+          <h4>Sim/não</h4>
+          <p>Três estados: <b>Sim</b>, <b>Não</b> ou vazio (não informado).</p>
+          <p class="ex">Peça com insert: Sim<br>Içamento especial: Não</p>
+        </div>
+        <div class="type">
+          <h4>Data</h4>
+          <p>Escolhida no calendário do tablet. Mostrada como dia/mês/ano.</p>
+          <p class="ex">Data de concretagem: 14/11/2026</p>
+        </div>
+        <div class="type">
+          <h4>Texto</h4>
+          <p>Texto livre, até 1.000 caracteres. Espaços repetidos são juntados. Use só quando não há como listar as opções.</p>
+          <p class="ex">Observação de produção: “usar desmoldante B”</p>
+        </div>
+      </div>
+      <div class="note tip"><strong>Dica</strong><p>Prefira <b>Lista</b> a Texto sempre que as respostas se repetem. “F-12”, “f12” e “F 12” digitados à mão viram três valores diferentes nas cores e no Excel. Na lista, a busca e o preenchimento aceitam a opção sem diferenciar maiúsculas (“f-12” vira “F-12”).</p></div>
+    </section>
+
+    <!-- 05 -->
+    <section id="catalogo">
+      <div class="sec-head"><span class="sec-num">05</span><h2>Catálogo: editar e excluir</h2></div>
+      <p>Painel lateral › <b>Parâmetros da fábrica</b> › <span class="ui">Catálogo</span> mostra os parâmetros que valem para a obra aberta: os globais e os desta obra. Cada linha resume o parâmetro, por exemplo:</p>
+      <p><code>Lista de opções · 3 opções · Pilares estruturais · todas as obras · 12 marca(s) com valor</code></p>
+      <p class="muted">Abaixo: quem criou e quando. O asterisco vermelho indica obrigatório.</p>
+
+      <h3>O que pode mudar depois que já há valores</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Campo</th><th>Sem valores</th><th>Com valores</th></tr></thead>
+          <tbody>
+            <tr><td>Nome</td><td class="c yes">muda</td><td class="c yes">muda</td></tr>
+            <tr><td>Unidade, Obrigatório, Aplica-se a</td><td class="c yes">muda</td><td class="c yes">muda</td></tr>
+            <tr><td>Opções da lista</td><td class="c yes">muda</td><td>pode <b>acrescentar</b>; não pode remover uma opção <b>em uso</b> (o formulário lista quais)</td></tr>
+            <tr><td>Tipo</td><td class="c yes">muda</td><td class="c no">travado</td></tr>
+            <tr><td>Escopo (global / obra)</td><td class="c yes">muda</td><td class="c no">travado</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Para trocar uma opção em uso (ex.: renomear “F-12” para “F-12A”): acrescente “F-12A”, mude as marcas com a edição em lote (seção 07) e depois remova “F-12”.</p>
+
+      <h3>Excluir</h3>
+      <p><span class="ui">Excluir</span> pede confirmação, avisando quantas marcas têm valor. Depois de excluído:</p>
+      <ul class="plain">
+        <li>o parâmetro some do painel, das cores, do progresso e do Excel em todas as obras do alcance dele;</li>
+        <li>os valores <b>não são perdidos</b>: ficam guardados no histórico, com quem excluiu e quando;</li>
+        <li>o nome fica livre para um parâmetro novo.</li>
+      </ul>
+      <div class="note warn"><strong>Atenção</strong><p>Excluir um parâmetro <b>global</b> o retira de <b>todas</b> as obras. Se o parâmetro não serve só para uma obra, prefira tirar a categoria dele ou criar um de obra.</p></div>
+    </section>
+
+    <!-- 06 -->
+    <section id="preencher">
+      <div class="sec-head"><span class="sec-num">06</span><h2>Preencher os valores de uma marca</h2></div>
+      <ol class="steps">
+        <li>Selecione uma peça no 3D ou na lista. O painel mostra a <b>marca</b> e quantas peças ela tem (ex.: “PP001 · Pilares estruturais · 4 peças”).</li>
+        <li>Em <b>Parâmetros da fábrica</b> aparecem só os parâmetros que se aplicam à categoria dessa marca. Toque <span class="ui">Editar</span>.</li>
+        <li>Preencha os campos. Obrigatórios têm <span style="color:var(--danger)">*</span>.</li>
+        <li><span class="ui">Salvar</span> grava. <span class="ui">Cancelar</span> ou a tecla <code>Esc</code> descartam.</li>
+      </ol>
+      <ul class="plain">
+        <li>Só o que você <b>mudou</b> é gravado. Abrir e salvar sem mudar nada não cria histórico.</li>
+        <li>Para <b>apagar</b> um valor, deixe o campo vazio e salve. O histórico registra “→ apagado”.</li>
+        <li>Se um campo estiver errado, <b>nada é salvo</b> e a mensagem diz qual (ex.: <i>Ciclo de cura: "8.5h" não é um número (use vírgula para decimais).</i>).</li>
+        <li>Abaixo dos valores: <i>Última alteração: Fábio Fábrica · 12/11/2026 14:02</i>. <span class="ui">Histórico</span> mostra todas as mudanças da marca, a mais recente primeiro.</li>
+      </ul>
+
+      <h3>Duas pessoas na mesma marca</h3>
+      <p>Se um colega salvou a mesma marca enquanto você editava, o app <b>não sobrescreve</b> o trabalho dele. Aparece:</p>
+      <div class="note warn"><p><b>Fábio Fábrica</b> alterou esta marca há 1 min. Seus valores não foram salvos. <u>Recarregar</u></p></div>
+      <p>Toque <span class="ui">Recarregar</span>, confira o que ele gravou e edite de novo se precisar. Mudanças feitas por outras pessoas aparecem na sua tela sozinhas, sem recarregar a página.</p>
+
+      <h3>Versão anterior aberta</h3>
+      <p>Ao abrir uma versão antiga do modelo, os valores aparecem só para consulta: <i>Valores atuais da marca: valem para a versão ativa. Nesta versão só é possível consultar.</i> Para editar, volte à versão ativa.</p>
+    </section>
+
+    <!-- 07 -->
+    <section id="lote">
+      <div class="sec-head"><span class="sec-num">07</span><h2>Edição em lote</h2></div>
+      <p>Para gravar o mesmo valor em muitas marcas de uma vez (ex.: todas as vigas do térreo usam a forma F-02).</p>
+      <h3>Selecionar várias marcas</h3>
+      <ul class="plain">
+        <li><b>Tablet:</b> ligue <span class="ui">Seleção múltipla</span> e toque nas peças; cada toque acumula uma marca.</li>
+        <li><b>Computador:</b> <code>Ctrl</code> + clique.</li>
+        <li><b>Pela busca:</b> filtre e toque <span class="ui">Selecionar todas</span>.</li>
+        <li><b>Pela legenda das cores:</b> tocar numa linha da legenda (ex.: “Pendente”) seleciona todas as marcas dela.</li>
+      </ul>
+      <p>Com 2 ou mais marcas, o painel mostra o valor comum de cada parâmetro, ou <i>(valores mistos)</i> quando as marcas têm valores diferentes. Toque <span class="ui">Editar em lote</span>, preencha só o que quer mudar (campos que você não mexer ficam como estão em cada marca) e toque <span class="ui">Aplicar</span>. Antes de gravar, o app mostra o que vai acontecer:</p>
+
+      <div class="confirm" role="img" aria-label="Exemplo da confirmação do lote">
+        <div class="mock-title">Aplicar às marcas selecionadas</div>
+        <div class="mock-body">
+          <p><b>18 marcas</b> serão alteradas. <b>5 marcas</b> já têm outro valor.</p>
+          <p class="muted">“Sobrescrever todas” grava nas 18; “Só nas vazias” grava só onde o campo está vazio (13 marcas).</p>
+          <div class="btns"><span class="btn primary">Sobrescrever todas</span><span class="btn secondary">Só nas vazias</span><span class="btn secondary">Cancelar</span></div>
+        </div>
+      </div>
+
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Botão</th><th>O que grava</th><th>Quando usar</th></tr></thead>
+          <tbody>
+            <tr><td><b>Sobrescrever todas</b></td><td>o valor novo em todas as marcas selecionadas, trocando o que já existia</td><td>corrigir um valor errado em várias marcas</td></tr>
+            <tr><td><b>Só nas vazias</b></td><td>só nas marcas em que o campo está vazio; as que já têm valor ficam como estão</td><td>completar o que falta sem desfazer o trabalho de ninguém</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <ul class="plain">
+        <li><b>Desfazer:</b> depois de aplicar aparece um aviso com <span class="ui">Desfazer</span> por <b>10 segundos</b>. Ele volta todas as marcas do lote ao estado anterior.</li>
+        <li><b>Categorias misturadas:</b> cada parâmetro só é gravado nas marcas em que se aplica. O campo avisa “Vale para 12 marcas de 18”.</li>
+        <li>Peças sem Marca na seleção ficam de fora. Um lote aceita até 5.000 marcas.</li>
+      </ul>
+    </section>
+
+    <!-- 08 -->
+    <section id="status">
+      <div class="sec-head"><span class="sec-num">08</span><h2>Status, cores e progresso</h2></div>
+      <p>Cada marca tem um status de preenchimento, calculado na hora:</p>
+      <div class="status-row">
+        <div class="st" style="--c: var(--pending)"><span class="dot">Pendente</span><p>nenhum parâmetro da conta preenchido</p></div>
+        <div class="st" style="--c: var(--partial)"><span class="dot">Parcial</span><p>alguns preenchidos, falta pelo menos um</p></div>
+        <div class="st" style="--c: var(--complete)"><span class="dot">Completa</span><p>todos os parâmetros da conta preenchidos</p></div>
+        <div class="st" style="--c: var(--review)"><span class="dot">Revisar</span><p>a marca mudou numa versão nova e precisa de conferência (seção 10)</p></div>
+      </div>
+      <div class="note tip"><strong>Quais parâmetros entram na conta</strong><p>Só os <b>obrigatórios</b> que se aplicam à marca. Se nenhum obrigatório se aplica a ela, entram <b>todos</b> os que se aplicam. Por isso, marcar “Obrigatório” nos parâmetros que realmente importam para liberar a peça deixa o status fiel ao que a fábrica precisa.</p></div>
+
+      <h3>Colorir o 3D</h3>
+      <p>Em <b>Colorir por</b>:</p>
+      <ul class="plain">
+        <li><span class="ui">Status</span>: as cores acima.</li>
+        <li><span class="ui">Parâmetro</span>: escolha um parâmetro; cada valor ganha uma cor (ex.: F-01 azul, F-02 laranja) e “Sem valor” fica cinza. Marcas em que o parâmetro não se aplica ficam sem cor.</li>
+        <li><span class="ui">Categoria</span>: uma cor por categoria.</li>
+      </ul>
+      <p>A <b>legenda</b> sobre o 3D mostra quantas marcas há em cada cor. Tocar numa linha seleciona essas marcas, o que é útil para mandar direto para a edição em lote.</p>
+      <h3>Progresso</h3>
+      <p>O rodapé do modelo mostra uma barra por parâmetro com quantas marcas já estão preenchidas, além do total de marcas e peças da versão.</p>
+    </section>
+
+    <!-- 09 -->
+    <section id="buscar">
+      <div class="sec-head"><span class="sec-num">09</span><h2>Encontrar o que falta</h2></div>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Quero ver…</th><th>Como</th></tr></thead>
+          <tbody>
+            <tr><td>marcas sem nenhum dado</td><td>atalho <span class="ui">Pendentes</span></td></tr>
+            <tr><td>marcas começadas e não terminadas</td><td>atalho <span class="ui">Parciais</span></td></tr>
+            <tr><td>marcas sem um parâmetro específico</td><td>digite na busca <code>sem forma</code> (ou <code>sem &lt;nome do parâmetro&gt;</code>)</td></tr>
+            <tr><td>marcas que mudaram na versão nova</td><td>atalho <span class="ui">A revisar</span></td></tr>
+            <tr><td>marcas que apareceram na versão nova</td><td>atalho <span class="ui">Novas na versão</span></td></tr>
+            <tr><td>marcas que sumiram e tinham valores</td><td>atalho <span class="ui">Órfãs</span> ou <span class="ui">Fila de órfãs</span></td></tr>
+            <tr><td>peças por uma propriedade do modelo</td><td><code>Nome=valor</code>, ex.: <code>SEÇÃO-Altura=90.000 cm</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Os atalhos se combinam com o texto da busca e os filtros de categoria e nível. A busca livre também procura no código da marca, tipo, seção e nível.</p>
+    </section>
+
+    <!-- 10 -->
+    <section id="versao">
+      <div class="sec-head"><span class="sec-num">10</span><h2>Quando chega uma versão nova</h2></div>
+      <p>Quando o escritório publica uma revisão do modelo, o app a compara com a anterior, marca por marca, e mostra no topo um aviso como <i>3 novas · 2 a revisar · 1 órfã</i>. Os valores continuam na marca; o que acontece depende do caso:</p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Na versão nova a marca…</th><th>O que o app faz</th><th>O que você faz</th></tr></thead>
+          <tbody>
+            <tr><td>está igual</td><td>mantém os valores</td><td>nada</td></tr>
+            <tr><td>ganhou ou perdeu peças, mas não mudou de forma</td><td>mantém os valores; as peças novas <b>herdam</b> os valores da marca</td><td>nada</td></tr>
+            <tr><td><b>mudou</b>: medidas (diferença maior que 5 mm), tipo/seção ou armadura, e já tinha valores</td><td>marca como <b>Revisar</b> (laranja) e mostra o que mudou (ex.: “Seção 40x60 → 40x80”)</td><td><span class="ui">Manter valores</span> se continuam certos, ou <span class="ui">Editar</span> para corrigir. As duas tiram o “Revisar”</td></tr>
+            <tr><td>é nova</td><td>entra como Pendente</td><td>preencher</td></tr>
+            <tr><td><b>sumiu</b> e tinha valores</td><td>vira <b>órfã</b>: sai do 3D, mas os valores ficam guardados</td><td>religar ou arquivar (abaixo)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>Fila de órfãs</h3>
+      <p>Painel lateral › <span class="ui">Fila de órfãs</span> lista as marcas que sumiram com valores, com a versão em que sumiram e os valores que levam (ex.: “Tipo de forma: F-12 · Ciclo: 8”).</p>
+      <ul class="plain">
+        <li><b>Religar</b>: quando a marca só mudou de nome (ex.: PP005 virou PP007). Toque <span class="ui">Religar</span> e depois a marca de destino no 3D ou na lista. Os valores são <b>copiados</b>. Se o destino já tiver outro valor, o app mostra quais e oferece <span class="ui">Sobrescrever e religar</span>. Se a categoria for diferente, os parâmetros que não valem para ela ficam só na marca antiga.</li>
+        <li><b>Arquivar</b>: quando a peça realmente saiu do projeto. Os valores não são copiados, mas continuam no histórico.</li>
+      </ul>
+      <p>Uma marca que volta numa versão seguinte (mesmo código e categoria) recupera os valores sozinha.</p>
+    </section>
+
+    <!-- 11 -->
+    <section id="excel">
+      <div class="sec-head"><span class="sec-num">11</span><h2>Exportar para o Excel</h2></div>
+      <p>O botão de exportar gera uma planilha da versão aberta. Com filtros ou busca ativos, exporta <b>só as marcas da lista</b>; sem filtros, todas.</p>
+      <ul class="plain">
+        <li>Aba <b>Marcas</b>: Marca, Categoria, Peças, Seção, Comprimento (cm), Status e <b>uma coluna por parâmetro</b> (com a unidade no título), mais Última alteração e Autor.</li>
+        <li>Aba <b>Peças</b>: uma linha por peça física, com a marca e o nível.</li>
+        <li>Aba <b>Sobre</b>: obra, versão, filtros usados, quando e por quem foi gerada.</li>
+      </ul>
+      <p>A planilha é uma foto do momento: editar nela não volta para o app.</p>
+    </section>
+
+    <!-- 12 -->
+    <section id="mensagens">
+      <div class="sec-head"><span class="sec-num">12</span><h2>Mensagens e o que fazer</h2></div>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Mensagem</th><th>O que quer dizer</th><th>O que fazer</th></tr></thead>
+          <tbody>
+            <tr><td><i>Já existe um parâmetro "…" no catálogo global.</i></td><td>nome repetido (seção 03)</td><td>usar o existente ou outro nome</td></tr>
+            <tr><td><i>Uma lista precisa de pelo menos duas opções.</i></td><td>lista com uma opção só</td><td>acrescentar opções ou usar Sim/não</td></tr>
+            <tr><td><i>Opções em uso não podem ser removidas: F-12.</i></td><td>há marcas com essa opção</td><td>mudar as marcas antes (seção 05)</td></tr>
+            <tr><td><i>O tipo não pode ser alterado: N marca(s) já têm valor…</i></td><td>tipo travado</td><td>criar um parâmetro novo do tipo certo</td></tr>
+            <tr><td><i>…não é um número (use vírgula para decimais).</i></td><td>texto ou ponto num campo Número</td><td>digitar só o número, ex.: <code>8,5</code></td></tr>
+            <tr><td><i>…não é uma das opções (…).</i></td><td>valor fora da lista</td><td>escolher na lista ou acrescentar a opção</td></tr>
+            <tr><td><i>… alterou esta marca … Seus valores não foram salvos.</i></td><td>edição ao mesmo tempo (seção 06)</td><td><span class="ui">Recarregar</span> e conferir</td></tr>
+            <tr><td><i>Muitas alterações em pouco tempo (limite de 120 por minuto)…</i></td><td>proteção contra uso automático</td><td>esperar os segundos indicados; um lote conta como uma alteração só</td></tr>
+            <tr><td><i>Seu papel não permite esta ação.</i></td><td>usuário de Projetos ou Leitura</td><td>trocar para um usuário da Fábrica</td></tr>
+            <tr><td><i>Nenhum parâmetro se aplica a esta categoria.</i></td><td>nenhum parâmetro marca a categoria dessa marca</td><td>editar “Aplica-se a” no Catálogo</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 13 -->
+    <section id="dicas">
+      <div class="sec-head"><span class="sec-num">13</span><h2>Boas práticas</h2></div>
+      <ul class="plain">
+        <li><b>Defina o catálogo antes de preencher.</b> Combine com a equipe os nomes, tipos e opções; tipo e escopo travam depois do primeiro valor.</li>
+        <li><b>Global para o que é padrão da fábrica</b> (tipo de forma, ciclo de cura). <b>De obra</b> para o que só existe naquela obra.</li>
+        <li><b>Lista em vez de texto</b> sempre que as respostas se repetem.</li>
+        <li><b>Marque como obrigatório</b> só o que precisa estar preenchido para a peça ir à produção. O status “Completa” passa a significar “pronta para produzir”.</li>
+        <li><b>Use “Só nas vazias”</b> no lote quando outras pessoas também estão preenchendo.</li>
+        <li><b>Resolva “Revisar” e órfãs</b> logo depois de cada versão nova: são as marcas em que o projeto mudou.</li>
+        <li><b>Consulte o histórico</b> antes de corrigir um valor de outra pessoa.</li>
+      </ul>
+    </section>
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span>Visualizador BIM · Cassol Pré-Fabricados · guia dos parâmetros da fábrica</span>
+    <span>Dúvidas ou erros: anote a obra, a marca e o horário e fale com o responsável pelo sistema.</span>
+  </div>
+</footer>

@@ -1,0 +1,13 @@
+# Todo dia às 03:00; se o servidor estava desligado, roda ao ligar (Persistent).
+#   sudo systemctl daemon-reload && sudo systemctl enable --now bim-backup.timer
+#   journalctl -u bim-backup.service     # log de cada execução
+[Unit]
+Description=Agenda o backup diário do Visualizador BIM
+
+[Timer]
+OnCalendar=*-*-* 03:00:00
+RandomizedDelaySec=10m
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,69 @@
+{
+  "data": {
+    "type": "objects",
+    "objects": [
+      {
+        "objectid": 1,
+        "name": "Model",
+        "objects": [
+          {
+            "objectid": 2,
+            "name": "Structural Framing",
+            "objects": [
+              {
+                "objectid": 3,
+                "name": "Viga Pré-moldada",
+                "objects": [
+                  {
+                    "objectid": 4,
+                    "name": "V 30x60",
+                    "objects": [
+                      {"objectid": 10, "name": "Viga Pré-moldada [100001]"},
+                      {"objectid": 11, "name": "Viga Pré-moldada [100002]"},
+                      {
+                        "objectid": 12,
+                        "name": "Viga Pré-moldada [100003]",
+                        "objects": [
+                          {"objectid": 13, "name": "Insert metálico [100004]"},
+                          {"objectid": 14, "name": "Insert metálico [100005]"}
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "objectid": 5,
+            "name": "Structural Columns",
+            "objects": [
+              {
+                "objectid": 6,
+                "name": "Pilar",
+                "objects": [
+                  {"objectid": 20, "name": "Pilar [200001]"},
+                  {"objectid": 21, "name": "Pilar [200002]"}
+                ]
+              }
+            ]
+          },
+          {
+            "objectid": 7,
+            "name": "Floors",
+            "objects": [
+              {
+                "objectid": 8,
+                "name": "Laje alveolar",
+                "objects": [
+                  {"objectid": 30, "name": "Laje alveolar [300001]"},
+                  {"objectid": 31, "name": "Laje alveolar [300002]"}
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

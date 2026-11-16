@@ -1,0 +1,155 @@
+{
+  "data": {
+    "type": "properties",
+    "collection": [
+      {
+        "objectid": 10,
+        "name": "Pilar pré-moldado [10]",
+        "externalId": "val-0010",
+        "properties": {
+          "Dados de identidade": {
+            "Marca": "PP001",
+            "Tipo": "Pilar 40x40"
+          },
+          "Dimensões": {
+            "Largura": "40.0 cm",
+            "Altura": "40.0 cm",
+            "Comprimento": "600.0 cm"
+          },
+          "Restrições": {
+            "Nível base": "TÉRREO"
+          },
+          "Other": {
+            "Category": "Revit Structural Columns"
+          }
+        }
+      },
+      {
+        "objectid": 11,
+        "name": "Pilar pré-moldado [11]",
+        "externalId": "val-0011",
+        "properties": {
+          "Dados de identidade": {
+            "Marca": "PP001",
+            "Tipo": "Pilar 40x50"
+          },
+          "Dimensões": {
+            "Largura": "40.0 cm",
+            "Altura": "50.0 cm",
+            "Comprimento": "600.0 cm"
+          },
+          "Restrições": {
+            "Nível base": "TÉRREO"
+          },
+          "Other": {
+            "Category": "Revit Structural Columns"
+          }
+        }
+      },
+      {
+        "objectid": 12,
+        "name": "Pilar pré-moldado [12]",
+        "externalId": "val-0012",
+        "properties": {
+          "Dados de identidade": {
+            "Marca": "PP002",
+            "Tipo": "Pilar 30x30"
+          },
+          "Dimensões": {
+            "Largura": "30.0 cm",
+            "Altura": "30.0 cm",
+            "Comprimento": "600.0 cm"
+          },
+          "Restrições": {
+            "Nível base": "1º PAVIMENTO"
+          },
+          "Other": {
+            "Category": "Revit Structural Columns"
+          }
+        }
+      },
+      {
+        "objectid": 13,
+        "name": "Pilar pré-moldado [13]",
+        "externalId": "val-0013",
+        "properties": {
+          "Dados de identidade": {
+            "Marca": "PP002",
+            "Tipo": "Pilar 30x30"
+          },
+          "Dimensões": {
+            "Largura": "30.0 cm",
+            "Altura": "30.0 cm",
+            "Comprimento": "600.3 cm"
+          },
+          "Restrições": {
+            "Nível base": "1º PAVIMENTO"
+          },
+          "Other": {
+            "Category": "Revit Structural Columns"
+          }
+        }
+      },
+      {
+        "objectid": 30,
+        "name": "Pilar pré-moldado [30]",
+        "externalId": "val-0030",
+        "properties": {
+          "Dados de identidade": {
+            "Comentários": "",
+            "Tipo": "Pilar 30x30"
+          },
+          "Dimensões": {
+            "Largura": "30.0 cm"
+          },
+          "Restrições": {
+            "Nível base": "1º PAVIMENTO"
+          },
+          "Other": {
+            "Category": "Revit Structural Columns"
+          }
+        }
+      },
+      {
+        "objectid": 20,
+        "name": "Viga [20]",
+        "externalId": "val-0020",
+        "properties": {
+          "Dados de identidade": {
+            "Marca": "V-01",
+            "Tipo": "Viga 30x60"
+          },
+          "Dimensões": {
+            "Comprimento": "6000 mm"
+          },
+          "Restrições": {
+            "Nível base": "TÉRREO"
+          },
+          "Other": {
+            "Category": "Revit Structural Framing"
+          }
+        }
+      },
+      {
+        "objectid": 21,
+        "name": "Viga [21]",
+        "externalId": "val-0021",
+        "properties": {
+          "Dados de identidade": {
+            "Marca": "V-01",
+            "Tipo": "Viga 30x60"
+          },
+          "Dimensões": {
+            "Comprimento": "6,0 m"
+          },
+          "Restrições": {
+            "Nível base": "1º PAVIMENTO"
+          },
+          "Other": {
+            "Category": "Revit Structural Framing"
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "type": "manifest",
+  "status": "inprogress",
+  "progress": "45% complete",
+  "region": "US",
+  "urn": "dXJuOmFkc2sud2lwcHJvZDpmcy5maWxlOnZmLlNBTklUSVpFRF9GSUxFX0lEP3ZlcnNpb249Mg",
+  "derivatives": [
+    {
+      "outputType": "svf2",
+      "status": "inprogress",
+      "progress": "45% complete"
+    }
+  ]
+}

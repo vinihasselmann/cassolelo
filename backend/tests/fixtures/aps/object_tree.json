@@ -1,0 +1,43 @@
+{
+  "data": {
+    "type": "objects",
+    "objects": [
+      {
+        "objectid": 1,
+        "name": "Model",
+        "objects": [
+          {
+            "objectid": 2,
+            "name": "Structural Framing",
+            "objects": [
+              {
+                "objectid": 3,
+                "name": "Viga Pré-moldada",
+                "objects": [
+                  {
+                    "objectid": 10,
+                    "name": "Viga Pré-moldada [100001]"
+                  },
+                  {
+                    "objectid": 11,
+                    "name": "Viga Pré-moldada [100002]"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "objectid": 4,
+            "name": "Structural Columns",
+            "objects": [
+              {
+                "objectid": 20,
+                "name": "Pilar [200001]"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

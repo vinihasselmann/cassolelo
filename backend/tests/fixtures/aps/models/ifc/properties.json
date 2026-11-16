@@ -1,0 +1,42 @@
+{
+  "data": {
+    "type": "properties",
+    "collection": [
+      {
+        "objectid": 10,
+        "name": "Viga:V30x60:1",
+        "externalId": "2O2Fr$t4X7Zf8NOew3FLOH",
+        "properties": {
+          "IFC Parameters": {"IfcClass": "IfcBeam", "GlobalId": "2O2Fr$t4X7Zf8NOew3FLOH"},
+          "Identity Data": {"Mark": "V-201"}
+        }
+      },
+      {
+        "objectid": 11,
+        "name": "Viga:V30x60:2",
+        "externalId": "2O2Fr$t4X7Zf8NOew3FLOI",
+        "properties": {
+          "IFC Parameters": {"IfcClass": "IfcBeam", "GlobalId": "2O2Fr$t4X7Zf8NOew3FLOI"},
+          "Identity Data": {"Mark": "V-201"}
+        }
+      },
+      {
+        "objectid": 12,
+        "name": "Pilar:P40x40:1",
+        "externalId": "2O2Fr$t4X7Zf8NOew3FLOJ",
+        "properties": {
+          "IFC Parameters": {"IfcClass": "IfcColumn", "GlobalId": "2O2Fr$t4X7Zf8NOew3FLOJ"},
+          "Identity Data": {"Mark": ["P-201"]}
+        }
+      },
+      {
+        "objectid": 13,
+        "name": "Laje:L20:1",
+        "externalId": "2O2Fr$t4X7Zf8NOew3FLOK",
+        "properties": {
+          "IFC Parameters": {"IfcClass": "IfcSlab", "GlobalId": "2O2Fr$t4X7Zf8NOew3FLOK"}
+        }
+      }
+    ]
+  }
+}

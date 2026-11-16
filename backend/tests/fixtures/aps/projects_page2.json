@@ -1,0 +1,23 @@
+{
+  "jsonapi": {
+    "version": "1.0"
+  },
+  "links": {
+    "self": {
+      "href": "..."
+    }
+  },
+  "data": [
+    {
+      "type": "projects",
+      "id": "b.22222222-2222-2222-2222-222222222222",
+      "attributes": {
+        "name": "OBRA TESTE 002",
+        "extension": {
+          "type": "projects:autodesk.bim360:Project",
+          "version": "1.0"
+        }
+      }
+    }
+  ]
+}

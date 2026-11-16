@@ -1,0 +1,15 @@
+{
+  "jsonapi": {
+    "version": "1.0"
+  },
+  "data": {
+    "type": "items",
+    "id": "urn:adsk.wipprod:dm.lineage:LINEAGE_RVT",
+    "attributes": {
+      "displayName": "OBRA-001-PRE.rvt",
+      "extension": {
+        "type": "items:autodesk.bim360:File"
+      }
+    }
+  }
+}

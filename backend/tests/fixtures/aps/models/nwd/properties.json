@@ -1,0 +1,54 @@
+{
+  "data": {
+    "type": "properties",
+    "collection": [
+      {
+        "objectid": 2,
+        "name": "Estrutura.rvt",
+        "properties": {"Item": {"Type": "File", "Source File": "Estrutura.rvt"}}
+      },
+      {
+        "objectid": 10,
+        "name": "Viga Pré-moldada",
+        "externalId": "nwd/2/3/10",
+        "properties": {
+          "Item": {"Name": "Viga Pré-moldada", "Type": "Viga 30x60"},
+          "Element": {"Category": "Structural Framing", "Mark": "V-101", "Id": "100001"}
+        }
+      },
+      {
+        "objectid": 11,
+        "name": "Sólido",
+        "externalId": "nwd/2/3/10/11",
+        "properties": {"Item": {"Type": "Shell"}}
+      },
+      {
+        "objectid": 12,
+        "name": "Viga Pré-moldada",
+        "externalId": "nwd/2/3/12",
+        "properties": {
+          "Item": {"Name": "Viga Pré-moldada", "Type": "Viga 30x60"},
+          "Element": {"Category": "Structural Framing", "Mark": "v-101", "Id": "100002"}
+        }
+      },
+      {
+        "objectid": 13,
+        "name": "Pilar",
+        "externalId": "nwd/2/3/13",
+        "properties": {
+          "Item": {"Name": "Pilar", "Type": "Pilar 40x40"},
+          "Elemento": {"Categoria": "Structural Columns", "Marca": "P-01"}
+        }
+      },
+      {
+        "objectid": 20,
+        "name": "Grade A",
+        "externalId": "nwd/2/3/20",
+        "properties": {
+          "Item": {"Name": "Grade A"},
+          "Element": {"Category": "Grids"}
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "jsonapi": {
+    "version": "1.0"
+  },
+  "data": [
+    {
+      "type": "folders",
+      "id": "urn:adsk.wipprod:fs.folder:co.PROJECTFILES",
+      "attributes": {
+        "name": "Project Files",
+        "displayName": "Project Files",
+        "hidden": false
+      }
+    },
+    {
+      "type": "folders",
+      "id": "urn:adsk.wipprod:fs.folder:co.PLANS",
+      "attributes": {
+        "name": "Plans",
+        "displayName": "Plans",
+        "hidden": false
+      }
+    }
+  ]
+}

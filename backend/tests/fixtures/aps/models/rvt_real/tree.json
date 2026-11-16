@@ -1,0 +1,253 @@
+{
+ "data": {
+  "type": "objects",
+  "objects": [
+   {
+    "objectid": 1,
+    "name": "Model",
+    "objects": [
+     {
+      "objectid": 80,
+      "name": "Quadro estrutural",
+      "objects": [
+       {
+        "objectid": 7078,
+        "name": "CASSOL-PREO-Viga-R",
+        "objects": [
+         {
+          "objectid": 7081,
+          "name": "R80-40x80cm-V10",
+          "objects": [
+           {
+            "objectid": 7084,
+            "name": "CASSOL-PREO-Viga-R [6657266]"
+           },
+           {
+            "objectid": 7085,
+            "name": "CASSOL-PREO-Viga-R [6658541]"
+           },
+           {
+            "objectid": 7086,
+            "name": "CASSOL-PREO-Viga-R [6658789]"
+           },
+           {
+            "objectid": 7087,
+            "name": "CASSOL-PREO-Viga-R [6658884]"
+           }
+          ]
+         },
+         {
+          "objectid": 7082,
+          "name": "R60-20x60cm-V11",
+          "objects": [
+           {
+            "objectid": 7290,
+            "name": "CASSOL-PREO-Viga-R [6664989]"
+           },
+           {
+            "objectid": 7291,
+            "name": "CASSOL-PREO-Viga-R [6664991]"
+           },
+           {
+            "objectid": 7292,
+            "name": "CASSOL-PREO-Viga-R [6664993]"
+           },
+           {
+            "objectid": 7293,
+            "name": "CASSOL-PREO-Viga-R [6664994]"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "objectid": 7079,
+        "name": "CASSOL-PREO-Viga-I",
+        "objects": [
+         {
+          "objectid": 7156,
+          "name": "I90-50x90cm-V05",
+          "objects": [
+           {
+            "objectid": 7158,
+            "name": "CASSOL-PREO-Viga-I [6658418]"
+           },
+           {
+            "objectid": 7159,
+            "name": "CASSOL-PREO-Viga-I [6658516]"
+           },
+           {
+            "objectid": 7160,
+            "name": "CASSOL-PREO-Viga-I [6658991]"
+           },
+           {
+            "objectid": 7161,
+            "name": "CASSOL-PREO-Viga-I [6659092]"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "objectid": 7080,
+        "name": "CASSOL-PREO-Viga-L",
+        "objects": [
+         {
+          "objectid": 7248,
+          "name": "L100-40x66.5cm-V01",
+          "objects": [
+           {
+            "objectid": 7251,
+            "name": "CASSOL-PREO-Viga-L [6659306]"
+           },
+           {
+            "objectid": 7252,
+            "name": "CASSOL-PREO-Viga-L [6659349]"
+           },
+           {
+            "objectid": 7253,
+            "name": "CASSOL-PREO-Viga-L [6659412]"
+           },
+           {
+            "objectid": 7254,
+            "name": "CASSOL-PREO-Viga-L [6662509]"
+           }
+          ]
+         },
+         {
+          "objectid": 7249,
+          "name": "L60-40x40cm-V02",
+          "objects": [
+           {
+            "objectid": 7279,
+            "name": "CASSOL-PREO-Viga-L [6664987]"
+           },
+           {
+            "objectid": 7280,
+            "name": "CASSOL-PREO-Viga-L [6665002]"
+           },
+           {
+            "objectid": 7281,
+            "name": "CASSOL-PREO-Viga-L [6665003]"
+           },
+           {
+            "objectid": 7282,
+            "name": "CASSOL-PREO-Viga-L [6665004]"
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "objectid": 81,
+      "name": "Pilares estruturais",
+      "objects": [
+       {
+        "objectid": 7150,
+        "name": "CASSOL-PREO-Pilar-R",
+        "objects": [
+         {
+          "objectid": 7152,
+          "name": "R-60x60cm-P01",
+          "objects": [
+           {
+            "objectid": 86,
+            "name": "CASSOL-PREO-Pilar-R [6657283]"
+           },
+           {
+            "objectid": 87,
+            "name": "CASSOL-PREO-Pilar-R [6657284]"
+           },
+           {
+            "objectid": 88,
+            "name": "CASSOL-PREO-Pilar-R [6657285]"
+           },
+           {
+            "objectid": 89,
+            "name": "CASSOL-PREO-Pilar-R [6657286]"
+           }
+          ]
+         },
+         {
+          "objectid": 7153,
+          "name": "R-40x40cm-P02",
+          "objects": [
+           {
+            "objectid": 125,
+            "name": "CASSOL-PREO-Pilar-R [6658414]"
+           },
+           {
+            "objectid": 161,
+            "name": "CASSOL-PREO-Pilar-R [6662568]"
+           },
+           {
+            "objectid": 162,
+            "name": "CASSOL-PREO-Pilar-R [6662569]"
+           },
+           {
+            "objectid": 163,
+            "name": "CASSOL-PREO-Pilar-R [6662618]"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "objectid": 7151,
+        "name": "CASSOL-PREO-Pilar-C-duplo",
+        "objects": [
+         {
+          "objectid": 7391,
+          "name": "C-2xØ60cm_PILAR 03",
+          "objects": [
+           {
+            "objectid": 196,
+            "name": "CASSOL-PREO-Pilar-C-duplo [6719241]"
+           },
+           {
+            "objectid": 197,
+            "name": "CASSOL-PREO-Pilar-C-duplo [6722479]"
+           },
+           {
+            "objectid": 198,
+            "name": "CASSOL-PREO-Pilar-C-duplo [6722491]"
+           },
+           {
+            "objectid": 199,
+            "name": "CASSOL-PREO-Pilar-C-duplo [6722503]"
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "objectid": 85,
+      "name": "Pisos",
+      "objects": [
+       {
+        "objectid": 7378,
+        "name": "Piso",
+        "objects": [
+         {
+          "objectid": 7379,
+          "name": "LA01-LP26.5 SC=500",
+          "objects": [
+           {
+            "objectid": 231,
+            "name": "Piso [6665472]"
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

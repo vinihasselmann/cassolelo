@@ -1,0 +1,141 @@
+# Visualizador BIM — pilha de produção/teste (10.3). Ver docs/DEPLOY.md.
+#
+#   docker compose -f infra/docker-compose.prod.yml --env-file infra/.env.prod up -d --build
+#
+# Só o nginx (web) abre porta. Banco e Redis ficam na rede interna. Segredos: um arquivo
+# por segredo em infra/secrets/ (fora do git), montados em /run/secrets.
+
+name: ${COMPOSE_PROJECT_NAME:-visualizador-bim-prod}
+
+x-backend: &backend
+  image: visualizador-bim-backend:${APP_VERSION:-local}
+  build: ../backend
+  env_file: .env.prod
+  environment:
+    SECRETS_DIR: /run/secrets
+    REDIS_URL: redis://redis:6379/0
+  secrets:
+    - database_url
+    - aps_client_secret
+    - aps_webhook_secret
+    - smtp_password
+    - metrics_token
+    - alert_teams_webhook_url
+  restart: unless-stopped
+  networks: [internal]
+
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-bim}
+      POSTGRES_DB: ${POSTGRES_DB:-bim}
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets: [postgres_password]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    networks: [internal]
+
+  redis:
+    image: redis:7
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    networks: [internal]
+
+  # Migrações Alembic: roda e sai antes de a API e o worker subirem
+  migrate:
+    <<: *backend
+    command: ["alembic", "upgrade", "head"]
+    restart: "no"
+    healthcheck:
+      disable: true
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api:
+    <<: *backend
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
+  worker:
+    <<: *backend
+    command: ["arq", "app.workers.settings.WorkerSettings"]
+    healthcheck:
+      disable: true
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
+  web:
+    image: visualizador-bim-web:${APP_VERSION:-local}
+    build: ../frontend
+    restart: unless-stopped
+    ports:
+      - "${HTTP_BIND:-0.0.0.0}:${HTTP_PORT:-80}:8080"
+    depends_on:
+      api:
+        condition: service_healthy
+    networks: [internal]
+
+  # Backup/restauração sob demanda (agendado pelo host: Tarefa Agendada do Windows ou
+  # timer do systemd). Não sobe com "up": use --profile backup run --rm backup.
+  backup:
+    image: visualizador-bim-backup:${APP_VERSION:-local}
+    build: ./backup
+    profiles: [backup]
+    environment:
+      PGHOST: postgres
+      PGUSER: ${POSTGRES_USER:-bim}
+      PGDATABASE: ${POSTGRES_DB:-bim}
+      REDIS_HOST: redis
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-30}
+      BACKUP_REMOTES: ${BACKUP_REMOTES:-}
+    secrets: [postgres_password, rclone_conf]
+    volumes:
+      - ${BACKUP_DIR:-./backups}:/backups
+    restart: "no"
+    networks: [internal]
+
+networks:
+  internal:
+
+volumes:
+  pgdata:
+  redisdata:
+
+secrets:
+  postgres_password:
+    file: ./secrets/postgres_password
+  database_url:
+    file: ./secrets/database_url
+  aps_client_secret:
+    file: ./secrets/aps_client_secret
+  aps_webhook_secret:
+    file: ./secrets/aps_webhook_secret
+  smtp_password:
+    file: ./secrets/smtp_password
+  metrics_token:
+    file: ./secrets/metrics_token
+  alert_teams_webhook_url:
+    file: ./secrets/alert_teams_webhook_url
+  rclone_conf:
+    file: ./secrets/rclone_conf

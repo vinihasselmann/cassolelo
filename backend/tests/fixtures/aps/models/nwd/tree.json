@@ -1,0 +1,41 @@
+{
+  "data": {
+    "type": "objects",
+    "objects": [
+      {
+        "objectid": 1,
+        "name": "Obra.nwd",
+        "objects": [
+          {
+            "objectid": 2,
+            "name": "Estrutura.rvt",
+            "objects": [
+              {
+                "objectid": 3,
+                "name": "Nível 1",
+                "objects": [
+                  {
+                    "objectid": 10,
+                    "name": "Viga Pré-moldada",
+                    "objects": [{"objectid": 11, "name": "Sólido"}]
+                  },
+                  {
+                    "objectid": 12,
+                    "name": "Viga Pré-moldada",
+                    "objects": [{"objectid": 14, "name": "Sólido"}]
+                  },
+                  {
+                    "objectid": 13,
+                    "name": "Pilar",
+                    "objects": [{"objectid": 15, "name": "Sólido"}]
+                  },
+                  {"objectid": 20, "name": "Grade A"}
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

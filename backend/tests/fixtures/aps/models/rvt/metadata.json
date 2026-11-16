@@ -1,0 +1,10 @@
+{
+  "data": {
+    "type": "metadata",
+    "metadata": [
+      {"name": "Prancha 01", "role": "2d", "guid": "rvt-2d-0001"},
+      {"name": "{3D}", "role": "3d", "guid": "rvt-3d-0001", "isMasterView": true},
+      {"name": "3D Fábrica", "role": "3d", "guid": "rvt-3d-0002"}
+    ]
+  }
+}

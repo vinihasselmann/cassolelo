@@ -1,0 +1,107 @@
+{
+ "type": "manifest",
+ "hasThumbnail": "true",
+ "status": "success",
+ "progress": "complete",
+ "region": "US",
+ "urn": "dXJuOnJ2dF9yZWFs",
+ "version": "1.0",
+ "derivatives": [
+  {
+   "hasThumbnail": "true",
+   "status": "success",
+   "progress": "complete",
+   "properties": {
+    "Component Tool Information": {
+     "component_build_version": "Autodesk, Inc. Autodesk Translation Framework 15.22.0.0"
+    },
+    "originalDocumentIdentity": {
+     "documentId": "5a281a57-4275-4158-8929-6acb7a81e65f",
+     "revitNumberOfSaves": "146",
+     "instanceId": "b4f81948-03bb-42ad-96e4-ba73055fec56"
+    },
+    "Document Information": {
+     "IFC Application Name": "Autodesk Revit 2025 (PTB)",
+     "IFC Application Version": "2025",
+     "IFC Organization": "Autodesk Revit 2025 (PTB)",
+     "ViewDefinition": "CoordinationView_V2.0",
+     "implementation_level": "2;1",
+     "schema_identifiers": "IFC2X3",
+     "IFC Loader": "4"
+    }
+   },
+   "outputType": "svf",
+   "overrideOutputType": "svf2",
+   "children": [
+    {
+     "guid": "0a3b8f90-32c9-408e-8d58-f1978a7f8f9d",
+     "type": "geometry",
+     "role": "3d",
+     "name": "Scene",
+     "viewableID": "MODELO-TESTE.ifc",
+     "status": "success",
+     "progress": "complete",
+     "hasThumbnail": "true",
+     "children": [
+      {
+       "guid": "ce83b959-54ec-4803-9c5d-4c2f051c449c",
+       "type": "resource",
+       "urn": "urn:adsk.viewing:fs.file:dXJuOmFkc2sud2lwcHJvZDpmcy5maWxlOnZmLnhkNE5hYnRxUmVtaURCSmx4di1jR0E_dmVyc2lvbj0x/output/1/MODELO-TESTE.svf",
+       "role": "graphics",
+       "mime": "application/autodesk-svf"
+      },
+      {
+       "guid": "b9cf3efa-083c-434e-922d-c059ad97baf2",
+       "type": "resource",
+       "urn": "urn:adsk.viewing:fs.file:dXJuOmFkc2sud2lwcHJvZDpmcy5maWxlOnZmLnhkNE5hYnRxUmVtaURCSmx4di1jR0E_dmVyc2lvbj0x/output/1/MODELO-TESTE.svf.png01_thumb_400x400.png",
+       "resolution": [
+        400,
+        400
+       ],
+       "mime": "image/png",
+       "role": "thumbnail"
+      },
+      {
+       "guid": "f38f81ba-2721-4cd9-b400-79e67a8affe1",
+       "type": "resource",
+       "urn": "urn:adsk.viewing:fs.file:dXJuOmFkc2sud2lwcHJvZDpmcy5maWxlOnZmLnhkNE5hYnRxUmVtaURCSmx4di1jR0E_dmVyc2lvbj0x/output/1/MODELO-TESTE.svf.png01_thumb_200x200.png",
+       "resolution": [
+        200,
+        200
+       ],
+       "mime": "image/png",
+       "role": "thumbnail"
+      },
+      {
+       "guid": "5049e366-7a84-4b1c-b50f-d3750f8a5b94",
+       "type": "resource",
+       "urn": "urn:adsk.viewing:fs.file:dXJuOmFkc2sud2lwcHJvZDpmcy5maWxlOnZmLnhkNE5hYnRxUmVtaURCSmx4di1jR0E_dmVyc2lvbj0x/output/1/MODELO-TESTE.svf.png01_thumb_100x100.png",
+       "resolution": [
+        100,
+        100
+       ],
+       "mime": "image/png",
+       "role": "thumbnail"
+      }
+     ]
+    },
+    {
+     "guid": "64eb1f39-21ec-403d-a436-ae30250a15b4",
+     "type": "resource",
+     "urn": "urn:adsk.viewing:fs.file:dXJuOmFkc2sud2lwcHJvZDpmcy5maWxlOnZmLnhkNE5hYnRxUmVtaURCSmx4di1jR0E_dmVyc2lvbj0x/output/1/properties.db",
+     "role": "Autodesk.CloudPlatform.PropertyDatabase",
+     "mime": "application/autodesk-db",
+     "status": "success"
+    },
+    {
+     "guid": "5c8e0386-ab53-41b2-8dd0-a7b97d0eb252",
+     "type": "resource",
+     "urn": "urn:adsk.viewing:fs.file:dXJuOmFkc2sud2lwcHJvZDpmcy5maWxlOnZmLnhkNE5hYnRxUmVtaURCSmx4di1jR0E_dmVyc2lvbj0x/output/1/AECModelData.json",
+     "role": "Autodesk.AEC.ModelData",
+     "mime": "application/json",
+     "status": "success"
+    }
+   ]
+  }
+ ]
+}

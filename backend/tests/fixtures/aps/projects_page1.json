@@ -1,0 +1,26 @@
+{
+  "jsonapi": {
+    "version": "1.0"
+  },
+  "links": {
+    "self": {
+      "href": "https://developer.api.autodesk.com/project/v1/hubs/b.00000000-0000-0000-0000-000000000001/projects"
+    },
+    "next": {
+      "href": "https://developer.api.autodesk.com/project/v1/hubs/b.00000000-0000-0000-0000-000000000001/projects?page%5Bnumber%5D=1"
+    }
+  },
+  "data": [
+    {
+      "type": "projects",
+      "id": "b.11111111-1111-1111-1111-111111111111",
+      "attributes": {
+        "name": "OBRA TESTE 001",
+        "extension": {
+          "type": "projects:autodesk.bim360:Project",
+          "version": "1.0"
+        }
+      }
+    }
+  ]
+}
