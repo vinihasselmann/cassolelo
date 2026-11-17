@@ -172,6 +172,9 @@ button.link.danger:disabled { color: var(--text-muted); }
 .table { width: 100%; border-collapse: collapse; background: var(--surface); margin-top: 12px; }
 .table th, .table td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border-subtle); font-size: var(--fs-sm); }
 .table th { background: var(--surface-muted); }
+/* Editar / Excluir na linha: alvo de toque do tablet sem pesar na tabela. */
+.table .row-actions { white-space: nowrap; text-align: right; }
+.row-actions button.link { min-height: var(--tap-sm); padding: 0 6px; }
 
 .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin: 12px 0; }
 .tabs a { padding: 8px 14px; text-decoration: none; color: var(--text-muted); border-bottom: 2px solid transparent; }

@@ -98,6 +98,66 @@ async def update_obra(
     return obra
 
 
+class DeletePreviewOut(BaseModel):
+    versions: int
+    marks: int
+    units: int
+    filled_values: int
+    admin_only: bool  # com valores preenchidos, só o admin exclui
+
+
+def _preview_out(p: obras_service.DeletePreview) -> DeletePreviewOut:
+    return DeletePreviewOut(
+        versions=p.versions,
+        marks=p.marks,
+        units=p.units,
+        filled_values=p.filled_values,
+        admin_only=p.has_values,
+    )
+
+
+@router.get("/{obra_id}/delete-preview", response_model=DeletePreviewOut)
+async def delete_preview(obra_id: int, session: SessionDep, _user: Editor) -> DeletePreviewOut:
+    obra = await obras_service.get_obra(session, obra_id)
+    return _preview_out(await obras_service.delete_preview(session, obra))
+
+
+@router.delete("/{obra_id}", response_model=DeletePreviewOut)
+async def delete_obra(
+    obra_id: int,
+    request: Request,
+    session: SessionDep,
+    aps: ApsDep,
+    user: Editor,
+    background: BackgroundTasks,
+) -> DeletePreviewOut:
+    obra = await obras_service.get_obra(session, obra_id)
+    hooks_ref = Obra(id=obra.id)  # só o id importa para achar os hooks
+    folder = obra.acc_folder_id
+    preview = await obras_service.delete_obra(session, obra, actor=user)
+    await session.commit()
+    settings: Settings = request.app.state.settings
+    # Obras da mesma pasta dividem o hook (find_obra resolve pela pasta + arquivo):
+    # só remove quando nenhuma outra obra usa a pasta.
+    folder_in_use = folder is not None and (
+        await session.scalar(select(Obra.id).where(Obra.acc_folder_id == folder).limit(1))
+        is not None
+    )
+    if settings.webhook_callback_url and not folder_in_use:
+        background.add_task(_delete_hooks, aps, hooks_ref)
+    return _preview_out(preview)
+
+
+async def _delete_hooks(aps: ApsClient, obra: Obra) -> None:
+    """Remove os webhooks da obra excluída. Falha não desfaz a exclusão: o webhook
+    órfão chega sem obra e é ignorado; o CLI reregistra/limpa depois."""
+    try:
+        deleted = await webhooks_service.delete_obra_hooks(aps, obra)
+        log.info("Webhooks da obra excluída %s removidos: %d", obra.id, len(deleted))
+    except ApsError:
+        log.exception("Falha ao remover webhooks da obra excluída %s", obra.id)
+
+
 class MarkRuleOut(BaseModel):
     """Regra de identificação das peças da obra (o que vale agora)."""
 

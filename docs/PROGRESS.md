@@ -1104,6 +1104,32 @@ Diagnóstico em `docs/bugs/data-por-peca.md`. Os outros tipos de parâmetro (tex
   - ainda há 2 datas inválidas no dev (9480): PP310-1 = 0002-11-16 e PP318-12 = 0002-05-06. Limpar com `dates fix p:7 --clear` e `dates fix p:10 --clear` se confirmado;
   - conferir o seletor de data nativo no tablet real.
 
+## Editar e excluir obra na página Obras (2026-11-17)
+
+Para corrigir um cadastro errado (código/nome digitados errado, arquivo errado).
+
+**Decisão do usuário (2026-11-17):** obra com valores preenchidos pela fábrica (por marca ou por peça) **só o admin exclui**; sem valores, projetos e admin excluem. Nada some em silêncio: o `audit_log` guarda o retrato da obra e as contagens do que foi apagado.
+
+- **Backend:**
+  - `DELETE /api/obras/{id}` e `GET /api/obras/{id}/delete-preview` (projetos/admin; entram na matriz de papéis).
+  - `app/services/obras.py`: `delete_preview` conta versões, marcas, unidades e valores preenchidos. Valor nulo, seja NULL ou `null` do JSONB, não conta.
+  - `delete_obra` apaga na ordem das FKs: valores, órfãs, versões (em cascata: elementos, props, ligações, relatórios), unidades, marcas, inclusões e parâmetros da obra. Os parâmetros da biblioteca ficam.
+  - Webhooks: depois do commit, remove os hooks da obra no APS. Só faz isso se nenhuma outra obra usar a mesma pasta, porque o hook da pasta é compartilhado. Se o APS falhar, a exclusão não é desfeita; o erro vai para o log.
+  - Editar já existia (`PATCH`, auditado, 409 para código repetido).
+- **Frontend (`ObrasPage`):** coluna com **Editar** e **Excluir**, visível só para projetos/admin.
+  - `ObraEditDialog`: código e nome; Enter salva, Esc cancela.
+  - `ObraDeleteDialog`: mostra o que some junto e pede o código da obra digitado para liberar o botão. Com valores: para projetos, aviso "só um administrador"; para o admin, aviso de que os valores serão apagados.
+- **Testes:**
+  - `tests/test_obras_delete.py` (11): contagens, exclusão completa, só admin com valores, 403 para fábrica/leitura, 404, outra obra intacta, hooks removidos, hook compartilhado mantido, falha do APS.
+  - `ObraEditDelete.test.tsx` (7).
+- **Verificação (2026-11-17):**
+  - backend: ruff, format e mypy OK; **710/710**;
+  - frontend: lint e typecheck OK; **234/234** (+2 todo);
+  - `make e2e` não rodado.
+- **Falta:**
+  - excluir de verdade a obra criada por engano no dev, pela tela;
+  - não há "desfazer": se precisar recuperar, só pelo backup do banco.
+
 ## Coordenadas do eixo da peça no app (2026-11-16)
 - **`src/viewer/coordinates.ts`** (só matemática; não conhece o Viewer):
   - conversão mundo do Viewer → arquivo → ponto base (`globalOffset`, `refPointTransformation` do AEC, unidade → metros);

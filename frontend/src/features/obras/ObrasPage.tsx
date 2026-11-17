@@ -2,16 +2,20 @@ import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { fetchObras } from '../../api/obras';
+import { fetchObras, type Obra } from '../../api/obras';
 import { errorMessage } from '../../lib/errors';
 import { EDITOR_ROLES, hasRole, useCurrentUser } from '../dev-user/useCurrentUser';
 import { NewObraForm } from './NewObraForm';
+import { ObraDeleteDialog } from './ObraDeleteDialog';
+import { ObraEditDialog } from './ObraEditDialog';
 
 export function ObrasPage() {
   const me = useCurrentUser();
   const obras = useQuery({ queryKey: ['obras'], queryFn: fetchObras, retry: false });
   const [creating, setCreating] = useState(false);
   const canEdit = hasRole(me.data, EDITOR_ROLES);
+  const [editing, setEditing] = useState<Obra | null>(null);
+  const [deleting, setDeleting] = useState<Obra | null>(null);
 
   return (
     <section>
@@ -44,6 +48,11 @@ export function ObrasPage() {
               <th>Código</th>
               <th>Nome</th>
               <th>Arquivo no Docs</th>
+              {canEdit && (
+                <th>
+                  <span className="sr-only">Ações</span>
+                </th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -54,10 +63,39 @@ export function ObrasPage() {
                 </td>
                 <td>{o.name}</td>
                 <td>{o.acc_item_name ?? '—'}</td>
+                {canEdit && (
+                  <td className="row-actions">
+                    <button
+                      type="button"
+                      className="link"
+                      aria-label={`Editar obra ${o.code}`}
+                      onClick={() => { setEditing(o); }}
+                    >
+                      Editar
+                    </button>
+                    <button
+                      type="button"
+                      className="link danger"
+                      aria-label={`Excluir obra ${o.code}`}
+                      onClick={() => { setDeleting(o); }}
+                    >
+                      Excluir
+                    </button>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
         </table>
+      )}
+
+      {editing && <ObraEditDialog obra={editing} onClose={() => { setEditing(null); }} />}
+      {deleting && (
+        <ObraDeleteDialog
+          obra={deleting}
+          isAdmin={me.data?.role === 'admin'}
+          onClose={() => { setDeleting(null); }}
+        />
       )}
     </section>
   );

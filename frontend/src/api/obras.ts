@@ -78,3 +78,24 @@ export const fetchVersions = (obraId: number): Promise<ModelVersion[]> =>
   apiFetch(`/obras/${obraId}/versions`);
 export const syncVersions = (obraId: number): Promise<SyncResult> =>
   apiFetch(`/obras/${obraId}/sync`, { method: 'POST' });
+
+export interface ObraUpdate {
+  code?: string;
+  name?: string;
+}
+
+/** O que some junto com a obra. Com valores preenchidos, só o admin exclui. */
+export interface DeletePreview {
+  versions: number;
+  marks: number;
+  units: number;
+  filled_values: number;
+  admin_only: boolean;
+}
+
+export const updateObra = (id: number, body: ObraUpdate): Promise<Obra> =>
+  apiFetch(`/obras/${id}`, { method: 'PATCH', body: JSON.stringify(body) });
+export const fetchDeletePreview = (id: number): Promise<DeletePreview> =>
+  apiFetch(`/obras/${id}/delete-preview`);
+export const deleteObra = (id: number): Promise<DeletePreview> =>
+  apiFetch(`/obras/${id}`, { method: 'DELETE' });

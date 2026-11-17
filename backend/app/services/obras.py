@@ -3,15 +3,28 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Any
 
-from sqlalchemy import exists, select
+from sqlalchemy import Select, delete, exists, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.aps import data_management as dm
 from app.aps.client import ApsClient
-from app.models import ModelVersion, Obra, User
+from app.models import (
+    Mark,
+    ModelVersion,
+    Obra,
+    ObraParam,
+    Orphan,
+    ParamDef,
+    ParamValue,
+    PieceUnit,
+    PieceValue,
+    User,
+)
+from app.models.enums import Role
 from app.services import audit
-from app.services.errors import ConflictError, NotFoundError, ValidationError
+from app.services.errors import ConflictError, ForbiddenError, NotFoundError, ValidationError
 
 SUPPORTED_FILE_TYPES = frozenset({"rvt", "nwd", "ifc"})
 
@@ -133,3 +146,93 @@ async def update_obra(
         await session.flush()
         await audit.record(session, "obra", obra.id, "update", before, audit.snapshot(obra), actor)
     return obra
+
+
+# --------------------------------------------------------------------------- exclusão
+
+
+@dataclass(frozen=True)
+class DeletePreview:
+    """O que some junto com a obra. `filled_values` conta valores preenchidos pela fábrica
+    (por marca e por peça; valor nulo = apagado, não conta)."""
+
+    versions: int
+    marks: int
+    units: int
+    filled_values: int
+
+    @property
+    def has_values(self) -> bool:
+        return self.filled_values > 0
+
+
+async def delete_preview(session: AsyncSession, obra: Obra) -> DeletePreview:
+    marks_q = select(Mark.id).where(Mark.obra_id == obra.id)
+    units_q = select(PieceUnit.id).where(PieceUnit.obra_id == obra.id)
+
+    async def count(stmt: Select[Any]) -> int:
+        return int(await session.scalar(stmt) or 0)
+
+    def filled(col: Any) -> Any:  # JSONB: valor apagado pode ser NULL ou o null do JSON
+        return col.is_not(None) & (func.jsonb_typeof(col) != "null")
+
+    mark_values = await count(
+        select(func.count())
+        .select_from(ParamValue)
+        .where(ParamValue.mark_id.in_(marks_q), filled(ParamValue.value))
+    )
+    piece_values = await count(
+        select(func.count())
+        .select_from(PieceValue)
+        .where(PieceValue.unit_id.in_(units_q), filled(PieceValue.value))
+    )
+    return DeletePreview(
+        versions=await count(
+            select(func.count()).select_from(ModelVersion).where(ModelVersion.obra_id == obra.id)
+        ),
+        marks=await count(select(func.count()).select_from(Mark).where(Mark.obra_id == obra.id)),
+        units=await count(
+            select(func.count()).select_from(PieceUnit).where(PieceUnit.obra_id == obra.id)
+        ),
+        filled_values=mark_values + piece_values,
+    )
+
+
+async def delete_obra(session: AsyncSession, obra: Obra, *, actor: User) -> DeletePreview:
+    """Exclui a obra e tudo que é dela (para corrigir um cadastro errado).
+
+    Obra com valores preenchidos pela fábrica só o admin exclui (decisão de 2026-11-17):
+    nada some em silêncio — o retrato da obra e as contagens vão para o audit_log.
+    Os parâmetros da biblioteca (scope global) ficam; só sai a inclusão deles na obra."""
+    preview = await delete_preview(session, obra)
+    if preview.has_values and actor.role != Role.ADMIN:
+        raise ForbiddenError(
+            f"A obra {obra.code} tem {preview.filled_values} valor(es) preenchido(s) pela "
+            "fábrica. Só um administrador pode excluí-la."
+        )
+    before = audit.snapshot(obra)
+    marks_q = select(Mark.id).where(Mark.obra_id == obra.id)
+    units_q = select(PieceUnit.id).where(PieceUnit.obra_id == obra.id)
+    obra_defs_q = select(ParamDef.id).where(ParamDef.obra_id == obra.id)
+    # Ordem pelas FKs RESTRICT: valores → órfãs → versões (CASCADE: elementos, props,
+    # ligações, relatórios) → unidades → marcas → parâmetros da obra → obra.
+    await session.execute(delete(PieceValue).where(PieceValue.unit_id.in_(units_q)))
+    await session.execute(delete(ParamValue).where(ParamValue.mark_id.in_(marks_q)))
+    await session.execute(delete(Orphan).where(Orphan.mark_id.in_(marks_q)))
+    await session.execute(delete(ModelVersion).where(ModelVersion.obra_id == obra.id))
+    await session.execute(delete(PieceUnit).where(PieceUnit.obra_id == obra.id))
+    await session.execute(delete(Mark).where(Mark.obra_id == obra.id))
+    await session.execute(delete(ObraParam).where(ObraParam.obra_id == obra.id))
+    await session.execute(delete(ObraParam).where(ObraParam.def_id.in_(obra_defs_q)))
+    await session.execute(delete(ParamDef).where(ParamDef.obra_id == obra.id))
+    obra_id = obra.id
+    await session.delete(obra)
+    await session.flush()
+    before["deleted"] = {
+        "versions": preview.versions,
+        "marks": preview.marks,
+        "units": preview.units,
+        "filled_values": preview.filled_values,
+    }
+    await audit.record(session, "obra", obra_id, "delete", before, None, actor)
+    return preview

@@ -46,6 +46,8 @@ MATRIX: dict[str, frozenset[Role] | str] = {
     "POST /api/obras": EDITOR,
     "GET /api/obras/{obra_id}": ALL,
     "PATCH /api/obras/{obra_id}": EDITOR,
+    "DELETE /api/obras/{obra_id}": EDITOR,  # com valores preenchidos, só admin (serviço)
+    "GET /api/obras/{obra_id}/delete-preview": EDITOR,
     "GET /api/obras/{obra_id}/versions": ALL,
     "POST /api/obras/{obra_id}/sync": SYNC,
     "GET /api/obras/{obra_id}/mark-rule": ALL,

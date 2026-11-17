@@ -273,9 +273,9 @@ async def test_types_formats_section_and_layout(
     assert about["Versão"] == "V2" and about["Marcas"] == 3 and about["Peças"] == 6
     assert about["Gerado por"] == ctx["users"][Role.FABRICA].name
     disposition = r.headers["content-disposition"]
-    assert disposition.startswith(
-        'attachment; filename="OB-EXP-1_V2_'
-    ) and disposition.endswith(".xlsx")
+    assert disposition.startswith('attachment; filename="OB-EXP-1_V2_') and disposition.endswith(
+        ".xlsx"
+    )
     assert r.headers["content-type"].startswith("application/vnd.openxmlformats")
 
 
