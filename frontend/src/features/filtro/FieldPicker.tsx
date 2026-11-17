@@ -47,7 +47,7 @@ export function FieldList({ fields, onPick }: ListProps) {
             <ul>
               {g.items.map((f) => (
                 <li key={`${f.source}:${f.key}`}>
-                  <button type="button" className="field-item" onClick={() => { onPick(f); }}>
+                  <button type="button" className="list-item field-item" onClick={() => { onPick(f); }}>
                     <span className="field-item__name">{f.name}</span>
                     {f.source === 'model' && f.group && <span className="field-item__group">{f.group}</span>}
                     <span className="field-item__meta">

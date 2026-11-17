@@ -14,7 +14,8 @@ Barramento:
 - MemoryEventBus: o mesmo contrato em memória (testes e desenvolvimento sem Redis).
 
 Tipos: version_ready, version_failed, values_changed, batch_applied, batch_undone,
-orphan_changed, param_def_changed.
+orphan_changed, param_def_changed e, por peça (P2), unit_values_changed,
+unit_batch_applied, unit_batch_undone.
 """
 
 from __future__ import annotations
@@ -47,6 +48,11 @@ EVENT_TYPES = frozenset(
         "batch_undone",
         "orphan_changed",
         "param_def_changed",
+        # parâmetros por peça (P2)
+        "unit_values_changed",
+        "unit_batch_applied",
+        "unit_batch_undone",
+        "unit_orphan_changed",  # P5: unidade órfã religada ou arquivada
     }
 )
 EVENT_ID = re.compile(r"^\d{1,20}-\d{1,20}$")

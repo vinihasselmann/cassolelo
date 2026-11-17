@@ -13,7 +13,15 @@ Fase 7: cria também a obra E2E-REV com DUAS versões (fixtures revisao_v1 → r
 REVIEW_PROPERTY_NAMES=Seção). A cada execução zera órfãs, revisões e valores, preenche
 "Tipo de forma" na v1 (PP001 F-11, PP003 F-12, PP004 F-12, PP005 F-13) e reprocessa a v2:
 a chegada da v2 deixa PP001 em revisão (40x60 → 40x80) e PP004/PP005 órfãs.
-Imprime {"obra_id", "version_id", "param_def_id", "rev_obra_id", "rev_version_id"}.
+P4 (parâmetros por peça): cria a obra E2E-PEC (fixture `pecas`: P-06 com 6 pilares, V-02
+com 2 vigas) com o parâmetro POR PEÇA "Data de fabricação" (data) e zera os valores por peça.
+P5 (unidades órfãs): obra E2E-PECREV com DUAS versões (fixtures `pecas` → `pecas_v2`, a
+v2 sem a peça pec-0012). A cada execução apaga as unidades da obra, processa a v1,
+preenche a "Data de fabricação" (hoje) só na unidade da peça pec-0012 e processa a v2:
+essa unidade fica ÓRFÃ com o valor.
+Imprime {"obra_id", "version_id", "param_def_id", "rev_obra_id", "rev_version_id",
+"pec_obra_id", "pec_version_id", "pec_param_def_id", "pecrev_obra_id",
+"pecrev_version_id"}.
 Idempotente: rodar de novo reprocessa as mesmas versões.
 """
 
@@ -42,6 +50,9 @@ from app.models import (
     Orphan,
     ParamDef,
     ParamValue,
+    PieceUnit,
+    PieceUnitLink,
+    PieceValue,
     SavedFilter,
     VersionDiff,
 )
@@ -54,6 +65,11 @@ OBRA_CODE = "E2E-01"
 URN = "ZTJlLXZhbGlkYWNhbw"  # fictício; o Viewer falso do E2E não usa
 REV_CODE = "E2E-REV"
 REV_URNS = {1: "ZTJlLXJldmlzYW8x", 2: "ZTJlLXJldmlzYW8y"}
+PEC_CODE = "E2E-PEC"
+PEC_URN = "ZTJlLXBlY2Fz"
+PECREV_CODE = "E2E-PECREV"
+PECREV_URNS = {1: "ZTJlLXBlY3JldjE", 2: "ZTJlLXBlY3JldjI"}
+PECREV_FIXTURES = {1: "pecas", 2: "pecas_v2"}
 REV_VALUES = {"PP001": "F-11", "PP003": "F-12", "PP004": "F-12", "PP005": "F-13"}
 
 
@@ -167,6 +183,107 @@ async def _revisions(session: AsyncSession, config: ProcessingConfig) -> dict[st
     return {"rev_obra_id": obra.id, "rev_version_id": versions[2].id}
 
 
+async def _pieces(session: AsyncSession, config: ProcessingConfig) -> dict[str, int]:
+    """Obra E2E-PEC (P4): marca de 6 peças e um parâmetro por peça, sem valores."""
+    obra = await session.scalar(select(Obra).where(Obra.code == PEC_CODE))
+    if obra is None:
+        obra = Obra(code=PEC_CODE, name="Obra de teste E2E · por peça", active=False)
+        obra.acc_item_name = "modelo-pecas.rvt"
+        session.add(obra)
+        await session.flush()
+    version = await session.scalar(
+        select(ModelVersion).where(ModelVersion.acc_version_id == "e2e:pecas:1")
+    )
+    if version is None:
+        version = ModelVersion(
+            obra_id=obra.id,
+            acc_version_id="e2e:pecas:1",
+            version_number=1,
+            urn=PEC_URN,
+            published_by="E2E",
+        )
+        session.add(version)
+    version.status = "pending"
+    await session.commit()
+    await _process(session, version.id, "pecas", PEC_URN, config)
+    fab = await session.scalar(
+        select(ParamDef).where(
+            ParamDef.obra_id == obra.id, ParamDef.name == "Data de fabricação", ParamDef.active
+        )
+    )
+    if fab is None:
+        fab = ParamDef(
+            name="Data de fabricação", type="date", scope="obra", obra_id=obra.id, level="piece"
+        )
+        session.add(fab)
+        await session.flush()
+    units = select(PieceUnit.id).join(Mark, Mark.id == PieceUnit.mark_id)
+    await session.execute(
+        delete(PieceValue).where(PieceValue.unit_id.in_(units.where(Mark.obra_id == obra.id)))
+    )
+    await session.execute(delete(SavedFilter).where(SavedFilter.obra_id == obra.id))
+    await session.flush()
+    await piece_props.sync_factory(session, obra.id)
+    await session.commit()
+    return {"pec_obra_id": obra.id, "pec_version_id": version.id, "pec_param_def_id": fab.id}
+
+
+async def _piece_revisions(session: AsyncSession, config: ProcessingConfig) -> dict[str, int]:
+    """Obra E2E-PECREV (P5): v2 com uma peça a menos deixa uma unidade órfã com valor."""
+    obra = await session.scalar(select(Obra).where(Obra.code == PECREV_CODE))
+    if obra is None:
+        obra = Obra(code=PECREV_CODE, name="Obra de teste E2E · peças órfãs", active=False)
+        obra.acc_item_name = "modelo-pecas-rev.rvt"
+        session.add(obra)
+        await session.flush()
+    versions: dict[int, ModelVersion] = {}
+    for n, urn in PECREV_URNS.items():
+        v = await session.scalar(
+            select(ModelVersion).where(ModelVersion.acc_version_id == f"e2e:pecrev:{n}")
+        )
+        if v is None:
+            v = ModelVersion(
+                obra_id=obra.id,
+                acc_version_id=f"e2e:pecrev:{n}",
+                version_number=n,
+                urn=urn,
+                published_by="E2E",
+            )
+            session.add(v)
+        v.status = "pending"
+        versions[n] = v
+    await session.flush()
+    # Estado zerado: sem unidades (e sem valores por peça) nesta obra.
+    units = select(PieceUnit.id).where(PieceUnit.obra_id == obra.id)
+    await session.execute(delete(PieceValue).where(PieceValue.unit_id.in_(units)))
+    await session.execute(delete(PieceUnitLink).where(PieceUnitLink.unit_id.in_(units)))
+    await session.execute(delete(PieceUnit).where(PieceUnit.obra_id == obra.id))
+    await session.commit()
+
+    await _process(session, versions[1].id, PECREV_FIXTURES[1], PECREV_URNS[1], config)
+    versions[2].status = "pending"
+    fab = await session.scalar(
+        select(ParamDef).where(
+            ParamDef.obra_id == obra.id, ParamDef.name == "Data de fabricação", ParamDef.active
+        )
+    )
+    if fab is None:
+        fab = ParamDef(
+            name="Data de fabricação", type="date", scope="obra", obra_id=obra.id, level="piece"
+        )
+        session.add(fab)
+        await session.flush()
+    gone = await session.scalar(
+        select(PieceUnit).where(PieceUnit.obra_id == obra.id, PieceUnit.external_id == "pec-0012")
+    )
+    if gone is None:
+        raise SystemExit("E2E-PECREV: unidade da peça pec-0012 não encontrada")
+    session.add(PieceValue(unit_id=gone.id, def_id=fab.id, value=date.today().isoformat()))
+    await session.commit()
+    await _process(session, versions[2].id, PECREV_FIXTURES[2], PECREV_URNS[2], config)
+    return {"pecrev_obra_id": obra.id, "pecrev_version_id": versions[2].id}
+
+
 async def main() -> dict[str, int]:
     settings = get_settings()
     engine = create_engine(settings.database_url)
@@ -208,6 +325,8 @@ async def main() -> dict[str, int]:
             await session.commit()
             ids["param_def_id"] = forma.id
             ids |= await _revisions(session, replace(config, review_names=["Seção"]))
+            ids |= await _pieces(session, config)
+            ids |= await _piece_revisions(session, config)
             return ids
     finally:
         await engine.dispose()

@@ -11,6 +11,7 @@ from app.models.obra import (
     VersionReport,
 )
 from app.models.params import ObraParam, Orphan, ParamDef, ParamValue
+from app.models.units import PieceUnit, PieceUnitLink, PieceValue
 from app.models.user import User
 from app.models.views import ColorScheme, SavedFilter
 
@@ -27,6 +28,9 @@ __all__ = [
     "ParamDef",
     "ParamValue",
     "PieceProp",
+    "PieceUnit",
+    "PieceUnitLink",
+    "PieceValue",
     "SavedFilter",
     "User",
     "VersionDiff",

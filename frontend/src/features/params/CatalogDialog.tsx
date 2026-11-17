@@ -20,7 +20,8 @@ function describe(p: ParamDef): string {
   parts.push(p.categories?.length ? p.categories.join(', ') : 'todas as categorias');
   if (p.scope === 'obra') parts.push(`só a obra ${p.obra_code ?? ''}`.trim());
   else parts.push(`biblioteca · em ${p.obras_count ?? 0} obra(s)`);
-  parts.push(`${p.values_count} marca(s) com valor`);
+  if (p.level === 'piece') parts.push('por peça', `${p.values_count} peça(s) com valor`);
+  else parts.push(`${p.values_count} marca(s) com valor`);
   return parts.join(' · ');
 }
 
@@ -34,7 +35,8 @@ function question({ action, param }: Pending): string {
   if (action === 'remove') {
     return `Retirar “${param.name}” desta obra? Ele some das telas desta obra; os valores ficam guardados e voltam se ele for incluído de novo.`;
   }
-  const values = param.values_count ? ` Os valores de ${param.values_count} marca(s) ficam só na auditoria.` : '';
+  const unit = param.level === 'piece' ? 'peça(s)' : 'marca(s)';
+  const values = param.values_count ? ` Os valores de ${param.values_count} ${unit} ficam só na auditoria.` : '';
   if (param.scope === 'global') {
     return `Excluir “${param.name}” da biblioteca? Ele sai de TODAS as obras (${param.obras_count ?? 0}).${values}`;
   }

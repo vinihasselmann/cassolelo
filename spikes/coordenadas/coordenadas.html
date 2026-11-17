@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spike coordenadas</title>
+  <!-- Autodesk Viewer v7 (a mesma versão do app: 7.*) -->
+  <link rel="stylesheet" href="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/style.min.css">
+  <script src="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/viewer3D.min.js"></script>
+  <style>
+    html, body { margin: 0; height: 100%; font-family: system-ui, sans-serif; }
+    #app { display: flex; height: 100%; }
+    #viewer { position: relative; flex: 1; }
+    #panel { width: 420px; padding: 12px; border-left: 1px solid #ccc; overflow: auto; background: #fafafa; font-size: 13px; }
+    #panel h2 { font-size: 15px; margin: 12px 0 6px; }
+    pre { white-space: pre-wrap; word-break: break-all; font-size: 12px; background: #fff; border: 1px solid #ddd; padding: 6px; }
+    table { border-collapse: collapse; width: 100%; }
+    td, th { border-bottom: 1px solid #ddd; padding: 3px 4px; text-align: right; font-family: monospace; }
+    td:first-child, th:first-child { text-align: left; font-family: system-ui, sans-serif; }
+    .erro { color: #b00020; }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div id="viewer"></div>
+  <aside id="panel">
+    <div id="status">Carregando…</div>
+    <h2>Peça clicada (eixo, mm, relativo ao ponto base do projeto)</h2>
+    <div id="piece">Clique numa peça.</div>
+    <h2>Conversão</h2>
+    <pre id="info">—</pre>
+  </aside>
+</div>
+<script type="module" src="/coordenadas.js"></script>
+</body>
+</html>

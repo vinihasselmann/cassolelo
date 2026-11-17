@@ -11,7 +11,7 @@ from pydantic import BaseModel, Field
 from app.auth import CurrentUser, Role, require_role
 from app.db import SessionDep
 from app.models import User
-from app.models.enums import ParamScope, ParamType
+from app.models.enums import ParamLevel, ParamScope, ParamType
 from app.services import param_defs as service
 from app.services.param_defs import ParamDefInfo, ParamDefInput
 
@@ -31,10 +31,11 @@ class ParamDefOut(BaseModel):
     required: bool
     categories: list[str] | None  # nulo = todas
     scope: ParamScope
+    level: ParamLevel  # por marca ou por peça
     obra_id: int | None
     obra_code: str | None
     active: bool
-    values_count: int  # marcas com valor
+    values_count: int  # marcas (por marca) ou unidades de peça (por peça) com valor
     in_obra: bool | None = None  # listado para uma obra: vale nela?
     obras_count: int = 0  # obras em que o parâmetro da biblioteca está incluído
     options_in_use: list[str]
@@ -56,6 +57,7 @@ class ParamDefCreate(BaseModel):
     obra_id: int | None = None
     # parâmetro da biblioteca criado de dentro de uma obra: já entra nela
     include_in_obra_id: int | None = None
+    level: str = ParamLevel.MARK.value  # "mark" (por marca) | "piece" (por peça)
 
 
 class ParamDefUpdate(BaseModel):
@@ -67,6 +69,7 @@ class ParamDefUpdate(BaseModel):
     categories: list[str] | None = Field(default=None, description="[] = todas")
     scope: str | None = None
     obra_id: int | None = None
+    level: str | None = None  # só enquanto não houver valores
 
 
 def _out(info: ParamDefInfo) -> ParamDefOut:
@@ -80,6 +83,7 @@ def _out(info: ParamDefInfo) -> ParamDefOut:
         required=p.required,
         categories=p.categories,
         scope=ParamScope(p.scope),
+        level=ParamLevel(p.level),
         obra_id=p.obra_id,
         obra_code=info.obra_code,
         active=p.active,

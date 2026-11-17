@@ -257,6 +257,13 @@ function renderModel(
         { mark: { id: m.mark_id, code: m.code, category: m.category }, values: [], last_change_by: null, last_change_at: null },
       ]),
     ),
+    // P4: sem parâmetros por peça (a tabela por peça não aparece; tem testes próprios).
+    ...Object.fromEntries(
+      MARKS.map((m) => [
+        `GET /api/obras/7/marks/${m.mark_id}/units`,
+        { mark: { id: m.mark_id, code: m.code, category: m.category }, version_id: 1, params: [], units: [] },
+      ]),
+    ),
     'GET /api/obras/7': OBRA,
     'GET /api/obras/7/versions': versions,
     'GET /api/versions/1/marks': MARKS,
@@ -728,6 +735,7 @@ describe('Catálogo de parâmetros da fábrica (6.1)', () => {
     required: true,
     categories: ['Structural Columns'],
     scope: 'global',
+    level: 'mark',
     obra_id: null,
     obra_code: null,
     active: true,
@@ -801,6 +809,7 @@ describe('Catálogo de parâmetros da fábrica (6.1)', () => {
       required: true,
       categories: ['Structural Columns'],
       scope: 'global',
+      level: 'mark',
       obra_id: null,
       include_in_obra_id: 7, // criado da biblioteca aqui: já entra nesta obra
     });
@@ -1056,6 +1065,22 @@ describe('Valores por marca (6.2)', () => {
     await user.click(within(alert).getByRole('button', { name: 'Recarregar' }));
     await vi.waitFor(() => { expect(screen.queryByRole('alert')).not.toBeInTheDocument(); });
     expect(screen.getByLabelText('Valores da marca')).toHaveTextContent('Tipo de forma *F-11');
+  });
+
+  it('data com ano fora de 1900–2100: avisa abaixo do campo e não salva; corrigida, salva', async () => {
+    const { puts, user } = await openMark(FIELDS);
+    await user.click(await screen.findByRole('button', { name: 'Editar' }));
+    const input = screen.getByLabelText('Data de concretagem');
+    fireEvent.change(input, { target: { value: '0002-05-05' } }); // não grava ao mudar
+    expect(puts).toEqual([]);
+    await user.click(screen.getByRole('button', { name: 'Salvar' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Data inválida: use dd/mm/aaaa');
+    expect(input).toHaveAttribute('aria-invalid', 'true');
+    expect(puts).toEqual([]);
+
+    fireEvent.change(input, { target: { value: '2026-05-05' } });
+    await user.click(screen.getByRole('button', { name: 'Salvar' }));
+    await vi.waitFor(() => { expect(puts).toEqual([{ changes: [{ def_id: 3, value: '2026-05-05', row_version: 1 }] }]); });
   });
 
   it('422: a mensagem do servidor aparece no formulário', async () => {
@@ -1770,6 +1795,12 @@ describe('Tempo real (8.1)', () => {
     expect(describeEvent(ev('param_def_changed', { name: 'Ciclo', action: 'created' }))).toBe('J. Silva criou o parâmetro “Ciclo”');
     expect(describeEvent(ev('version_failed', { version_number: 3 }))).toBe('A versão 3 não pôde ser processada');
     expect(describeEvent(ev('version_ready', {}))).toBeNull();
+    // parâmetros por peça (P2)
+    expect(describeEvent(ev('unit_values_changed', { unit: 'PP001-3' }))).toBe('J. Silva alterou a peça PP001-3');
+    expect(describeEvent(ev('unit_batch_applied', { units: 4 }))).toBe('J. Silva alterou 4 peças em lote');
+    expect(describeEvent(ev('unit_batch_undone', {}))).toBe('J. Silva desfez uma edição em lote de peças');
+    // tipo desconhecido (servidor mais novo que a tela): sem aviso, sem quebrar
+    expect(describeEvent(ev('outro' as ObraEvent['type'], {}))).toBeNull();
   });
 });
 

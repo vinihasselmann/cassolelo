@@ -11,8 +11,21 @@ const REAL = Boolean(process.env.E2E_REAL_VIEWER);
 const MAX_LOAD_MS = Number(process.env.E2E_MAX_LOAD_MS ?? 15_000);
 const FAKE_VIEWER = resolve(process.cwd(), 'e2e/fake-viewer/viewer3D.js');
 
-// Peças do modelo de teste (backend/tests/fixtures/aps/models/validacao)
-const PIECES = [10, 11, 12, 13, 20, 21, 30].map((dbid) => ({ dbid, label: `Peça ${dbid}` }));
+// Peças do modelo de teste (backend/tests/fixtures/aps/models/validacao). Geometria no
+// Viewer falso (pés, mundo): pilar 10 com seção 40x40 cm e 6 m, base em z = -2 pés; viga 20
+// de 8 m ao longo de X, seção 30x60 cm, eixo em y = 30 e z = 9,84252 pés. As outras peças
+// ganham uma caixa padrão (fake-viewer/viewer3D.js).
+const GEOMETRY: Record<number, { category: string; geom: { origin: number[]; a: number[]; b: number[]; c: number[] } }> = {
+  10: {
+    category: 'Pilares estruturais',
+    geom: { origin: [10, 20, -2], a: [1.312336, 0, 0], b: [0, 1.312336, 0], c: [0, 0, 19.68504] },
+  },
+  20: {
+    category: 'Quadro estrutural',
+    geom: { origin: [10, 29.507874, 8.858268], a: [26.24672, 0, 0], b: [0, 0.984252, 0], c: [0, 0, 1.968504] },
+  },
+};
+const PIECES = [10, 11, 12, 13, 20, 21, 30].map((dbid) => ({ dbid, label: `Peça ${dbid}`, ...GEOMETRY[dbid] }));
 
 function obraId(): string {
   const id = process.env.E2E_OBRA_ID;
@@ -1158,5 +1171,411 @@ test.describe('Coloração (F4)', () => {
     await expect(piece(page, 20)).toHaveAttribute('data-color', '#C6DBEF');
     await expect(piece(page, 10)).toHaveAttribute('data-color', '#0B3C78');
     await expect(piece(page, 12)).toHaveAttribute('data-color', '#9AA0A6');
+  });
+});
+
+test.describe('Parâmetros por peça (P4)', () => {
+  test.skip(REAL, 'usa a obra de teste E2E-PEC (P-06 com 6 pilares)');
+  const pec = () => process.env.E2E_PEC_OBRA_ID ?? '';
+  const defId = () => process.env.E2E_PEC_PARAM_DEF_ID ?? '0';
+  const PEC_PIECES = [10, 11, 12, 13, 14, 15, 20, 21];
+  const piece = (page: Page, dbid: number) => page.getByTestId('fake-3d').getByRole('button', { name: `Peça ${String(dbid)}` });
+  const panel = (page: Page) => page.getByRole('complementary', { name: 'Peça selecionada' });
+  const cell = (page: Page, n: number) =>
+    panel(page).getByRole('button', { name: new RegExp(`^Data de fabricação de P-06-${String(n)}:`) });
+  const today = () => {
+    const d = new Date();
+    return `${String(d.getFullYear())}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  };
+  const br = (iso: string) => iso.split('-').reverse().join('/');
+
+  interface Unit {
+    id: number;
+    number: number;
+    element: { dbid: number } | null;
+    values: { def_id: number; value: unknown }[];
+  }
+
+  /** Unidades da P-06 pela API (usuário da fábrica). */
+  async function units(page: Page): Promise<{ headers: Record<string, string>; list: Unit[] }> {
+    const users = (await (await page.request.get('/api/dev/users')).json()) as { id: number; role: string }[];
+    const headers = { 'X-Dev-User': String(users.find((u) => u.role === 'fabrica')?.id ?? '') };
+    const marks = (await (
+      await page.request.get(`/api/versions/${process.env.E2E_PEC_VERSION_ID ?? ''}/marks`, { headers })
+    ).json()) as { mark_id: number; code: string }[];
+    const markId = marks.find((m) => m.code === 'P-06')?.mark_id ?? 0;
+    const body = (await (await page.request.get(`/api/obras/${pec()}/marks/${String(markId)}/units`, { headers })).json()) as {
+      units: Unit[];
+    };
+    return { headers, list: body.units.filter((u) => u.element !== null).sort((a, b) => a.number - b.number) };
+  }
+
+  /** Estado conhecido: as 6 peças vazias; `filled` (nºs das unidades) com a data de hoje. */
+  async function setValues(page: Page, filled: number[] = []): Promise<Unit[]> {
+    const { headers, list } = await units(page);
+    const post = (ids: number[], value: string | null) =>
+      page.request.post(`/api/obras/${pec()}/units/batch-apply`, {
+        headers,
+        data: { unit_ids: ids, changes: { [defId()]: value }, mode: 'overwrite' },
+      });
+    expect((await post(list.map((u) => u.id), null)).ok()).toBe(true);
+    const ids = list.filter((u) => filled.includes(u.number)).map((u) => u.id);
+    if (ids.length) expect((await post(ids, today())).ok()).toBe(true);
+    return list;
+  }
+
+  const filledNumbers = async (page: Page) =>
+    (await units(page)).list
+      .filter((u) => u.values.some((v) => String(v.def_id) === defId() && v.value !== null))
+      .map((u) => u.number);
+
+  test('preencher a 3ª unidade de uma marca de 6 só muda essa peça', async ({ page }, testInfo) => {
+    const list = await setValues(page);
+    const third = list.find((u) => u.number === 3)?.element?.dbid ?? 0;
+    const fifth = list.find((u) => u.number === 5)?.element?.dbid ?? 0;
+    await fakeViewerOn(page, PEC_PIECES);
+    await openRev(page, pec(), '(Fábrica)');
+    testInfo.annotations.push({ type: 'obra', description: `E2E-PEC ${pec()}` });
+
+    // Clique no 3D: seleciona a marca inteira e foca a linha da peça clicada.
+    await piece(page, third).click();
+    await expect(panel(page).getByRole('heading', { level: 3 })).toHaveText('P-06 · Structural Columns · 6 peças');
+    const table = panel(page).getByRole('table', { name: 'Peças da marca' });
+    await expect(table.getByRole('row')).toHaveCount(7);
+    await expect(table.getByRole('row', { selected: true })).toContainText('P-06-3');
+    // Um grupo só: PARÂMETROS DA FÁBRICA > Parâmetros por marca / Parâmetros por peça.
+    const factory = panel(page).getByRole('region', { name: 'Parâmetros da fábrica' });
+    await expect(factory.getByRole('region', { name: 'Parâmetros por marca' })).toBeVisible();
+    await expect(factory.getByRole('region', { name: 'Parâmetros por peça' }).getByRole('table')).toBeVisible();
+    for (const u of list) await expect(piece(page, u.element?.dbid ?? 0)).toHaveAttribute('aria-pressed', 'true');
+
+    // Edição na célula: escolher a data só preenche o campo; Enter confirma e grava.
+    await cell(page, 3).click();
+    await panel(page).getByLabel('Data de fabricação de P-06-3').fill(today());
+    await page.keyboard.press('Enter');
+    await expect(cell(page, 3)).toHaveText(br(today()));
+    for (const n of [1, 2, 4, 5, 6]) await expect(cell(page, n)).toHaveText('—');
+    expect(await filledNumbers(page)).toEqual([3]);
+
+    // Clicar numa linha destaca só aquela peça no 3D; clicar no 3D volta para a marca.
+    await table.getByRole('button', { name: 'Mostrar P-06-5 no modelo' }).click();
+    await expect(piece(page, fifth)).toHaveAttribute('aria-pressed', 'true');
+    await expect(piece(page, third)).toHaveAttribute('aria-pressed', 'false');
+    await expect(table.getByRole('row', { selected: true })).toContainText('P-06-5');
+    await piece(page, third).click();
+    await expect(piece(page, fifth)).toHaveAttribute('aria-pressed', 'true');
+    await expect(table.getByRole('row', { selected: true })).toContainText('P-06-3');
+
+    // Persiste após recarregar.
+    await openRev(page, pec(), '(Fábrica)');
+    await piece(page, third).click();
+    await expect(cell(page, 3)).toHaveText(br(today()));
+    await expect(cell(page, 1)).toHaveText('—');
+  });
+
+  test('catálogo: o botão Excluir é um link vermelho com texto legível', async ({ page }) => {
+    await fakeViewerOn(page, PEC_PIECES);
+    await openRev(page, pec(), '(Fábrica)');
+    await page.getByRole('button', { name: 'Catálogo', exact: true }).click();
+    const dialog = page.getByRole('dialog', { name: 'Catálogo de parâmetros da fábrica' });
+    const del = dialog.getByRole('button', { name: 'Excluir Data de fabricação' });
+    await expect(del).toHaveText(/Excluir/);
+    const look = await del.evaluate((el) => {
+      const cs = getComputedStyle(el);
+      return { bg: cs.backgroundColor, color: cs.color };
+    });
+    expect(look.bg).toBe('rgba(0, 0, 0, 0)'); // sem o retângulo preenchido
+    expect(look.color).not.toBe(look.bg);
+    expect(look.color).not.toBe('rgb(255, 255, 255)');
+  });
+
+  test('preencher em lote 4 unidades com "Preencher selecionadas" e Desfazer', async ({ page }) => {
+    const list = await setValues(page);
+    await fakeViewerOn(page, PEC_PIECES);
+    await openRev(page, pec(), '(Fábrica)');
+    await piece(page, list[0]?.element?.dbid ?? 0).click();
+    const table = panel(page).getByRole('table', { name: 'Peças da marca' });
+    for (const n of [1, 2, 4, 5]) await table.getByRole('checkbox', { name: `Marcar P-06-${String(n)}` }).check();
+    await panel(page).getByRole('button', { name: 'Preencher selecionadas (4)' }).click();
+
+    const dialog = page.getByRole('dialog', { name: 'Preencher 4 peças' });
+    await dialog.getByLabel('Data de fabricação').fill(today());
+    await dialog.getByRole('button', { name: 'Aplicar' }).click();
+    await expect(dialog).toContainText('4 peças serão alteradas.');
+    await dialog.getByRole('button', { name: 'Confirmar' }).click();
+    await expect(dialog).toBeHidden();
+
+    await expect(page.getByText('Valores aplicados a 4 peças.')).toBeVisible();
+    for (const n of [1, 2, 4, 5]) await expect(cell(page, n)).toHaveText(br(today()));
+    for (const n of [3, 6]) await expect(cell(page, n)).toHaveText('—');
+    expect(await filledNumbers(page)).toEqual([1, 2, 4, 5]);
+
+    await page.getByRole('button', { name: 'Desfazer' }).click();
+    for (const n of [1, 2, 4, 5]) await expect(cell(page, n)).toHaveText('—');
+    expect(await filledNumbers(page)).toEqual([]);
+  });
+
+  test('filtrar pelo parâmetro por peça mostra só as peças preenchidas', async ({ page }, testInfo) => {
+    const list = await setValues(page, [2, 5]);
+    const dbid = (n: number) => list.find((u) => u.number === n)?.element?.dbid ?? 0;
+    await fakeViewerOn(page, PEC_PIECES);
+    await openRev(page, pec(), '(Fábrica)');
+    testInfo.annotations.push({ type: 'obra', description: `E2E-PEC ${pec()}` });
+
+    const pop = await openFilter(page);
+    await pop.getByRole('button', { name: '+ Adicionar filtro' }).click();
+    const picker = page.getByRole('dialog', { name: 'Selecionar parâmetro' });
+    await picker.getByRole('searchbox', { name: 'Buscar parâmetro' }).fill('fabricacao');
+    await picker.getByRole('region', { name: 'Fábrica' }).getByRole('button', { name: /Data de fabricação/ }).click();
+    const step = page.getByRole('dialog', { name: 'Data de fabricação' });
+    await expect(step.getByRole('combobox', { name: 'Operador' })).toHaveValue('this_month');
+    await step.getByRole('button', { name: 'Adicionar' }).click();
+    await expect(pop.getByRole('list', { name: 'Filtros ativos' })).toContainText('Data de fabricação: no mês atual');
+    await expect(page.getByRole('list', { name: /^Marcas/ }).getByRole('button')).toHaveText([/P-06.*2 de 6 peças/]);
+    await closePopovers(page);
+    for (const n of [2, 5]) await expect(piece(page, dbid(n))).toHaveAttribute('data-state', 'normal');
+    for (const n of [1, 3, 4, 6]) await expect(piece(page, dbid(n))).toBeHidden();
+    for (const v of [20, 21]) await expect(piece(page, v)).toBeHidden();
+  });
+});
+
+test.describe('Unidades órfãs (P5)', () => {
+  test.skip(REAL, 'usa a obra de teste E2E-PECREV (v2 sem uma peça da P-06)');
+  const piece = (page: Page, dbid: number) => page.getByTestId('fake-3d').getByRole('button', { name: `Peça ${String(dbid)}` });
+  const panel = (page: Page) => page.getByRole('complementary', { name: 'Peça selecionada' });
+
+  interface Unit {
+    id: number;
+    label: string;
+    status: string;
+    element: { dbid: number } | null;
+    values: { value: unknown }[];
+  }
+
+  test('v2 com uma peça a menos deixa a unidade órfã com os valores; religar a outra peça recupera os valores', async ({ page }, testInfo) => {
+    const { runSeed } = await import('./global-setup');
+    const obra = String(runSeed().pecrev_obra_id); // estado inicial: v2 acabou de chegar
+    testInfo.annotations.push({ type: 'obra', description: `E2E-PECREV ${obra}` });
+    const users = (await (await page.request.get('/api/dev/users')).json()) as { id: number; role: string }[];
+    const headers = { 'X-Dev-User': String(users.find((u) => u.role === 'fabrica')?.id ?? '') };
+    const api = async <T,>(path: string): Promise<T> => (await (await page.request.get(`/api${path}`, { headers })).json()) as T;
+
+    // A unidade da peça que saiu ficou órfã, com o valor.
+    const [orphan] = await api<{ id: number; label: string; mark_id: number; values: { value: unknown }[] }[]>(
+      `/obras/${obra}/unit-orphans`,
+    );
+    expect(orphan?.values.map((v) => v.value)).toHaveLength(1);
+    const raw = orphan?.values[0]?.value;
+    const date = typeof raw === 'string' ? raw : '';
+    const br = date.split('-').reverse().join('/');
+    const label = orphan?.label ?? '';
+
+    await fakeViewerOn(page, [10, 11, 13, 14, 15, 20, 21]); // peças da pecas_v2 (sem a 12)
+    await openRev(page, obra, '(Fábrica)');
+
+    // Banner: a unidade que perdeu a peça (com valores) e o atalho para a fila.
+    const banner = page.getByRole('region', { name: 'Versão nova' }).getByRole('group', { name: 'Peças' });
+    await expect(banner).toContainText(`1 perdeu a peça nesta versão, com valores: ${label}`);
+    await banner.getByRole('button', { name: '1 peça órfã' }).click();
+
+    const dialog = page.getByRole('dialog', { name: 'Peças órfãs' });
+    const list = dialog.getByRole('list', { name: 'Peças órfãs abertas' });
+    await expect(list).toContainText(label);
+    await expect(list).toContainText(`Data de fabricação: ${br}`);
+    await expect(list).toContainText('Sem peça desde a versão 2');
+
+    // Religar a uma peça vazia da mesma marca.
+    await dialog.getByRole('button', { name: `Religar ${label}` }).click();
+    const target = dialog.getByRole('list', { name: 'Peças de P-06' }).getByRole('button', { name: /vazia/ }).last();
+    const targetLabel = ((await target.locator('b').textContent()) ?? '').trim();
+    const before = await api<{ units: Unit[] }>(`/obras/${obra}/marks/${String(orphan?.mark_id)}/units`);
+    const dbid = before.units.find((u) => u.label === targetLabel)?.element?.dbid ?? 0;
+    await target.click();
+    await expect(dialog).toBeHidden();
+    await expect(page.getByRole('status')).toContainText(`${label} religada à peça que era da ${targetLabel}: os valores voltaram.`);
+
+    // A peça mostra a unidade religada com o valor recuperado.
+    await piece(page, dbid).click();
+    const table = panel(page).getByRole('table', { name: 'Peças da marca' });
+    await expect(table.getByRole('row', { selected: true })).toContainText(label);
+    await expect(panel(page).getByRole('button', { name: `Data de fabricação de ${label}: ${br}` })).toBeVisible();
+    await expect(table).not.toContainText(targetLabel);
+
+    // Fila vazia; tudo auditado no histórico da unidade.
+    expect(await api<unknown[]>(`/obras/${obra}/unit-orphans`)).toEqual([]);
+    const history = await api<{ action: string }[]>(`/obras/${obra}/units/${String(orphan?.id)}/history`);
+    expect(history.map((h) => h.action)).toEqual(expect.arrayContaining(['orphan', 'relink']));
+    await page.getByRole('button', { name: 'Peças órfãs', exact: true }).click();
+    await expect(page.getByRole('dialog', { name: 'Peças órfãs' })).toContainText('Nenhuma peça órfã pendente.');
+  });
+});
+
+test.describe('Coordenadas do eixo', () => {
+  test.skip(REAL, 'usa a geometria do Viewer falso (valores conhecidos)');
+  const piece = (page: Page, dbid: number) => page.getByTestId('fake-3d').getByRole('button', { name: `Peça ${String(dbid)}` });
+  const coords = (page: Page) =>
+    page.getByRole('complementary', { name: 'Peça selecionada' }).getByRole('table', { name: 'Coordenadas do eixo' });
+  const cells = async (page: Page, row: number) =>
+    (await coords(page).getByRole('row').nth(row).getByRole('cell').allTextContents()).slice(0, 3);
+
+  test('pilar mostra X, Y, Z do eixo na base; viga mostra início e fim; marcador no 3D', async ({ page }, testInfo) => {
+    await openModel(page, testInfo);
+    const panel = page.getByRole('complementary', { name: 'Peça selecionada' });
+
+    // Pilar (PP001, 2 peças): coordenadas da peça CLICADA, em metros, ponto base do projeto
+    await piece(page, 10).click();
+    await expect(panel.getByRole('heading', { name: 'Coordenadas do eixo (ponto base do projeto)' })).toBeVisible();
+    await expect(coords(page).getByRole('row')).toHaveCount(2);
+    await expect.poll(() => cells(page, 1)).toEqual(['33,728', '67,256', '0,914']);
+    await expect(panel.getByText(/Pilar · centro da seção na base · em metros/)).toBeVisible();
+    await expect(panel.getByRole('button', { name: 'Copiar Pilar: 33,728; 67,256; 0,914' })).toBeVisible();
+    await expect(page.getByTestId('fake-3d')).toHaveAttribute('data-eixo', 'ponto');
+    // a seleção destaca a marca inteira, mas a outra peça dela tem as suas coordenadas
+    await expect(piece(page, 11)).toHaveAttribute('aria-pressed', 'true');
+    await piece(page, 11).click();
+    await expect.poll(() => cells(page, 1)).toEqual(['47,396', '61,112', '1,524']);
+
+    // Viga: início e fim do eixo, na meia altura
+    await piece(page, 20).click();
+    const rows = coords(page).getByRole('row');
+    await expect(rows).toHaveCount(3);
+    await expect(rows.nth(1).getByRole('rowheader')).toHaveText('Início');
+    await expect(rows.nth(2).getByRole('rowheader')).toHaveText('Fim');
+    await expect.poll(() => cells(page, 1)).toEqual(['33,528', '70,104', '4,524']);
+    await expect.poll(() => cells(page, 2)).toEqual(['41,528', '70,104', '4,524']);
+    await expect(page.getByTestId('fake-3d')).toHaveAttribute('data-eixo', 'linha');
+
+    // Sem seleção: some o marcador e a seção
+    await page.getByRole('button', { name: 'Limpar seleção' }).click();
+    await expect(page.getByTestId('fake-3d')).not.toHaveAttribute('data-eixo', /.*/);
+    await expect(coords(page)).toBeHidden();
+  });
+});
+
+// Bug relatado em 2026-11-16 (docs/bugs/data-por-peca.md): o editor de DATA por peça grava
+// a cada tecla (ano 0002) e não deixa corrigir. Estes testes FALHAM até a correção.
+test.describe('Bug: editor de data por peça (docs/bugs/data-por-peca.md)', () => {
+  test.skip(REAL, 'usa a obra de teste E2E-PEC');
+  test.use({ locale: 'pt-BR' }); // campo de data no formato dd/mm/aaaa, como no tablet da fábrica
+  const pec = () => process.env.E2E_PEC_OBRA_ID ?? '';
+  const defId = () => process.env.E2E_PEC_PARAM_DEF_ID ?? '0';
+  const panel = (page: Page) => page.getByRole('complementary', { name: 'Peça selecionada' });
+  const cell = (page: Page, label: string) =>
+    panel(page).getByRole('button', { name: new RegExp(`^Data de fabricação de ${label}:`) });
+
+  interface Unit {
+    id: number;
+    number: number;
+    label: string;
+    element: { dbid: number } | null;
+    values: { def_id: number; value: unknown }[];
+  }
+
+  /** Unidades da P-06 e o cabeçalho da fábrica (API). */
+  async function units(page: Page): Promise<{ headers: Record<string, string>; list: Unit[] }> {
+    const users = (await (await page.request.get('/api/dev/users')).json()) as { id: number; role: string }[];
+    const headers = { 'X-Dev-User': String(users.find((u) => u.role === 'fabrica')?.id ?? '') };
+    const marks = (await (
+      await page.request.get(`/api/versions/${process.env.E2E_PEC_VERSION_ID ?? ''}/marks`, { headers })
+    ).json()) as { mark_id: number; code: string }[];
+    const markId = marks.find((m) => m.code === 'P-06')?.mark_id ?? 0;
+    const body = (await (await page.request.get(`/api/obras/${pec()}/marks/${String(markId)}/units`, { headers })).json()) as {
+      units: Unit[];
+    };
+    return { headers, list: body.units.filter((u) => u.element !== null).sort((a, b) => a.number - b.number) };
+  }
+
+  /** Zera a data da P-06-n (e, se `value`, grava esse valor) pela API. */
+  async function setUnit(page: Page, n: number, value: string | null): Promise<Unit> {
+    const { headers, list } = await units(page);
+    const unit = list.find((u) => u.number === n);
+    if (!unit) throw new Error(`P-06-${String(n)} não encontrada`);
+    const post = (v: string | null) =>
+      page.request.post(`/api/obras/${pec()}/units/batch-apply`, {
+        headers,
+        data: { unit_ids: [unit.id], changes: { [defId()]: v }, mode: 'overwrite' },
+      });
+    expect((await post(null)).ok()).toBe(true);
+    if (value) expect((await post(value)).ok()).toBe(true);
+    return unit;
+  }
+
+  async function valueOf(page: Page, n: number): Promise<unknown> {
+    const { list } = await units(page);
+    return list.find((u) => u.number === n)?.values.find((v) => String(v.def_id) === defId())?.value ?? null;
+  }
+
+  /** Abre o modelo da E2E-PEC e seleciona a peça da unidade. Devolve as gravações (PUT). */
+  async function open(page: Page, unit: Unit): Promise<string[]> {
+    const puts: string[] = [];
+    page.on('request', (r) => {
+      if (r.method() === 'PUT' && r.url().includes('/units/')) puts.push(r.postData() ?? '');
+    });
+    await fakeViewerOn(page, [10, 11, 12, 13, 14, 15, 20, 21]);
+    await openRev(page, pec(), '(Fábrica)');
+    await page.getByTestId('fake-3d').getByRole('button', { name: `Peça ${String(unit.element?.dbid ?? 0)}` }).click();
+    return puts;
+  }
+
+  test('digitar 05052026 na célula grava 05/05/2026 (uma gravação só)', async ({ page }) => {
+    const unit = await setUnit(page, 3, null);
+    const puts = await open(page, unit);
+
+    await cell(page, unit.label).click();
+    const input = panel(page).getByLabel(`Data de fabricação de ${unit.label}`);
+    await expect(input).toBeFocused();
+    await page.keyboard.type('05052026', { delay: 80 });
+    await page.keyboard.press('Enter');
+
+    await expect(cell(page, unit.label)).toHaveText('05/05/2026');
+    expect(await valueOf(page, 3)).toBe('2026-05-05');
+    expect(puts).toHaveLength(1);
+  });
+
+  test('depois de salva, a célula reabre e a data pode ser corrigida', async ({ page }) => {
+    const unit = await setUnit(page, 4, '2026-05-05');
+    await open(page, unit);
+    await expect(cell(page, unit.label)).toHaveText('05/05/2026');
+
+    await cell(page, unit.label).click();
+    const input = panel(page).getByLabel(`Data de fabricação de ${unit.label}`);
+    await expect(input).toBeVisible();
+    await expect(input).toHaveValue('2026-05-05');
+    await page.keyboard.type('06062026', { delay: 80 });
+    await page.keyboard.press('Enter');
+
+    await expect(cell(page, unit.label)).toHaveText('06/06/2026');
+    expect(await valueOf(page, 4)).toBe('2026-06-06');
+  });
+
+  test('data pela metade + Enter: avisa, não grava e não apaga a data antiga', async ({ page }) => {
+    const unit = await setUnit(page, 5, '2026-05-05');
+    const puts = await open(page, unit);
+    await cell(page, unit.label).click();
+    const input = panel(page).getByLabel(`Data de fabricação de ${unit.label}`);
+    await expect(input).toBeFocused();
+    await page.keyboard.type('0707', { delay: 80 }); // dia e mês; o ano fica pela metade
+    await page.keyboard.press('Backspace');
+    await page.keyboard.press('Enter');
+
+    await expect(panel(page).getByText('Data inválida: use dd/mm/aaaa')).toBeVisible();
+    await expect(input).toBeVisible(); // o editor continua aberto
+    await page.keyboard.press('Escape');
+    await expect(cell(page, unit.label)).toHaveText('05/05/2026');
+    expect(puts).toHaveLength(0);
+    expect(await valueOf(page, 5)).toBe('2026-05-05');
+  });
+
+  test('ano 0002: avisa abaixo do campo e não grava', async ({ page }) => {
+    const unit = await setUnit(page, 6, null);
+    const puts = await open(page, unit);
+    await cell(page, unit.label).click();
+    await expect(panel(page).getByLabel(`Data de fabricação de ${unit.label}`)).toBeFocused();
+    await page.keyboard.type('05050002', { delay: 80 });
+    await page.keyboard.press('Enter');
+
+    await expect(panel(page).getByText('Data inválida: use dd/mm/aaaa')).toBeVisible();
+    expect(puts).toHaveLength(0);
+    expect(await valueOf(page, 6)).toBeNull();
   });
 });

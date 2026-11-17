@@ -57,6 +57,16 @@ MATRIX: dict[str, frozenset[Role] | str] = {
     "GET /api/obras/{obra_id}/marks/{mark_id}/history": ALL,
     "POST /api/obras/{obra_id}/marks/batch-preview": ALL,  # só calcula, não grava
     "POST /api/obras/{obra_id}/marks/batch-apply": FACTORY,
+    # parâmetros por peça (P2): leitura para todos, gravação fábrica e admin
+    "GET /api/obras/{obra_id}/marks/{mark_id}/units": ALL,
+    "GET /api/obras/{obra_id}/units/{unit_id}": ALL,
+    "PUT /api/obras/{obra_id}/units/{unit_id}/values": FACTORY,
+    "GET /api/obras/{obra_id}/units/{unit_id}/history": ALL,
+    "POST /api/obras/{obra_id}/units/batch-preview": ALL,  # só calcula, não grava
+    "POST /api/obras/{obra_id}/units/batch-apply": FACTORY,
+    "GET /api/obras/{obra_id}/unit-orphans": ALL,
+    "POST /api/obras/{obra_id}/units/{unit_id}/relink": FACTORY,
+    "POST /api/obras/{obra_id}/units/{unit_id}/archive": FACTORY,
     "GET /api/obras/{obra_id}/orphans": ALL,
     "GET /api/obras/{obra_id}/events": ALL,
     "GET /api/obras/{obra_id}/export.xlsx": ALL,
@@ -97,6 +107,7 @@ MATRIX: dict[str, frozenset[Role] | str] = {
     "PATCH /api/color-schemes/{scheme_id}": ALL,
     "DELETE /api/color-schemes/{scheme_id}": ALL,
     "GET /api/viewer-token": ALL,
+    "GET /api/viewer-config": ALL,
     "POST /api/webhooks/aps": PUBLIC,  # assinatura x-adsk-signature
 }
 

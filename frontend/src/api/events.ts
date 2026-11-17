@@ -16,7 +16,12 @@ export type ObraEventType =
   | 'batch_applied'
   | 'batch_undone'
   | 'orphan_changed'
-  | 'param_def_changed';
+  | 'param_def_changed'
+  // parâmetros por peça (P2)
+  | 'unit_values_changed'
+  | 'unit_batch_applied'
+  | 'unit_batch_undone'
+  | 'unit_orphan_changed';
 
 export interface EventActor {
   id: number;

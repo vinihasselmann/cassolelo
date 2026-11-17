@@ -99,7 +99,7 @@ export function FilterResultList({ marks, evaluation, filtered, loading, error, 
               <li key={r.key}>
                 <button
                   type="button"
-                  className={`mark-item${r.markId === null ? ' mark-item--loose' : ''}`}
+                  className={`list-item mark-item${r.markId === null ? ' mark-item--loose' : ''}`}
                   aria-pressed={r.markId !== null && selectedMarkIds.has(r.markId)}
                   disabled={orphan}
                   title={orphan ? 'Marca órfã: não tem peças nesta versão' : undefined}

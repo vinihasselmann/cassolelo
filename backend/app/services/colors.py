@@ -258,9 +258,9 @@ async def _status_values(
 ) -> dict[int, str]:
     from app.services.mark_status import version_statuses
 
-    statuses = (await version_statuses(session, version_id)).statuses
-    labels = {m: STATUS_LABELS[s] for m, s in statuses.items()}
-    return {p.id: labels[p.mark_id] for p in pieces if p.mark_id in labels}
+    # status de CADA peça (por peça desde 2026-11-16)
+    statuses = (await version_statuses(session, version_id)).piece_statuses
+    return {p.id: STATUS_LABELS[statuses[p.id]] for p in pieces if p.id in statuses}
 
 
 async def colorize(session: AsyncSession, version_id: int, body: ColorizeInput) -> ColorizeResult:

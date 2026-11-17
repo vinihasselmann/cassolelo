@@ -47,3 +47,30 @@ class OrphanStatus(StrEnum):
 def check_in(column: str, enum: type[StrEnum]) -> str:
     values = ", ".join(f"'{m.value}'" for m in enum)
     return f"{column} IN ({values})"
+
+
+class ParamLevel(StrEnum):
+    """Parâmetro da fábrica por MARCA (um valor para todas as peças da marca) ou por PEÇA
+    (um valor por unidade de peça). Decisão de 2026-11-16 (docs/pecas/verificacao.md)."""
+
+    MARK = "mark"
+    PIECE = "piece"
+
+
+class UnitStatus(StrEnum):
+    """Situação da unidade de peça na versão mais recente processada da obra."""
+
+    LINKED = "linked"  # ligada a um elemento
+    UNLINKED = "unlinked"  # sem elemento e sem valores (só fica registrada)
+    ORPHAN = "orphan"  # sem elemento e COM valores (nunca apagar em silêncio)
+    # órfã arquivada pela fábrica (P5): valores guardados; só volta se a chave reaparecer
+    ARCHIVED = "archived"
+
+
+class LinkMethod(StrEnum):
+    """Como a unidade foi ligada ao elemento numa versão."""
+
+    KEY = "key"  # pelo externalId (UniqueId no Revit, GlobalId no IFC)
+    ORDER = "order"  # pela ordem estável dentro da marca: "conferir"
+    NEW = "new"  # unidade criada nesta versão para um elemento a mais
+    MANUAL = "manual"  # religada à mão a esta peça (fila de unidades órfãs, P5)

@@ -1,4 +1,4 @@
-"""Lotes de edição dos parâmetros da fábrica: desfazer (6.3)."""
+"""Lotes de edição dos parâmetros da fábrica: desfazer (6.3; por peça desde o P2)."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from pydantic import BaseModel
 from app.auth import Role, require_role
 from app.db import SessionDep
 from app.models import User
-from app.services import mark_batch
+from app.services import mark_batch, piece_values
 
 router = APIRouter(prefix="/batches", tags=["batches"])
 
@@ -25,7 +25,12 @@ class UndoOut(BaseModel):
 
 @router.post("/{batch_id}/undo", response_model=UndoOut)
 async def undo_batch(batch_id: UUID, session: SessionDep, user: ParamEditor) -> UndoOut:
-    """Restaura os valores anteriores do lote. 409 se já desfeito ou alterado depois."""
-    r = await mark_batch.undo(session, batch_id, user)
+    """Restaura os valores anteriores do lote (por marca ou por peça). 409 se já desfeito
+    ou alterado depois."""
+    r: mark_batch.UndoResult | piece_values.UndoResult
+    if await piece_values.is_piece_batch(session, batch_id):
+        r = await piece_values.undo(session, batch_id, user)
+    else:
+        r = await mark_batch.undo(session, batch_id, user)
     await session.commit()
     return UndoOut(batch_id=r.batch_id, restored=r.restored)

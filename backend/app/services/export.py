@@ -5,8 +5,9 @@ O arquivo é a MESMA lista da tela: usa `search.find_marks` com os filtros da bu
 
 Aba "Marcas" (uma linha por marca): Marca, Categoria, Peças, Seção, Comprimento (cm),
 Status, uma coluna por parâmetro ativo da obra ("Nome (unidade)"), Última alteração e
-Autor. Aba "Peças": Marca, Categoria, externalId, Nível, dbId. Aba "Sobre": obra,
-versão, filtros, quando e quem gerou.
+Autor (só os parâmetros POR MARCA). Aba "Peças": Marca, Categoria, externalId, Nível,
+dbId, Peça (unidade de peça, ex.: PP001-3) e uma coluna por parâmetro POR PEÇA (P3).
+Aba "Sobre": obra, versão, filtros, quando e quem gerou.
 
 Cabeçalho congelado e filtro automático; números como número, datas como data do Excel
 (no fuso DISPLAY_TIMEZONE). Parâmetro que não se aplica à categoria da marca: célula
@@ -30,8 +31,18 @@ from openpyxl.worksheet.worksheet import Worksheet
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import Element, ModelVersion, Obra, ParamDef, ParamValue, User
-from app.models.enums import ParamType, VersionStatus
+from app.models import (
+    Element,
+    ModelVersion,
+    Obra,
+    ParamDef,
+    ParamValue,
+    PieceUnit,
+    PieceUnitLink,
+    PieceValue,
+    User,
+)
+from app.models.enums import ParamLevel, ParamType, VersionStatus
 from app.services import filters as filters_engine
 from app.services import mark_status, search
 from app.services.errors import NotFoundError
@@ -264,15 +275,70 @@ async def build_workbook(
         ws.cell(row=r, column=len(headers) - 1).number_format = DATETIME_FMT
     _style_sheet(ws, _widths(table))
 
+    # Parâmetros POR PEÇA: valor da unidade ligada a cada peça nesta versão.
+    piece_defs = list(
+        await session.scalars(
+            select(ParamDef)
+            .where(
+                ParamDef.active.is_(True),
+                param_in_obra(obra_id, level=ParamLevel.PIECE.value),
+            )
+            .order_by(func.lower(ParamDef.name), ParamDef.id)
+        )
+    )
+    element_ids = [el.id for els in pieces.values() for el in els]
+    units: dict[int, tuple[int, int]] = {}  # elemento -> (unidade, número)
+    if element_ids:
+        for el_id, unit_id, number in await session.execute(
+            select(PieceUnitLink.element_id, PieceUnit.id, PieceUnit.number)
+            .join(PieceUnit, PieceUnit.id == PieceUnitLink.unit_id)
+            .where(
+                PieceUnitLink.version_id == version.id,
+                PieceUnitLink.element_id.in_(element_ids),
+            )
+        ):
+            units[el_id] = (unit_id, number)
+    unit_values: dict[tuple[int, int], Any] = {}
+    if units and piece_defs:
+        for unit_id, def_id, value in await session.execute(
+            select(PieceValue.unit_id, PieceValue.def_id, PieceValue.value).where(
+                PieceValue.unit_id.in_({u for u, _ in units.values()}),
+                PieceValue.def_id.in_([p.id for p in piece_defs]),
+            )
+        ):
+            unit_values[(unit_id, def_id)] = value
+
     ps = wb.create_sheet("Peças")
-    pheaders = ["Marca", "Categoria", "externalId", "Nível", "dbId"]
+    pheaders = ["Marca", "Categoria", "externalId", "Nível", "dbId", "Peça"] + [
+        f"{p.name} ({p.unit})" if p.unit else p.name for p in piece_defs
+    ]
     ps.append(pheaders)
     ptable: list[list[Any]] = [pheaders]
+    first_param_col = 7
     for m in marks:
+        applicable = [p for p in piece_defs if not p.categories or m.category in p.categories]
         for el in pieces.get(m.mark_id, []):
-            prow = [m.code, m.category, el.external_id, el.level, el.dbid]
+            unit = units.get(el.id)
+            prow: list[Any] = [
+                m.code,
+                m.category,
+                el.external_id,
+                el.level,
+                el.dbid,
+                f"{m.code}-{unit[1]}" if unit else None,
+            ]
+            for p in piece_defs:
+                raw = unit_values.get((unit[0], p.id)) if unit and p in applicable else None
+                prow.append(cell_value(p.type, raw) if raw is not None else None)
             ps.append(prow)
             ptable.append(prow)
+            r = ps.max_row
+            for i, p in enumerate(piece_defs):
+                cell = ps.cell(row=r, column=first_param_col + i)
+                if p not in applicable:
+                    cell.fill = NA_FILL
+                elif isinstance(cell.value, date):
+                    cell.number_format = DATE_FMT
     _style_sheet(ps, _widths(ptable))
 
     now = datetime.now(UTC).astimezone(tz)

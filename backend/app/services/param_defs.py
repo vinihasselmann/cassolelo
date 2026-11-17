@@ -22,8 +22,8 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import Mark, Obra, ObraParam, ParamDef, ParamValue, User
-from app.models.enums import ParamScope, ParamType
+from app.models import Mark, Obra, ObraParam, ParamDef, ParamValue, PieceValue, User
+from app.models.enums import ParamLevel, ParamScope, ParamType
 from app.services import audit, events
 from app.services.errors import ConflictError, NotFoundError, ValidationError
 
@@ -54,6 +54,8 @@ class ParamDefInput:
     obra_id: Any = UNSET
     # criar um parâmetro da biblioteca de dentro de uma obra já o inclui nela
     include_in_obra_id: Any = UNSET
+    # por marca (padrão) ou por peça; imutável depois que houver valores
+    level: Any = UNSET
 
 
 @dataclass(frozen=True)
@@ -70,17 +72,22 @@ class ParamDefInfo:
 # --------------------------------------------------------------------------- valores
 
 
-def in_obra(obra_id: Any) -> Any:
-    """O parâmetro vale para a obra: é dela, ou é da biblioteca e foi incluído nela."""
+def in_obra(obra_id: Any, level: str | None = ParamLevel.MARK.value) -> Any:
+    """O parâmetro vale para a obra: é dela, ou é da biblioteca e foi incluído nela.
+
+    `level` (padrão: só os POR MARCA): os fluxos de valores, status, busca, filtros e
+    exportação são da marca; os parâmetros POR PEÇA entram neles nos passos seguintes
+    (docs/pecas). `level=None`: todos (catálogo)."""
     included = exists(
         select(ObraParam.def_id).where(
             ObraParam.obra_id == obra_id, ObraParam.def_id == ParamDef.id
         )
     )
-    return or_(
+    cond = or_(
         and_(ParamDef.scope == ParamScope.OBRA.value, ParamDef.obra_id == obra_id),
         and_(ParamDef.scope == ParamScope.GLOBAL.value, included),
     )
+    return cond if level is None else and_(cond, ParamDef.level == level)
 
 
 async def included_ids(session: AsyncSession, obra_id: int) -> set[int]:
@@ -99,21 +106,32 @@ def has_value(column: Any) -> Any:
 
 
 async def values_count(session: AsyncSession, def_id: int) -> int:
-    n = await session.scalar(
+    """Marcas com valor (parâmetro por marca) + unidades com valor (por peça)."""
+    marks = await session.scalar(
         select(func.count(func.distinct(ParamValue.mark_id))).where(
             ParamValue.def_id == def_id, has_value(ParamValue.value)
         )
     )
-    return int(n or 0)
+    units = await session.scalar(
+        select(func.count(func.distinct(PieceValue.unit_id))).where(
+            PieceValue.def_id == def_id, has_value(PieceValue.value)
+        )
+    )
+    return int(marks or 0) + int(units or 0)
 
 
 async def options_in_use(session: AsyncSession, def_id: int) -> list[str]:
-    rows = await session.scalars(
-        select(func.distinct(ParamValue.value.op("#>>")(literal_column("'{}'::text[]")))).where(
-            ParamValue.def_id == def_id, has_value(ParamValue.value)
+    """Opções de uma lista em uso, por marca ou por peça (não podem ser removidas)."""
+    text_of: Any = literal_column("'{}'::text[]")
+    found: set[str] = set()
+    for model in (ParamValue, PieceValue):
+        rows = await session.scalars(
+            select(func.distinct(model.value.op("#>>")(text_of))).where(
+                model.def_id == def_id, has_value(model.value)
+            )
         )
-    )
-    return sorted(str(v) for v in rows if v is not None)
+        found.update(str(v) for v in rows if v is not None)
+    return sorted(found)
 
 
 # --------------------------------------------------------------------------- validação
@@ -126,6 +144,15 @@ def _clean_name(raw: Any) -> str:
     if len(name) > MAX_NAME:
         raise ValidationError(f"O nome pode ter no máximo {MAX_NAME} caracteres.")
     return name
+
+
+def _clean_level(raw: Any) -> ParamLevel:
+    try:
+        return ParamLevel(raw)
+    except ValueError:
+        raise ValidationError(
+            f"Nível inválido: {raw!r} (use mark = por marca, piece = por peça)."
+        ) from None
 
 
 def _clean_type(raw: Any) -> ParamType:
@@ -275,7 +302,7 @@ async def list_params(
     o catálogo oferecer "Incluir nesta obra". Sem obra_id: todos."""
     stmt = select(ParamDef)
     if obra_id is not None:
-        visible = in_obra(obra_id)
+        visible = in_obra(obra_id, level=None)
         if library:
             visible = or_(visible, ParamDef.scope == ParamScope.GLOBAL.value)
         stmt = stmt.where(visible)
@@ -348,6 +375,7 @@ async def create_param(session: AsyncSession, data: ParamDefInput, actor: User) 
         categories=_clean_categories(None if data.categories is UNSET else data.categories),
         scope=scope.value,
         obra_id=obra_id,
+        level=(ParamLevel.MARK if data.level is UNSET else _clean_level(data.level)).value,
         created_by=actor.id,
         updated_by=actor.id,
     )
@@ -444,6 +472,13 @@ async def update_param(
     before = audit.snapshot(p)
     used = await values_count(session, p.id)
 
+    level = ParamLevel(p.level) if data.level is UNSET else _clean_level(data.level)
+    if level.value != p.level and used:
+        raise ConflictError(
+            "Por marca / por peça não pode ser alterado: "
+            f"{used} marca(s) ou peça(s) já têm valor neste parâmetro."
+        )
+
     ptype = ParamType(p.type) if data.type is UNSET else _clean_type(data.type)
     if ptype.value != p.type and used:
         raise ConflictError(
@@ -475,6 +510,7 @@ async def update_param(
 
     p.name = name
     p.type = ptype.value
+    p.level = level.value
     p.scope = scope.value
     p.obra_id = obra_id
     if data.required is not UNSET:

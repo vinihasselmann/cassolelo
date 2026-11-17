@@ -95,3 +95,13 @@ export function resolveClick(
 export function selectPieces(ids: readonly DbId[], index: MarkIndex): Selection {
   return ids.length === 0 ? EMPTY_SELECTION : add(EMPTY_SELECTION, [...ids], index, ids[0] ?? null);
 }
+
+/**
+ * O índice de marcas chegou (ou mudou) depois do clique: peças que estavam "sem Marca" só
+ * porque o índice ainda não tinha carregado passam para a marca delas. A peça em foco não muda.
+ * Sem nada a corrigir, devolve a mesma seleção (sem re-render).
+ */
+export function refreshSelection(current: Selection, index: MarkIndex): Selection {
+  if (!current.unmarked.some((id) => index.has(id))) return current;
+  return { ...selectPieces(selectionDbIds(current), index), focus: current.focus };
+}

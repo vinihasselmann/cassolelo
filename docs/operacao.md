@@ -114,12 +114,12 @@ reprova o teste). Papel negado: 403; sem usuário: 401.
 
 | Rotas | projetos | fábrica | admin | leitura |
 |---|:-:|:-:|:-:|:-:|
-| Leitura: obras, versões, relatório, busca, facetas, status, progresso, peça, valores, histórico, órfãs, diff, catálogo, eventos (SSE), Excel, token do Viewer, `/api/me`, prévia de lote | ✓ | ✓ | ✓ | ✓ |
+| Leitura: obras, versões, relatório, busca, facetas, status, progresso, peça, valores, histórico, unidades de peça e valores por peça (com histórico), órfãs, peças órfãs, diff, catálogo, eventos (SSE), Excel, token e configuração do Viewer, `/api/me`, prévia de lote (por marca e por peça) | ✓ | ✓ | ✓ | ✓ |
 | Motor de filtros e cores: campos, valores, avaliar filtro, avaliar esquema de cores, colorir por campo | ✓ | ✓ | ✓ | ✓ |
 | Filtros salvos e esquemas de cores **pessoais** (só o dono vê e edita) | ✓ | ✓ | ✓ | ✓ |
 | Filtros salvos e esquemas de cores **compartilhados**: criar, editar, excluir (`SHARED_FILTER_ROLES`, padrão fábrica e admin; ver todos podem). Os de sistema (antigos atalhos) ninguém edita | – | ✓ | ✓ | – |
 | Navegar no Docs (`/api/acc/*`), cadastrar/editar obra | ✓ | – | ✓ | – |
 | Sincronizar agora | ✓ | ✓ | ✓ | – |
-| Editar valores, aplicar/desfazer lote, manter valores (revisar), religar/arquivar órfã, criar/editar/excluir parâmetro | – | ✓ | ✓ | – |
+| Editar valores (por marca e por peça), aplicar/desfazer lote, manter valores (revisar), religar/arquivar órfã (marca e peça), criar/editar/excluir parâmetro | – | ✓ | ✓ | – |
 | `/api/metrics` (ou Bearer `METRICS_TOKEN`) | – | – | ✓ | – |
 | Públicas: `/api/health`, `/api/ready`, `/api/dev/users` (só dev), webhook do APS (assinatura) | | | | |

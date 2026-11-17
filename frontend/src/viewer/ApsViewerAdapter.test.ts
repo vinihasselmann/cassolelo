@@ -271,3 +271,146 @@ describe('parseHexColor', () => {
     expect(() => parseHexColor('vermelho')).toThrow('Cor inválida');
   });
 });
+
+describe('ApsViewerAdapter · coordenadas do eixo', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  /** Viewer falso com árvore (raiz 1 → pilar 10 → sólido 11), malha normalizada e overlay. */
+  function geometryFake(aec: unknown = { refPointTransformation: [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0] }) {
+    const fake = fakeAutodesk();
+    const children: Record<number, number[]> = { 1: [10], 10: [11], 11: [] };
+    const parent: Record<number, number> = { 10: 1, 11: 10 };
+    const fragsOf: Record<number, number[]> = { 11: [7] };
+    const props: Record<number, { name: string; properties: { displayName: string; displayCategory?: string; displayValue: unknown }[] }> = {
+      10: {
+        name: 'Pilar [6657283]',
+        properties: [
+          { displayName: 'Category', displayCategory: 'Fases', displayValue: 'Fases' },
+          { displayName: 'Category', displayCategory: 'Element', displayValue: 'Pilares estruturais' },
+          { displayName: 'Material', displayValue: 'Concreto' },
+        ],
+      },
+      11: { name: 'IfcExtrudedAreaSolid::Concreto', properties: [] },
+    };
+    const model = {
+      getData: () => ({ globalOffset: { x: 100, y: 200, z: 0 } }),
+      getUnitScale: () => 0.3048,
+      getInstanceTree: () => ({
+        getRootId: () => 1,
+        getNodeParentId: (id: number) => parent[id] ?? 0,
+        enumNodeChildren: (id: number, cb: (c: number) => void) => { (children[id] ?? []).forEach(cb); },
+        enumNodeFragments: (id: number, cb: (f: number) => void) => { (fragsOf[id] ?? []).forEach(cb); },
+      }),
+      // fragmento 7: escala 2 e translação (5, 6, 7) aplicadas à malha unitária
+      getFragmentList: () => ({
+        getWorldMatrix: (_f: number, out: { elements: number[] }) => {
+          out.elements = [2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 0, 5, 6, 7, 1];
+        },
+      }),
+      getProperties: (id: number, ok: (r: (typeof props)[number]) => void, fail: (e: unknown) => void) => {
+        const p = props[id];
+        if (p) ok(p);
+        else fail(new Error('sem propriedades'));
+      },
+    };
+    fake.viewer.loadDocumentNode.mockResolvedValue(model);
+    const overlay = { added: [] as unknown[], removed: [] as unknown[], scenes: [] as string[], invalidated: 0 };
+    Object.assign(fake.viewer, {
+      impl: {
+        // vb intercalado (stride 6: posição + normal), posição no deslocamento 0
+        getRenderProxy: () => ({
+          geometry: { vb: [0, 0, 0, 9, 9, 9, 1, 0, 0, 9, 9, 9, 0, 1, 0, 9, 9, 9], vbstride: 6, attributes: { position: { offset: 0 } }, ib: [0, 1, 2] },
+        }),
+        createOverlayScene: (name: string) => overlay.scenes.push(name),
+        addOverlay: (_n: string, obj: unknown) => overlay.added.push(obj),
+        removeOverlay: (_n: string, obj: unknown) => overlay.removed.push(obj),
+        invalidate: () => { overlay.invalidated += 1; },
+      },
+    });
+    Object.assign(fake.av.Viewing.Document, { getAecModelData: () => Promise.resolve(aec) });
+    class Obj {
+      position = { set: vi.fn() };
+    }
+    class Stub {
+      readonly stub = true;
+    }
+    vi.stubGlobal('THREE', {
+      Vector4,
+      Matrix4: class {
+        elements: number[] = [];
+      },
+      Vector3: Stub,
+      Geometry: class {
+        vertices: unknown[] = [];
+      },
+      SphereGeometry: Stub,
+      MeshBasicMaterial: Stub,
+      LineBasicMaterial: Stub,
+      Mesh: Obj,
+      Line: Obj,
+    });
+    return { fake, overlay };
+  }
+
+  it('dados de conversão: globalOffset, unidade e ponto de referência do AEC (sem mudar a carga)', async () => {
+    const { fake } = geometryFake();
+    const { adapter } = makeAdapter(fake);
+    expect(adapter.getModelFrame()).toBeNull(); // antes de carregar
+    await adapter.load('dXJu');
+    expect(adapter.getModelFrame()).toEqual({
+      globalOffset: [100, 200, 0],
+      unitScaleToM: 0.3048,
+      refPointTransformation: [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
+    });
+    expect(fake.viewer.loadDocumentNode.mock.calls[0]).toHaveLength(2); // sem opções de carga
+  });
+
+  it('sem AEC (IFC/NWD): sem ponto de referência', async () => {
+    const { fake } = geometryFake(null);
+    const { adapter } = makeAdapter(fake);
+    await adapter.load('dXJu');
+    expect(adapter.getModelFrame()?.refPointTransformation).toBeNull();
+  });
+
+  it('nós: categoria do grupo Element, material, pai e filhos, geometria própria', async () => {
+    const { fake } = geometryFake();
+    const { adapter } = makeAdapter(fake);
+    await adapter.load('dXJu');
+    const [pilar, solido] = await adapter.getNodes([10, 11]);
+    expect(pilar).toMatchObject({ dbId: 10, parent: 1, children: [11], category: 'Pilares estruturais', material: 'Concreto', hasGeometry: false });
+    expect(solido).toMatchObject({ dbId: 11, parent: 10, children: [], name: 'IfcExtrudedAreaSolid::Concreto', hasGeometry: true });
+  });
+
+  it('triângulos em coordenadas de mundo: matriz da lista de fragmentos sobre a malha normalizada', async () => {
+    const { fake } = geometryFake();
+    const { adapter } = makeAdapter(fake);
+    await adapter.load('dXJu');
+    expect(adapter.getTriangles(11)).toEqual([
+      [
+        [5, 6, 7],
+        [7, 6, 7],
+        [5, 8, 7],
+      ],
+    ]);
+    expect(adapter.getTriangles(10)).toEqual([]); // só a geometria PRÓPRIA do nó
+  });
+
+  it('marcador: esfera no ponto, esferas + linha na viga; null apaga', async () => {
+    const { fake, overlay } = geometryFake();
+    const { adapter } = makeAdapter(fake);
+    await adapter.load('dXJu');
+    adapter.showAxisMarker([[1, 2, 3]]);
+    expect(overlay.scenes).toContain('cassol-eixo');
+    expect(overlay.added).toHaveLength(1);
+    adapter.showAxisMarker([
+      [0, 0, 0],
+      [8, 0, 0],
+    ]);
+    expect(overlay.removed).toHaveLength(1);
+    expect(overlay.added).toHaveLength(4); // 1 + (2 esferas + 1 linha)
+    adapter.showAxisMarker(null);
+    expect(overlay.removed).toHaveLength(4);
+  });
+});

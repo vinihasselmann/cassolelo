@@ -58,9 +58,9 @@ export function ViewerToolbar({
 
   return (
     <div ref={root} className="viewer-bar" role="toolbar" aria-label="Barra do visualizador">
-      {open === 'filter' && <div className="viewer-bar__pop">{filterPopover}</div>}
-      {open === 'color' && <div className="viewer-bar__pop viewer-bar__pop--color">{colorPopover}</div>}
-      <div className="viewer-bar__main">
+      {open === 'filter' && <div className="popover viewer-bar__pop">{filterPopover}</div>}
+      {open === 'color' && <div className="popover viewer-bar__pop viewer-bar__pop--color">{colorPopover}</div>}
+      <div className="float-bar viewer-bar__main">
         <button
           type="button"
           aria-expanded={open === 'filter'}
@@ -81,7 +81,7 @@ export function ViewerToolbar({
         </button>
       </div>
       {(filterActive || coloringActive) && (
-        <div className="viewer-bar__right">
+        <div className="float-bar viewer-bar__right">
           {filterActive && (
             <button type="button" className="secondary" onClick={() => { setOpen(null); onClearFilter(); }}>
               Remover filtros

@@ -20,6 +20,7 @@ import { LiveNotices } from '../live/LiveNotices';
 import { useObraEvents } from '../live/useObraEvents';
 import { OrphansDialog } from '../reconcile/OrphansDialog';
 import { RelinkConfirm } from '../reconcile/RelinkConfirm';
+import { UnitOrphansDialog } from '../reconcile/UnitOrphansDialog';
 import { VersionBanner } from '../reconcile/VersionBanner';
 import type { Orphan } from '../../api/reconcile';
 import { FilterPopover } from '../filtro/FilterPopover';
@@ -34,11 +35,13 @@ import { DEFAULT_COLORING, type ColoringChoice } from '../cores/coloringModel';
 import { useModelColoring } from '../cores/useModelColoring';
 import { usePanels } from './usePanels';
 import { PiecePanel } from './PiecePanel';
+import { useAxisCoordinates } from './useAxisCoordinates';
 import { ProgressFooter } from './ProgressFooter';
 import {
   buildMarkIndex,
   EMPTY_SELECTION,
   selectPieces,
+  refreshSelection,
   resolveClick,
   selectionDbIds,
   type MarkIndex,
@@ -177,6 +180,9 @@ export function ModelPage() {
   const viewer = useViewerAdapter(canvasRef);
   const [load, setLoad] = useState<LoadState>({ kind: 'idle' });
   const [selection, setSelection] = useState<Selection>(EMPTY_SELECTION);
+  // P4: peça escolhida na tabela "Parâmetros por peça": o 3D seleciona só ela (a marca
+  // continua selecionada no painel). Um clique no 3D volta a selecionar a marca inteira.
+  const [pieceFocus, setPieceFocus] = useState<{ markId: number; dbid: number } | null>(null);
   const [undo, setUndo] = useState<{ batchId: string; text: string } | null>(null);
   const closeUndo = useCallback(() => { setUndo(null); }, []);
   const [multi, setMulti] = useState(false);
@@ -186,6 +192,7 @@ export function ModelPage() {
   const [showColors, setShowColors] = useState(false);
   // Órfãs (7.2): janela, modo "escolha a marca de destino" e a confirmação.
   const [showOrphans, setShowOrphans] = useState(false);
+  const [showUnitOrphans, setShowUnitOrphans] = useState(false); // P5: peças órfãs
   const [relinkFrom, setRelinkFrom] = useState<Orphan | null>(null);
   const [relinkTarget, setRelinkTarget] = useState<MarkPieces | null>(null);
   const [relinkDone, setRelinkDone] = useState<string | null>(null);
@@ -216,6 +223,7 @@ export function ModelPage() {
   useEffect(
     () =>
       viewer?.onSelect((ids) => {
+        setPieceFocus(null);
         setSelection((prev) => resolveClick(ids, live.current.index, prev, live.current.multi));
         // Religando uma órfã: a peça clicada indica a marca de destino.
         const last = ids.at(-1);
@@ -225,14 +233,28 @@ export function ModelPage() {
     [viewer],
   );
 
+  // Clique antes de as marcas carregarem (tablet lento): a peça entrou "sem Marca";
+  // quando o índice chega, ela passa para a marca dela.
+  useEffect(() => { setSelection((prev) => refreshSelection(prev, index)); }, [index]);
+
   // A seleção do app (marca inteira) é refletida no Viewer.
   const selectedIds = useMemo(() => selectionDbIds(selection), [selection]);
+  const onlyMarkId = selection.marks.length === 1 && selection.unmarked.length === 0 ? selection.marks[0]?.mark_id : undefined;
+  const pieceDbid = pieceFocus !== null && pieceFocus.markId === onlyMarkId ? pieceFocus.dbid : null;
   useEffect(() => {
-    viewer?.selectDbIds(selectedIds);
-  }, [viewer, selectedIds]);
+    viewer?.selectDbIds(pieceDbid !== null ? [pieceDbid] : selectedIds);
+  }, [viewer, selectedIds, pieceDbid]);
+  const pickPiece = (dbid: number) => {
+    if (onlyMarkId === undefined) return;
+    setPieceFocus({ markId: onlyMarkId, dbid });
+    setSelection((prev) => ({ ...prev, focus: dbid })); // propriedades da peça escolhida
+    viewer?.fitTo([dbid]);
+  };
 
   const hasSelection = selectedIds.length > 0;
   const modelReady = load.kind === 'ready';
+  // Coordenadas do eixo da peça CLICADA (selection.focus), não da marca inteira.
+  const axis = useAxisCoordinates(viewer, selection.focus, modelReady);
 
   // O que o 3D mostra. Filtro: o backend diz o modo ("isolate": só o resultado;
   // "highlight": resultado normal, o resto esmaecido e as peças fora das visíveis ocultas).
@@ -269,6 +291,7 @@ export function ModelPage() {
     const mark = marksById.get(markId); // a marca inteira (a linha pode contar só parte)
     const first = mark?.dbids[0];
     if (!mark || first === undefined) return;
+    setPieceFocus(null);
     setSelection({ marks: [mark], unmarked: [], focus: first });
     viewer?.fitTo(mark.dbids);
     if (relinkFrom) setRelinkTarget(mark);
@@ -364,6 +387,7 @@ export function ModelPage() {
             onShowNew={() => { applySystemFilter('new'); }}
             onShowReview={() => { applySystemFilter('review'); }}
             onShowOrphans={() => { setShowOrphans(true); }}
+            onShowUnitOrphans={() => { setShowUnitOrphans(true); }}
           />
         )}
         {relinkDone && (
@@ -400,6 +424,9 @@ export function ModelPage() {
                   </button>
                   <button type="button" className="secondary" onClick={() => { setShowOrphans(true); }}>
                     Fila de órfãs
+                  </button>
+                  <button type="button" className="secondary" onClick={() => { setShowUnitOrphans(true); }}>
+                    Peças órfãs
                   </button>
                 </div>
               </div>
@@ -451,7 +478,7 @@ export function ModelPage() {
               {overlay}
             </div>
           )}
-          <div className="model-tools" role="toolbar" aria-label="Ferramentas do modelo">
+          <div className="float-bar model-tools" role="toolbar" aria-label="Ferramentas do modelo">
             <button type="button" disabled={!modelReady || !hasSelection} onClick={() => { viewer?.fitTo(selectedIds); }}>
               Enquadrar seleção
             </button>
@@ -535,6 +562,16 @@ export function ModelPage() {
               canEditParams={canEditParams}
               activeLabel={consulting ? revLabel(latest.version_number) : null}
               onNewParam={(category) => { setDialog({ kind: 'new', category }); }}
+              onPickPiece={pickPiece}
+              axis={axis}
+              onUnitBatchApplied={(r) => {
+                const n = r.units_changed;
+                setUndo(
+                  r.batch_id
+                    ? { batchId: r.batch_id, text: `Valores aplicados a ${n.toLocaleString('pt-BR')} ${n === 1 ? 'peça' : 'peças'}.` }
+                    : null,
+                );
+              }}
               onBatchApplied={(r) => {
                 const n = r.marks_changed;
                 setUndo(
@@ -566,6 +603,21 @@ export function ModelPage() {
             setRelinkDone(null);
             setRelinkTarget(null);
             setRelinkFrom(o);
+          }}
+        />
+      )}
+      {showUnitOrphans && latest && (
+        <UnitOrphansDialog
+          obraId={obraId}
+          versionId={latest.id}
+          canEdit={canEditParams}
+          onClose={() => { setShowUnitOrphans(false); }}
+          onRelinked={(r) => {
+            setShowUnitOrphans(false);
+            setRelinkDone(
+              `${r.label} religada à peça que era da ${r.displaced_label}: os valores voltaram.` +
+                (r.displaced_status === 'orphan' ? ` ${r.displaced_label} foi para a fila de peças órfãs.` : ''),
+            );
           }}
         />
       )}

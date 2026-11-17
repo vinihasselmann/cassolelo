@@ -3,7 +3,8 @@
 - Só os parâmetros ativos que se aplicam à marca (escopo global ou da obra da marca,
   categoria compatível).
 - Validação/normalização por tipo: número aceita vírgula decimal; lista só aceita as
-  opções (grava a forma do catálogo); data ISO (AAAA-MM-DD); sim/não booleano; texto
+  opções (grava a forma do catálogo); data ISO (AAAA-MM-DD), completa e com ano entre
+  1900 e 2100 (docs/bugs/data-por-peca.md); sim/não booleano; texto
   limpo. Vazio/nulo apaga o valor (a linha fica com value nulo, para o histórico).
 - Concorrência otimista por row_version: o cliente manda a versão que leu (nula se
   não havia valor). Se outro usuário salvou antes: ConflictError 409 com quem/quando,
@@ -72,6 +73,33 @@ def _is_empty(value: Any) -> bool:
     return value is None or (isinstance(value, str) and not value.strip())
 
 
+DATE_MIN_YEAR = 1900
+DATE_MAX_YEAR = 2100
+DATE_INVALID = "Data inválida: use dd/mm/aaaa"
+_ISO_DATE = re.compile(r"^(\d{4})-(\d{2})-(\d{2})")
+
+
+def valid_date(raw: Any) -> str | None:
+    """'AAAA-MM-DD' completa, existente e com ano entre 1900 e 2100 → a data ISO; senão None.
+    Aceita um sufixo de hora ('2026-05-05T00:00'), que é descartado."""
+    m = _ISO_DATE.match(str(raw).strip())
+    if not m:
+        return None
+    try:
+        d = date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+    except ValueError:
+        return None
+    return d.isoformat() if DATE_MIN_YEAR <= d.year <= DATE_MAX_YEAR else None
+
+
+def normalize_date(raw: Any, param: ParamDef) -> str:
+    """Data do parâmetro ou 422 com "Data inválida: use dd/mm/aaaa" (o campo vai no corpo)."""
+    iso = valid_date(raw)
+    if iso is None:
+        raise ValidationError(DATE_INVALID, def_id=param.id, param=param.name, value=str(raw))
+    return iso
+
+
 def normalize(param: ParamDef, raw: Any) -> Any:
     """Valor pronto para gravar (JSON), ou None para apagar. Erros em português."""
     if _is_empty(raw):
@@ -107,10 +135,7 @@ def normalize(param: ParamDef, raw: Any) -> Any:
             f'{name}: "{raw}" não é uma das opções ({", ".join(param.options or [])}).'
         )
     if ptype is ParamType.DATE:
-        try:
-            return date.fromisoformat(str(raw).strip()[:10]).isoformat()
-        except ValueError:
-            raise ValidationError(f'{name}: data inválida "{raw}" (use AAAA-MM-DD).') from None
+        return normalize_date(raw, param)
     # BOOL
     if isinstance(raw, bool):
         return raw

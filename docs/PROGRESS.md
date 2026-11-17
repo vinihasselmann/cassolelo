@@ -688,6 +688,355 @@ Pedido: popover Colorir com busca e "Cor por gama", legenda flutuante, janela Co
   - o logotipo usa as fontes do sistema (Arial Black). Se houver o arquivo vetorial oficial (SVG/AI/PDF), trocar pelo traçado original;
   - conferir no Viewer real se o redesenho acompanha a mudança de largura.
 
+## Parâmetros por peça · P0: verificação e decisão (2026-11-16)
+Relatório: `docs/pecas/verificacao.md`. Só leitura do banco de desenvolvimento, sem código de produto.
+- **Revit:** o externalId (UniqueId) se manteve em 359/359 peças entre versões, inclusive na R02 salva como arquivo novo. O dbId mudou em 213 das 359 peças e não serve como identidade.
+- **IFC exportado do Revit:** o GlobalId é derivado do UniqueId (359/359 batem); a mesma peça tem a mesma chave nos dois formatos.
+- **Montagens (9480):** a peça é a montagem, cujo GlobalId é estável enquanto ela não for desfeita e refeita. A estabilidade entre versões não foi medida (só existe a R00).
+- **NWD:** não há chave confiável. O externalId é um caminho na árvore, e os GUIDs das propriedades se repetem.
+- **Proposta:** unidades de peça numeradas por marca, ligadas pelo externalId e, sem par, pela ordem estável (nível, nome, externalId), marcadas "conferir". Unidade com valores e sem peça vira órfã. Em NWD a ligação é sempre pela ordem.
+- **Aguardando aprovação:** o novo texto da regra "valores ligam-se à marca" no CLAUDE.md (seção 5 do relatório) e as 3 perguntas para a equipe (seção 6).
+
+## Parâmetros por peça · P1: modelo de dados e unidades (2026-11-16)
+**Decisão aprovada pelo usuário:** a regra do CLAUDE.md foi trocada pelo texto da seção 5 de `docs/pecas/verificacao.md`. Cada parâmetro é por marca ou por peça; o valor por peça liga-se à unidade de peça; a ligação ao modelo é pelo externalId e, sem par, pela ordem.
+
+- **Migração 0015:**
+  - `param_defs.level` (`mark` | `piece`, padrão `mark`);
+  - tabela `piece_units` (obra, marca, número estável, externalId da última ligação, situação `linked`/`unlinked`/`orphan`, versão desde que ficou sem peça);
+  - tabela `piece_unit_links` (unidade ↔ elemento por versão, método `key`/`order`/`new`);
+  - tabela `piece_values` (valor por unidade, row_version, autoria);
+  - backfill das versões prontas existentes, da mais antiga para a mais nova, com a mesma regra do processamento.
+- **Regra (`app/services/unit_matching.py`, função pura):**
+  1. pela chave;
+  2. sobras pela ordem estável: unidades com valores primeiro, depois pelo número; elementos por nível, nome e externalId. Marcadas "conferir", e a unidade passa a ter a chave nova;
+  3. elemento a mais vira unidade nova, com o próximo número (nunca reaproveitado);
+  4. unidade a mais: com valores, órfã; sem valores, `unlinked`.
+  - NWD (`.nwd`/`.nwc`) só pela ordem.
+  - Uma versão anterior à mais recente só liga: não cria unidades nem muda situações.
+- **`piece_units.link_version`:** roda no `process_version`, na mesma transação, depois da reconciliação e antes do piece_props. O resumo (`by_key`, `by_order`, `new`, `orphans`, `unlinked`) vai para a auditoria da versão. A auditoria registra `piece_unit/link_order` (troca de chave) e `piece_unit/orphan`.
+- **Parâmetros:**
+  - `level` na criação (API `POST /param-defs`, campo `level`), imutável quando houver valores (409); `values_count` soma marcas e unidades com valor; as opções em uso consideram os dois níveis;
+  - `in_obra()` filtra por padrão só os parâmetros por marca, então valores, status, busca, filtros, exportação e piece_props continuam como estão até o P3. O catálogo (`list_params`) mostra os dois níveis.
+- **Testes:**
+  - `test_unit_matching.py` (12, função pura): primeira versão, peça movida, peça recriada pela ordem, quantidade sobe (sem reaproveitar número), quantidade desce, unidade com valores pareada primeiro, órfã, determinismo, NWD, versão anterior, chave repetida, ordem dos elementos;
+  - `test_piece_units.py` (6, com banco): ciclo completo de 6 versões (movida, recriada com auditoria, sobe, desce com órfã que preserva o valor, reprocessar sem duplicar, a órfã volta pela chave), versão anterior, NWD, troca de regra de identificação, nível do parâmetro (API, padrão, 422, catálogo × fluxos da marca, 409 com valor, values_count) e parâmetro da biblioteca;
+  - `test_process_version`: reprocessar não duplica unidades nem ligações;
+  - `test_migrations` com as 3 tabelas novas.
+- **Backfill no banco de desenvolvimento:**
+  - REC v1 → v2: 14/14 pela chave;
+  - 9480: 1531 unidades (IFC) e 1579 (NWD);
+  - E2E-REV v2: 6 pela chave, 2 pela ordem, 3 novas;
+  - ORC: as 359 unidades da v1 (marcas simuladas) ficaram `unlinked`, e as 3 marcas reais da v2 ganharam 14.
+- **Verificação (2026-11-16):**
+  - `make lint` OK (ruff, mypy, ESLint, tsc);
+  - backend **632/632** (`REQUIRE_DB=1`);
+  - frontend 139/139;
+  - `make e2e` 42 passaram + 6 pulados;
+  - migração 0015 aplicada no banco de desenvolvimento.
+- **Falta (próximos passos):**
+  - P2: API de valores por peça;
+  - P3: filtros, cores, status e exportação;
+  - P4: tela;
+  - P5: unidades órfãs e conferência das ligadas pela ordem;
+  - P6: aceite com modelo real.
+  - Até o P4, um parâmetro "por peça" só pode ser criado pela API e não aparece em nenhuma tela de valores.
+
+## Parâmetros por peça · P2: API dos valores por peça (2026-11-16)
+Serviço `app/services/piece_values.py` e rotas em `app/api/units.py`, com as mesmas regras dos valores por marca, aplicadas à unidade de peça.
+
+- **API** (leitura: todos os papéis; gravação: fábrica e admin):
+  - `GET /api/obras/{obra}/marks/{mark}/units?version_id=`: unidades da marca (inclusive órfãs e sem peça), com rótulo `PP001-3`, situação, chave, os parâmetros por peça da categoria (as colunas), os valores com row_version e o elemento ligado na versão aberta (padrão: a pronta mais recente; dbId para o 3D e método `key`/`order`/`new`);
+  - `GET /api/obras/{obra}/units/{unit}`: uma unidade;
+  - `PUT /api/obras/{obra}/units/{unit}/values`: grava só os campos alterados (tudo ou nada). Normaliza como os valores por marca. Concorrência por row_version: 409 `stale` com quem e quando, e nada é gravado;
+  - `POST /api/obras/{obra}/units/batch-preview` e `/batch-apply`: lote em várias unidades, inclusive de marcas e categorias diferentes (cada parâmetro só nas peças em que vale), modos `only_empty` e `overwrite`, até 5.000 peças;
+  - **desfazer** pela mesma rota dos lotes por marca (`POST /api/batches/{id}/undo`), que identifica o tipo do lote. Tudo ou nada; recusa se já foi desfeito ou se algo mudou depois; só quem aplicou ou um admin;
+  - `GET /api/obras/{obra}/units/{unit}/history`: valores e ligações da peça ao modelo (`link_order`, `orphan`), mais recentes primeiro.
+- **Auditoria:** `piece_value`, por unidade, campo a campo, com batch_id, e `source` batch/undo.
+- **SSE:** novos eventos `unit_values_changed`, `unit_batch_applied` e `unit_batch_undone`.
+  - A tela já mostra o aviso para quem está em outra aba ("J. Silva alterou a peça PP001-3").
+  - Um tipo de evento desconhecido agora não gera aviso, em vez de um aviso vazio.
+- **Parâmetro por peça não se grava numa marca, nem o contrário** (422). Os parâmetros por marca continuam como estavam.
+- **Matriz de papéis:** 6 rotas novas no teste e em `docs/operacao.md`.
+- **Testes:**
+  - `tests/test_piece_values.py` (7): listar (só parâmetros por peça da categoria, rótulos, elemento e método por versão, versão anterior, 404 de outra obra); gravar (data normalizada, só a unidade muda, 409 `stale` com quem, nada gravado, auditoria e SSE); validação e papéis (parâmetro por marca, outra categoria, data inválida, leitura e projetos 403, outra obra 404); lote entre marcas (prévia com misto e contagens por modo, só nas vazias, sobrescrever, desfazer, desfazer de novo 409, alterado depois 409, leitura 403, eventos); validação do lote; lotes por marca continuam desfazendo; histórico com valores e ligação pela ordem;
+  - Vitest: textos dos avisos dos eventos novos e do tipo desconhecido.
+- **Verificação (2026-11-16):** `make lint` OK; backend **645/645**; frontend 139/139; `make e2e` 42 passaram + 6 pulados.
+- **Falta:** P3 (filtros, cores, status e exportação com os valores por peça); P4 (tela); P5 (órfãs e conferência das ligadas pela ordem); P6 (aceite real).
+
+## Parâmetros por peça · P3: filtros, cores, status e exportação (2026-11-16)
+- **piece_props (`sync_factory`):** cada elemento recebe o valor da unidade ligada a ele naquela versão, em todas as versões da obra. Por isso:
+  - "Selecionar parâmetro" lista os parâmetros por peça (grupo Fábrica, com o nº de peças);
+  - o autocompletar, os filtros, a coloração por campo (distinct e gama) e os esquemas de cores funcionam sem lógica nova;
+  - a legenda conta peças.
+  - O valor segue a unidade, não o dbId: na versão anterior, o filtro bate nos elementos dela.
+- **Status:**
+  - um parâmetro por peça conta como feito para a marca quando **todas** as peças da marca na versão estão preenchidas; com só algumas, a marca fica **Parcial**;
+  - por isso o status das peças no piece_props passa a ser calculado por versão e marca (`mark_status.status_of` recebe as unidades preenchidas e o nº de peças).
+- **Progresso:** um obrigatório por peça conta **peça a peça**. `marks_filled` = marcas com todas as peças preenchidas; a resposta traz `level`.
+- **Gravação dos valores por peça:** salvar, lote e desfazer agora sincronizam o motor (filtros, cores, status).
+- **Excel:**
+  - a aba Peças ganha a coluna **Peça** (`PP001-3`) e uma coluna por parâmetro por peça, com data como data do Excel e cinza onde o parâmetro não vale para a categoria;
+  - a aba Marcas continua só com os parâmetros por marca.
+- **Fica como estava:** "sem <parâmetro>" no campo de busca antigo (`/marks/search`) segue só com parâmetros por marca. Na tela, o "sem X" + Enter vira uma regra do motor, que já vale para os dois níveis.
+- **Testes:**
+  - `tests/test_piece_params_engine.py` (5): campo listado com nº de peças e valores; **o filtro bate só nas peças preenchidas** (não vazio, mês atual, vazio, e versão anterior pelos elementos dela); **a coloração e a legenda contam peças** (distinct, gama, membros com a cor da peça, esquema com filtro inline); status Parcial → Completa, progresso peça a peça, filtro de sistema "Parcial", lote e desfazer acompanham; Excel com Peça, colunas por peça, data e cinza;
+  - `test_export`: a coluna Peça na aba Peças.
+- **Verificação (2026-11-16):** `make lint` OK; backend **650/650** (inclui os de desempenho com 20 mil peças); frontend 139/139; `make e2e` 42 passaram + 6 pulados.
+- **Falta:** P4 (tela); P5 (unidades órfãs e conferência das ligadas pela ordem); P6 (aceite real).
+
+## Parâmetros por peça · P4: interface no painel da peça (2026-11-16)
+- **Seção "Parâmetros por peça"** no painel da direita (`features/pecas/PieceUnitsSection.tsx`):
+  - aparece quando há uma só marca selecionada e algum parâmetro por peça vale para a categoria dela;
+  - é uma tabela com uma linha por unidade que tem peça na versão aberta (nº `P-06-3`, nível, identificador curto = fim do externalId ou, sem ele, o nome) e uma coluna por parâmetro por peça;
+  - as unidades sem peça nesta versão só são contadas numa nota (o tratamento delas fica para o P5).
+- **3D:**
+  - clicar numa linha seleciona só aquela peça no 3D, enquadra a câmera nela e mostra as propriedades dela; a marca continua no painel;
+  - clicar numa peça no 3D seleciona a marca inteira e destaca a linha da peça clicada (com rolagem até ela);
+  - um membro (consolo) clicado não tem linha própria.
+- **Edição na célula:**
+  - ao tocar, a célula vira campo;
+  - lista, sim/não e data gravam ao escolher (a data usa o calendário do navegador); texto e número gravam no Enter ou ao sair do campo; Esc cancela;
+  - grava só aquela unidade (`PUT /units/{id}/values` com `row_version`); se outra pessoa salvou antes (409), aparece o aviso e a tabela recarrega;
+  - salvar atualiza filtro, cores, status e progresso.
+- **"Preencher selecionadas"** (`UnitBatchDialog.tsx`):
+  - caixas de marcar por linha e "marcar todas";
+  - a janela mostra o valor comum ou misto, confere o efeito e oferece "Sobrescrever todas" / "Só nas vazias" (quando alguma peça já tem outro valor) ou "Confirmar";
+  - o aviso "Valores aplicados a N peças." tem Desfazer.
+- **Tablet:** células e linhas com 44 px de altura, caixas de 22 px, a tabela rola dentro do painel com o cabeçalho fixo.
+- **Cadastro de parâmetro:**
+  - a escolha "Por marca / Por peça" vem com uma explicação curta e fica travada quando já existem valores;
+  - o catálogo mostra "por peça" e "N peça(s) com valor".
+- **Somente leitura** (papel sem edição ou versão anterior): a tabela aparece sem as caixas de marcar e sem edição.
+- **Tempo real:** os eventos `unit_*` e qualquer gravação recarregam a tabela (`invalidateValueQueries` agora inclui `mark-units`/`unit-batch`).
+- **E2E:**
+  - modelo de teste novo `backend/tests/fixtures/aps/models/pecas` (P-06 com 6 pilares e V-02 com 2 vigas);
+  - obra **E2E-PEC** no `e2e_seed.py`, com o parâmetro por peça "Data de fabricação", sem valores a cada execução.
+- **Testes:**
+  - Vitest `features/pecas/PieceUnitsSection.test.tsx` (10):
+    - lista das 6 peças;
+    - **preencher a 3ª de 6 grava só ela**; Esc não grava;
+    - **lote em 4 unidades**;
+    - linha ↔ 3D;
+    - somente leitura; sem parâmetros por peça a seção não aparece;
+    - funções puras;
+    - "Por peça" no cadastro, travado com valores.
+  - Playwright "Parâmetros por peça (P4)" (3 × tablet/desktop):
+    - preencher a 3ª unidade de uma marca de 6 só muda essa peça (persiste após reabrir; linha ↔ 3D);
+    - lote em 4 unidades com Desfazer;
+    - **filtrar pelo parâmetro mostra só as peças preenchidas** (2 de 6).
+- **Verificação (2026-11-16):**
+  - `make lint` OK; frontend 149/149; `make e2e` 48 passaram + 6 pulados;
+  - backend 649/650 na rodada completa: o de desempenho dos filtros (20 mil peças) passou do limite com a máquina carregada e **passou ao rodar sozinho**; o P4 não muda o backend além do seed do E2E.
+- **Falta:** P5 (unidades órfãs e conferência das ligadas pela ordem); P6 (aceite real).
+
+## Parâmetros por peça · P5: revisões do modelo e unidades órfãs (2026-11-16)
+- **Chegada da versão nova** (`piece_units.link_version`):
+  - o diff da versão (`version_diffs.diff.units`) guarda as unidades que **perderam a peça com valores**, as **novas** e as que **voltaram** pela chave, com rótulos (`PP001-3`);
+  - o `/versions/{id}/diff` devolve isso em `units`, junto com as unidades órfãs abertas agora.
+- **Banner da versão:** "· Peças: N peças órfãs (1 perdeu a peça nesta versão, com valores: P-06-3) · N peças novas: …". O "N peças órfãs" abre a fila.
+- **Fila "Peças órfãs"** (`UnitOrphansDialog`; botão no painel esquerdo e no banner), nos moldes da fila de marcas órfãs:
+  - mostra o rótulo, a categoria, a versão desde a qual está sem peça, a última chave e os valores guardados;
+  - **Religar:**
+    - escolhe-se outra peça da **mesma marca** na versão ativa (lista com nº, nível, id curto e "vazia"/"com valores");
+    - a unidade órfã passa a ser daquela peça, fica com a chave dela (método `manual`) e **recupera os valores**, que nunca saíram da unidade;
+    - a unidade que estava na peça sai: vazia, fica `unlinked`; com valores, vai para a fila de órfãs só depois de "Religar mesmo assim" (409 `unit_relink_conflict`). Nada é apagado;
+    - nas versões seguintes, a religada segue ligada pela chave;
+  - **Arquivar:**
+    - a unidade sai da fila e passa a `archived`, com os valores guardados;
+    - não é mais ligada pela ordem a nenhuma peça e volta sozinha se a chave dela reaparecer;
+  - marca fora do modelo atual: só arquivar;
+  - somente fábrica e admin religam e arquivam.
+- **Auditoria** (`piece_unit`), que aparece no histórico da unidade:
+  - ações `orphan`, `relink` (com a peça e a unidade de onde veio), `displaced`, `archive` e `returned`;
+  - evento em tempo real `unit_orphan_changed`, com aviso "Ana religou a peça órfã P-06-3 (no lugar de P-06-6)".
+- **Banco:** migração `0016` (`piece_units.status` + `archived`; `piece_unit_links.method` + `manual`).
+- **Regra de ligação** (`unit_matching`): uma arquivada só participa do passo da chave (`key_only`).
+- **API:**
+  - `GET /obras/{o}/unit-orphans` (`?archived=true` traz também as arquivadas);
+  - `POST /obras/{o}/units/{u}/relink` `{target_unit_id, confirm}`;
+  - `POST /obras/{o}/units/{u}/archive`;
+  - matriz de papéis atualizada.
+- **E2E:** fixture `pecas_v2` (a P-06 sem a peça pec-0012); obra **E2E-PECREV** no seed (v1 → valor na unidade da pec-0012 → v2).
+- **Testes:**
+  - backend `tests/test_unit_orphans.py` (7):
+    - a v2 com uma peça a menos deixa a unidade **órfã com os valores**, mais diff, fila e auditoria;
+    - peças novas no diff;
+    - **religar recupera os valores** (método manual, fila vazia, auditoria, evento, e a v3 liga pela chave);
+    - conflito com confirmação;
+    - regras (outra marca, não órfã, leitura 403);
+    - arquivar → não liga pela ordem → volta pela chave;
+    - `match` com arquivada;
+  - mais a matriz de papéis;
+  - Vitest `reconcile/UnitOrphans.test.tsx` (7): fila, religar, conflito, arquivar, somente leitura e marca fora do modelo, banner, aviso em tempo real;
+  - Playwright "Unidades órfãs (P5)" (tablet e desktop): **a v2 com uma peça a menos deixa a unidade órfã com o valor; religar a outra peça recupera o valor** (banner → fila → religar → tabela da peça → histórico).
+- **Verificação (2026-11-16):** `make lint` OK; backend **660/660**; frontend 156/156; `make e2e` 50 passaram + 6 pulados.
+- **Decisão a confirmar:** pela regra do P1 (CLAUDE.md), uma unidade com valores que fica sem par pela chave é ligada **pela ordem** a uma peça sem par da mesma marca, marcada "conferir". Por isso uma unidade só fica órfã quando a marca tem menos peças que unidades. Religar troca a unidade de uma peça que já existe.
+- **Falta:** P6 (aceite real).
+
+## Parâmetros por peça · P6: aceite com modelo real (2026-11-16, em andamento)
+- **Situação:** **preparado, aguardando a revisão no Docs.**
+  - Em 16/11 o Docs não tinha versão nova de nenhum arquivo das obras (conferido só com GET: o ORC.rvt continua na v2, de 11/11);
+  - mover uma peça e apagar e recriar outra exige o Revit e a publicação no Docs, que são ação do usuário (o app nunca escreve no APS nem no arquivo BIM).
+- **Script de aceite** `backend/tests/real_units_acceptance.py` (só banco do app; sem APS):
+  - `prepare` grava, pelo serviço normal (auditado), uma data DIFERENTE em cada unidade da marca e salva o retrato (unidade, chave, ElementId do Revit, dbId, valor);
+  - `check` confere, na versão nova, cada unidade:
+    - segue a mesma peça pela chave (inclusive com o dbId mudado);
+    - peça recriada, ligada pela ordem à peça nova ("conferir");
+    - ficou sem peça (fila de peças órfãs);
+    - em todos os casos, se o valor continua o mesmo;
+  - imprime a tabela em Markdown e sai com erro se algo não bater.
+- **Passo 1 feito na obra real** `30.327-01` (ORC.rvt; a v2 é a R02 publicada com o mesmo nome; marcas reais PP001×4, PP002×4, PP005×6):
+  - criado o parâmetro POR PEÇA "Data de fabricação" (data, só desta obra);
+  - a **PP005** foi preenchida com uma data por pilar;
+  - retrato em `docs/pecas/aceite-p6-retrato.json`.
+
+  | Unidade | ElementId no Revit | Nível | Valor |
+  |---|---|---|---|
+  | PP005-1 | 6657284 | TÉRREO | 2026-11-01 |
+  | PP005-2 | 6657285 | TÉRREO | 2026-11-02 |
+  | PP005-3 | 6657286 | TÉRREO | 2026-11-03 |
+  | PP005-4 | 6657456 | TÉRREO | 2026-11-04 |
+  | PP005-5 | 6657457 | TÉRREO | 2026-11-05 |
+  | PP005-6 | 6657458 | TÉRREO | 2026-11-06 |
+
+- **Falta (usuário), na v2 do ORC.rvt:**
+  1. **Mover** o pilar **6657284** (PP005-1). Para achar: Gerenciar › Selecionar por ID.
+  2. **Apagar** o pilar **6657286** (PP005-3) e **criar outro** no mesmo lugar, com a **Marca = PP005**. O Revit não copia a Marca para uma instância nova: sem ela, a peça nova vira outra marca e a PP005-3 fica órfã.
+  3. Publicar no Docs com o **mesmo nome** `30.327-01 - MODELO - ORC.rvt`, para virar a v3. Com outro nome, vira outro arquivo, como aconteceu com a R02.
+  4. Com o app e o worker no ar (`make up` + `make worker`), clicar em "Sincronizar agora" na obra `30.327-01` e esperar a v3 ficar pronta.
+  5. Rodar `cd backend && uv run python -m tests.real_units_acceptance check --snapshot ../docs/pecas/aceite-p6-retrato.json` e colar a tabela aqui.
+- **Esperado:**
+  - PP005-1 "seguiu a mesma peça pela chave";
+  - PP005-3 "peça recriada: ligada pela ordem à peça nova (conferir)", com o ElementId novo;
+  - as outras pela chave;
+  - as 6 datas iguais às do retrato;
+  - no app, a tabela da PP005 mostra as datas nas peças certas, e o banner da v3 não acusa peça órfã.
+- **Ensaio com dados sintéticos** do mesmo cenário (`tests/test_real_units_acceptance.py`, 5 testes), com os mesmos UniqueIds e ElementIds da PP005:
+  - peça movida (dbId novo) segue pela chave;
+  - peça recriada é ligada pela ordem à nova;
+  - recriada **sem a Marca** deixa a PP005-3 órfã com o valor guardado;
+  - sem versão nova, o check espera.
+- **Verificação (2026-11-16):** `make lint` OK; backend **665/665**. Frontend e E2E sem mudança desde o P5 (156/156; 50 + 6 pulados).
+
+## Spike · Coordenadas do eixo da peça (2026-11-16)
+- Página de spike em `spikes/coordenadas/` (o app e as opções de carga do Viewer não mudaram). Resultado e método em `docs/coordenadas.md`.
+- **Conversão:**
+  - modelo = mundo do Viewer + `globalOffset` (o app carrega sem opções: centralizado, `applyRefPoint: false`);
+  - ponto base = Rᵀ·(modelo − t), com a `refPointTransformation` do AEC, que é identidade nos arquivos testados;
+  - para mm, × `getUnitScale()`·1000 (RVT e NWD em pés, IFC em cm).
+- **Eixo:**
+  - sobe à montagem e escolhe o membro de concreto pelo material e pelo volume, ignorando armadura, insertos, neoprene e aberturas;
+  - PCA com os momentos exatos da superfície, refinada pelos centros dos cortes de menor seção;
+  - extremos sem os trechos finos (neoprene junto no SVF2 do RVT).
+- **Entre formatos:**
+  - RVT × IFC (ORC): pilares e vigas até **0,01 mm**;
+  - NWD × IFC (9480, montagens e vínculos): 14 de 17 ocorrências do pilar e a viga até **0,01 mm**; as outras são diferenças das exportações.
+- **Pendente:**
+  - os valores medidos no Revit (não vieram no pedido) e a posição do ponto base em relação à origem interna, para fechar a meta de 1 mm;
+  - uma laje pré-moldada para validar a regra de laje.
+- **Testes:** `node --test spikes/coordenadas` (9) e `pytest spikes/coordenadas` (2); `ruff` e `mypy` dos spikes OK.
+
+## Design system do frontend: tokens e padrões (2026-11-17)
+Feito com a skill impeccable (`/impeccable init` e `/impeccable extract`). Contexto do produto em `PRODUCT.md` (raiz). A extração manteve o visual igual; trocar cores é um passo separado.
+- **`frontend/src/styles/tokens.css`** (novo): primitivas (marca, status, neutros) e tokens semânticos (superfície, borda, texto, ação, seleção, perigo, sucesso, atenção, revisar, raios, sombras, fontes, alvo de toque). `styles.css` importa e usa só tokens: **nenhum hex** sobrou nele.
+  - tons quase iguais unificados (ex.: hover `#f1f4f8`/`#f2f4f7` → `#eef1f5`; 5 sombras → 4);
+  - `--header-bg` virou `--action` (o cabeçalho já era branco; o marinho é a cor de botões e links).
+- **Padrões compartilhados** em `styles.css`: `.float-bar` (barras sobre o 3D), `.popover` (popovers e menus), `.list-item` (marcas, filtros salvos, campos), `.btn-sm` (no lugar de `.small-btn` e `.axis-copy`), `.control` (campos com borda), `.section-title` e o layout comum dos banners. `.level-select` (sem uso) removido.
+- **`frontend/src/lib/palette.ts`** (novo): fonte única das cores de status e da seleção no 3D; `coloringModel.ts` e `ViewerAdapter.ts` usam daqui.
+- **Testes:** `src/lib/palette.test.ts` (4): hex de status/seleção iguais no TS e no CSS, nenhum hex em `styles.css`, todo `var(--x)` existe.
+- **Verificação (2026-11-17):**
+  - `npm run lint` e `npm run typecheck` OK; `npm run build` OK;
+  - frontend **209/209** (+2 todo);
+  - Playwright **62 passaram** + 6 pulados (tablet e desktop);
+  - capturas das telas do modelo, filtro e colorir conferidas: sem mudança visual perceptível.
+  - Observação: no Git Bash o Vitest falha em todas as suítes ("failed to find the current suite") por causa da letra do drive minúscula (`c:`); pelo PowerShell (`C:`) passa.
+- **Falta (próximos passos de design, não feitos):**
+  - aplicar a paleta do logo (`PRODUCT.md`): trocar o marinho (`--action`) e o azul (`--selection`) — muda só valores em `tokens.css` e `palette.ts`;
+  - `DESIGN.md` (`/impeccable document`);
+  - polish: borda colorida de 4–5 px em `.notice`, `.alert--review`, `.live-notice`; fundo do 3D em gradiente (proibido pelo `PRODUCT.md`); barra "Ferramentas do modelo" quebra "Seleção múltipla" em 2ª linha (já era assim: `left: 50%` limita a largura);
+  - tamanhos de fonte (11 valores entre 0,68 e 0,92 rem) não viraram tokens: fica para `/impeccable typeset`.
+
+## Organização do painel e botão Excluir (2026-11-17)
+Pedido do usuário depois de testar o app.
+- **Painel da peça:** os dois tipos de parâmetro ficam num grupo só, "PARÂMETROS DA FÁBRICA", com dois subtítulos: "Parâmetros por marca" (valores da marca e edição em lote) e "Parâmetros por peça" (a tabela das unidades, que só aparece se houver parâmetros por peça para a categoria). `PiecePanel.tsx` e `PieceUnitsSection.tsx`; classe `.factory-sub`.
+- **Catálogo:** o botão "Excluir" / "Excluir da biblioteca" aparecia como um retângulo vermelho sem texto: o `button.danger` (fundo vermelho) vencia o `button.link`, e o texto também era vermelho. Agora `button.link.danger` é um link vermelho, sem fundo.
+- **Seleção antes de as marcas carregarem:** um clique no 3D antes de o índice dbId → marca chegar deixava a peça como "Peça sem Marca" até o próximo clique. Era a causa da falha intermitente do E2E no tablet, e podia acontecer num tablet lento. Agora a seleção se corrige sozinha quando o índice chega (`refreshSelection` em `selection.ts`).
+- **Testes:**
+  - E2E P4: a hierarquia do painel e um caso novo, "catálogo: o botão Excluir é um link vermelho com texto legível" (cor calculada pelo navegador);
+  - Vitest: `refreshSelection` (2 casos).
+- **Verificação (2026-11-17):**
+  - lint e typecheck OK;
+  - frontend **205/205** (+2 todo);
+  - `make e2e` **62 passaram** + 6 pulados;
+  - os grupos por peça (B1 e P4) repetidos 3×: 48/48.
+  - Backend sem mudança (697/697).
+
+## Bug · editor de data por peça: corrigido (2026-11-17)
+Diagnóstico em `docs/bugs/data-por-peca.md`. Os outros tipos de parâmetro (texto, número, lista, sim/não) seguem como antes.
+- **Editor de data** (célula por peça, formulário por marca, lote de marcas e "Preencher selecionadas"):
+  - o que é digitado fica no estado local e só grava ao confirmar (Enter, sair do campo, Salvar ou Aplicar); Esc cancela. `date` saiu de `SAVE_ON_CHANGE` (`PieceUnitsSection.tsx`);
+  - campo pela metade (`validity.badInput`) não é "apagar": é data inválida.
+- **Validação** (`frontend/src/features/params/dateDraft.ts` e `mark_values.valid_date` no backend): a data tem que estar completa e existir, com ano entre 1900 e 2100. Fora disso, a mensagem "Data inválida: use dd/mm/aaaa" aparece abaixo do campo (`aria-invalid`) e nada é gravado. O backend responde 422 com a mesma mensagem.
+- **Reabrir:**
+  - a célula não fica mais desabilitada durante a gravação e reabre depois de salvar ou de um erro;
+  - a gravação usa o `row_version` que o servidor devolveu na anterior;
+  - um 409 mostra o aviso de conflito e recarrega.
+- **Status de produção POR PEÇA** (`mark_status.status_of` / `aggregate`, `piece_props`):
+  - preencher uma peça muda só o status dela;
+  - o status da marca é o agregado das peças;
+  - a regra está no CLAUDE.md.
+- **Datas já gravadas:**
+  - `uv run python -m app.cli dates list [--obra N]` lista os valores fora da regra;
+  - `dates fix <chave> --clear | --set AAAA-MM-DD [--user e-mail]` limpa ou corrige pelo serviço normal (audit_log, evento em tempo real, filtros);
+  - rodado no dev: **PP318-10 = 0002-05-05 apagado** (audit_log 2756, `clear`, Ana Admin).
+- **Testes:**
+  - os 2 do B1 (`modelo.spec.ts`, "Bug: editor de data por peça") ficaram verdes, e entraram mais 2 E2E: data pela metade + Enter e ano 0002;
+  - Vitest: `dateDraft.test.ts` (validação) e 7 casos novos em `PieceUnitsSection.test.tsx` (sem gravar por tecla, blur, Esc, ano inválido, reabrir com `row_version`, 409, 422), mais a data inválida no formulário por marca (`ModelPage.test.tsx`);
+  - backend `test_date_rules_and_piece_status.py` (validação, status por peça, comando);
+  - o E2E do P4 agora confirma com Enter.
+- **Verificação (2026-11-17):**
+  - `make lint` OK;
+  - backend **697/697** (`REQUIRE_DB=1`);
+  - frontend **203/203** (+2 todo);
+  - `make e2e` **60 passaram** + 6 pulados. Numa rodada, 1 teste novo falhou no tablet por tempo; a causa foi achada e corrigida depois (seção "Organização do painel").
+- **Falta:**
+  - ainda há 2 datas inválidas no dev (9480): PP310-1 = 0002-11-16 e PP318-12 = 0002-05-06. Limpar com `dates fix p:7 --clear` e `dates fix p:10 --clear` se confirmado;
+  - conferir o seletor de data nativo no tablet real.
+
+## Coordenadas do eixo da peça no app (2026-11-16)
+- **`src/viewer/coordinates.ts`** (só matemática; não conhece o Viewer):
+  - conversão mundo do Viewer → arquivo → ponto base (`globalOffset`, `refPointTransformation` do AEC, unidade → metros);
+  - membro principal de concreto da montagem: material concreto e maior volume; fora armadura, alça, espera, insertos, conexões, neoprene e aberturas;
+  - eixo por PCA com os momentos exatos da superfície, refinado pelos cortes de menor seção, com as pontas sem trechos finos;
+  - regra de Z por tipo.
+- **Regra de Z em configuração:**
+  - `AXIS_Z_RULE` no backend, padrão `Pilar=base;Viga=meia altura;Laje=face inferior`;
+  - aceita pilar base|topo, viga meia altura|face inferior|face superior, laje face inferior|face superior;
+  - é validada ao iniciar e chega à tela por `GET /api/viewer-config` (todos os papéis).
+- **ViewerAdapter:**
+  - ganhou `getModelFrame`, `getNodes`, `getTriangles` e `showAxisMarker`, implementados só no `ApsViewerAdapter`;
+  - a malha do SVF2 é lida com a matriz da lista de fragmentos, e o ponto de referência vem do `getAecModelData`;
+  - **as opções de carga não mudaram**: `loadDocumentNode(doc, node)` continua sem opções.
+- **Painel:** seção "Coordenadas do eixo (ponto base do projeto)" para a **peça clicada** (`selection.focus`), mesmo com a marca inteira destacada:
+  - pilar e laje mostram X, Y, Z; viga mostra "Início" e "Fim";
+  - metros com 3 casas, vírgula decimal e fonte tabular;
+  - botão Copiar por linha, no formato "X; Y; Z";
+  - sem ponto base no modelo (IFC/NWD), uma nota diz que os valores são relativos à origem do arquivo.
+- **Marcador no 3D** (overlay laranja) enquanto a peça está selecionada: uma esfera no ponto ou, na viga, esferas nas pontas e a linha do eixo. Some ao limpar a seleção ou trocar de modelo.
+- **Testes:**
+  - Vitest (25 novos):
+    - `coordinates.test.ts`: peças sintéticas inclinadas, giradas, com consolo, neoprene e laje; conversão; formato; membro principal em montagem IFC/NWD;
+    - **malha real** do pilar 6657283 e da viga 6657266 do ORC.rvt (gravada pelo spike), a 1 mm dos valores do spike, que coincidem com o IFC a 0,01 mm;
+    - adaptador (conversão, nós, triângulos, marcador);
+    - tela (tabela, copiar, regra da configuração, erro);
+  - pytest `test_viewer_config.py` (8) e matriz de papéis;
+  - Playwright "Coordenadas do eixo" (tablet e desktop): pilar com X, Y, Z (e a outra peça da mesma marca com as suas), viga com início e fim, marcador ponto/linha e limpar seleção. O Viewer falso ganhou geometria no formato do SVF2.
+- **Pendente (`it.todo`):**
+  - comparar com as **medidas do Revit** (meta 1 mm): os valores ainda não foram informados, e não foram inventados;
+  - confirmar que o ponto base do projeto do ORC.rvt está na origem interna. A `refPointTransformation` é identidade; se o ponto base estiver deslocado, os valores mostrados estão relativos à origem interna;
+  - a regra de laje ainda não foi validada numa laje pré-moldada real.
+- **Verificação (2026-11-16):** `make lint` OK; backend **673/673**; frontend **177/177** (+2 todo); `make e2e` **52 passaram** + 6 pulados.
+
 ## Parâmetros: biblioteca por obra e exclusão visível (2026-11-13)
 Pedido: excluir um parâmetro criado por engano, e incluir ou retirar parâmetros da biblioteca em obras específicas.
 - O "Excluir" já existia, mas ficava escondido no Catálogo e dependia do `window.confirm`. Agora a confirmação é dentro do app.

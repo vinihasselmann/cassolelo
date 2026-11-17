@@ -5,6 +5,7 @@
 
 import type { ColorizeMode, ColorizeResult, SchemeResult } from '../../api/colors';
 import type { FieldRef } from '../../api/filters';
+import { STATUS_COLORS, STATUS_ORDER } from '../../lib/palette';
 import type { DbId, HexColor } from '../../viewer/ViewerAdapter';
 
 export type ColoringChoice =
@@ -16,14 +17,8 @@ export const CATEGORY_FIELD: FieldRef = { source: 'system', key: 'category' };
 /** Padrão ao abrir a tela: status de produção. */
 export const DEFAULT_COLORING: ColoringChoice = { kind: 'field', field: STATUS_FIELD, mode: 'distinct' };
 
-/** Status sempre nesta ordem (mesmo com zero peças), como no mockup. */
-export const STATUS_ORDER = ['Pendente', 'Parcial', 'Completa', 'Revisar'] as const;
-const STATUS_COLORS: Record<string, HexColor> = {
-  Pendente: '#B9BEC6',
-  Parcial: '#E3B341',
-  Completa: '#33A06F',
-  Revisar: '#E8743B',
-};
+/** Status sempre nesta ordem (mesmo com zero peças); cores em lib/palette.ts. */
+export { STATUS_ORDER };
 
 /** Campos que não dá para colorir: sim/não e os calculados na hora. */
 export const NOT_COLORABLE = new Set(['system:new', 'system:orphan']);
@@ -69,7 +64,7 @@ export function fromColorize(result: ColorizeResult, field: FieldRef, markOf: Ma
   if (sameRef(field, STATUS_FIELD)) {
     const byLabel = new Map(items.map((i) => [i.label, i]));
     const fixed = STATUS_ORDER.map(
-      (s) => byLabel.get(s) ?? { key: s, label: s, color: STATUS_COLORS[s] ?? '#B9BEC6', pieces: 0, dbids: [] },
+      (s) => byLabel.get(s) ?? { key: s, label: s, color: STATUS_COLORS[s], pieces: 0, dbids: [] },
     );
     items = [...fixed, ...items.filter((i) => !(STATUS_ORDER as readonly string[]).includes(i.label))];
   }

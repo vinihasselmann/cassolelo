@@ -42,3 +42,16 @@ async def viewer_token(
         expires_in=max(1, min(ttl, MAX_CLIENT_TTL)),
         region=settings.aps_region,
     )
+
+
+class ViewerConfigOut(BaseModel):
+    """Configuração da tela do modelo (não secreta)."""
+
+    # coordenadas do eixo: ponto de cada tipo de peça (AXIS_Z_RULE)
+    axis_z_rule: dict[str, str]
+
+
+@router.get("/viewer-config", response_model=ViewerConfigOut)
+async def viewer_config(request: Request, _user: CurrentUser) -> ViewerConfigOut:
+    settings: Settings = request.app.state.settings
+    return ViewerConfigOut(axis_z_rule=settings.axis_z_rules)

@@ -71,7 +71,7 @@ function QuickMenu({ label, versionId, field, filter, onChange }: QuickProps) {
         {chosen.length > 0 && ` (${String(chosen.length)})`} ▾
       </button>
       {open && (
-        <div className="quick__menu" role="group" aria-label={label}>
+        <div className="popover quick__menu" role="group" aria-label={label}>
           <ValueChecklist versionId={versionId} field={field} value={chosen} onChange={set} label={label} />
         </div>
       )}
@@ -130,7 +130,7 @@ export function FilterPopover({ obraId, versionId, fields, fieldsError, state, m
                 <li key={f.id}>
                   <button
                     type="button"
-                    className="saved-item"
+                    className="list-item saved-item"
                     aria-pressed={filter.savedId === f.id}
                     onClick={() => { setNotice(null); set(fromSaved(f)); }}
                   >
@@ -200,7 +200,7 @@ export function FilterPopover({ obraId, versionId, fields, fieldsError, state, m
               Salvar ▾
             </button>
             {saveMenu && (
-              <div className="menu__list" role="menu" aria-label="Salvar">
+              <div className="popover menu__list" role="menu" aria-label="Salvar">
                 <button type="button" role="menuitem" disabled={!state.active} onClick={() => { setSaveMenu(false); setDialog('save'); }}>
                   Salvar como novo…
                 </button>

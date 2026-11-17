@@ -237,6 +237,7 @@ class ParamProgressOut(BaseModel):
     marks_filled: int
     pieces_total: int
     pieces_filled: int
+    level: str = "mark"  # "piece": parâmetro por peça (conta peça a peça)
 
 
 class ProgressOut(BaseModel):
@@ -287,6 +288,21 @@ async def get_param_values(
 # ------------------------------------------------------------------ diff entre versões (7.2)
 
 
+class UnitLabelOut(BaseModel):
+    unit_id: int
+    label: str
+
+
+class UnitDiffOut(BaseModel):
+    lost: int = 0  # unidades com valores que perderam a peça nesta versão
+    new: int = 0  # unidades novas (peças a mais)
+    returned: int = 0  # órfãs/arquivadas que voltaram pela chave
+    by_order: int = 0  # ligadas pela ordem: conferir
+    lost_units: list[UnitLabelOut] = []
+    new_units: list[UnitLabelOut] = []
+    orphans_open: int = 0  # unidades órfãs abertas da obra, agora
+
+
 class VersionDiffOut(BaseModel):
     version_id: int
     version_number: int
@@ -300,6 +316,7 @@ class VersionDiffOut(BaseModel):
     orphans_open: int  # órfãs abertas da obra, agora
     review_properties: list[str]
     marks: list[dict[str, Any]]  # marcas que não ficaram inalteradas
+    units: UnitDiffOut  # parâmetros por peça (P5)
 
 
 @router.get("/{version_id}/diff", response_model=VersionDiffOut)
@@ -320,6 +337,7 @@ async def get_diff(version_id: int, session: SessionDep, _user: CurrentUser) -> 
         orphans_open=view.orphans_open,
         review_properties=d.get("review_properties", []),
         marks=d.get("marks", []),
+        units=UnitDiffOut(**d.get("units", {}), orphans_open=view.unit_orphans_open),
     )
 
 

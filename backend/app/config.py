@@ -109,6 +109,12 @@ class Settings(BaseSettings):
         "Seção,Section,Material estrutural,Structural Material,ObjectType"
     )
 
+    # Coordenadas do eixo da peça (docs/coordenadas.md): o ponto de cada tipo de peça.
+    # Pilar: base | topo (X, Y no centro da seção). Viga: meia altura | face inferior |
+    # face superior (início e fim do eixo). Laje: face inferior | face superior (X, Y no
+    # centro em planta). Tipo omitido = padrão.
+    axis_z_rule: str = "Pilar=base;Viga=meia altura;Laje=face inferior"
+
     # Webhooks APS: secret da assinatura x-adsk-signature e URL pública do backend
     # (ex.: túnel https://abc.trycloudflare.com). Sem PUBLIC_BASE_URL, os hooks não
     # são registrados automaticamente e só a verificação periódica encontra versões.
@@ -182,11 +188,50 @@ class Settings(BaseSettings):
         """X-Dev-User vale: sempre em dev; em staging só com DEV_USERS_ENABLED."""
         return self.is_dev or (self.app_env == "staging" and self.dev_users_enabled)
 
+    @property
+    def axis_z_rules(self) -> dict[str, str]:
+        return parse_axis_z_rule(self.axis_z_rule)
+
+    @model_validator(mode="after")
+    def _axis_z_rule_valid(self) -> Settings:
+        parse_axis_z_rule(self.axis_z_rule)  # erro na inicialização, não no clique
+        return self
+
     @model_validator(mode="after")
     def _no_dev_users_in_prod(self) -> Settings:
         if self.dev_users_enabled and self.app_env == "prod":
             raise ValueError("DEV_USERS_ENABLED não é permitido com APP_ENV=prod.")
         return self
+
+
+AXIS_Z_DEFAULT = {"pilar": "base", "viga": "meia altura", "laje": "face inferior"}
+AXIS_Z_ALLOWED = {
+    "pilar": {"base", "topo"},
+    "viga": {"meia altura", "face inferior", "face superior"},
+    "laje": {"face inferior", "face superior"},
+}
+
+
+def parse_axis_z_rule(text: str) -> dict[str, str]:
+    """ "Pilar=base;Viga=meia altura;Laje=face inferior" -> {"pilar": "base", ...}.
+    Sem diferenciar maiúsculas; tipo omitido fica com o padrão; valor inválido é erro."""
+    rules = dict(AXIS_Z_DEFAULT)
+    for part in text.split(";"):
+        if not part.strip():
+            continue
+        kind, sep, value = part.partition("=")
+        k, v = kind.strip().lower(), " ".join(value.strip().lower().split())
+        if not sep or k not in AXIS_Z_ALLOWED:
+            raise ValueError(
+                f"AXIS_Z_RULE: tipo inválido em {part.strip()!r} (Pilar, Viga ou Laje)."
+            )
+        if v not in AXIS_Z_ALLOWED[k]:
+            options = ", ".join(sorted(AXIS_Z_ALLOWED[k]))
+            raise ValueError(
+                f"AXIS_Z_RULE: {kind.strip()} aceita {options} (veio {value.strip()!r})."
+            )
+        rules[k] = v
+    return rules
 
 
 @lru_cache

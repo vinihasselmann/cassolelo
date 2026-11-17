@@ -12,17 +12,17 @@ select = ["E", "F", "I", "B", "UP"]
 [tool.ruff.lint.isort]
 known-first-party = [
     "list_docs", "read_model", "compare_versions",
-    "viewer_app", "webhook_server", "manage_webhooks",
+    "viewer_app", "webhook_server", "manage_webhooks", "server", "compare",
 ]
 
 [tool.mypy]
 strict = true
 ignore_missing_imports = true
 explicit_package_bases = true
-mypy_path = "aps_docs,viewer,webhooks"
+mypy_path = "aps_docs,viewer,webhooks,coordenadas"
 exclude = ["\\.venv"]
 
 [tool.pytest.ini_options]
-pythonpath = ["aps_docs", "viewer", "webhooks"]
-testpaths = ["aps_docs", "viewer", "webhooks"]
+pythonpath = ["aps_docs", "viewer", "webhooks", "coordenadas"]
+testpaths = ["aps_docs", "viewer", "webhooks", "coordenadas"]
 addopts = "-p no:cacheprovider"

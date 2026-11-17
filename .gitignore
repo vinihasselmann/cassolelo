@@ -47,3 +47,6 @@ loadtest/out/
 *.nwd
 *.nwc
 *.ifc
+
+# cópia da skill instalada pelo npx skills (o Claude Code usa .claude/skills)
+.agents/

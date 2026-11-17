@@ -1,0 +1,152 @@
+/*
+ * Tokens de design do ELO.
+ *
+ * Duas camadas:
+ *   1. Primitivas: valores brutos (marca, status, neutros). Não usar direto nos componentes.
+ *   2. Semânticas: o papel do valor (superfície, borda, ação…). Os componentes usam só estas.
+ *
+ * Trocar a aparência = mudar o valor de um token semântico, não caçar hex no CSS.
+ * As cores de status e da seleção também existem em src/lib/palette.ts, porque o Viewer
+ * precisa do hex em JS; palette.test.ts garante que os dois lugares batem.
+ *
+ * Paleta: o PRODUCT.md pede só as cores do logo (âmbar + grafite) e uma cor de destaque.
+ * --action (marinho) e --selection (azul) ainda são herança anterior a essa regra:
+ * a troca é um passo separado, feito só nos valores abaixo.
+ */
+
+:root {
+  /* ---------------------------------------------------------------- primitivas */
+
+  /* marca (logo Cassol Elo) */
+  --brand-amber: #F2A31B;
+  --brand-graphite: #3C3C3C;
+
+  /* status de produção: os mesmos hex de src/lib/palette.ts */
+  --status-pending: #B9BEC6;
+  --status-partial: #E3B341;
+  --status-complete: #33A06F;
+  --status-review: #E8743B;
+
+  /* neutros */
+  --gray-0: #ffffff;
+  --gray-50: #f7f9fb;
+  --gray-75: #f5f6f8;
+  --gray-100: #eef1f5;
+  --gray-150: #e3e7ec;
+  --gray-200: #dde2e8;
+  --gray-250: #dce2ea;
+  --gray-300: #c4ccd6;
+  --gray-350: #b9c3d0;
+  --gray-600: #5b6676;
+  --gray-650: #475467;
+  --gray-800: #1d2939;
+  --gray-900: #1c2430;
+
+  /* ---------------------------------------------------------------- semânticas */
+
+  /* superfícies */
+  --bg: var(--gray-75);
+  --surface: var(--gray-0);
+  --surface-subtle: var(--gray-50);  /* áreas secundárias dentro de um painel */
+  --surface-muted: var(--gray-100);  /* cabeçalho de tabela, selos, código */
+  --surface-hover: var(--gray-100);  /* hover de item de lista e botão sem fundo */
+  --surface-translucent: rgb(255 255 255 / 0.95); /* legenda sobre o 3D */
+  --overlay: rgb(16 24 40 / 0.45);   /* fundo atrás de janela modal */
+  --viewer-bg-top: var(--gray-100);
+  --viewer-bg-bottom: var(--gray-250);
+
+  /* bordas */
+  --border: var(--gray-200);         /* contorno de painel, cartão, barra */
+  --border-subtle: var(--gray-150);  /* separador de seção e de linha */
+  --divider: var(--gray-100);        /* separador fraco entre itens */
+  --border-control: var(--gray-300); /* campo, select, chip */
+  --border-control-hover: var(--gray-350);
+
+  /* texto */
+  --text: var(--gray-900);
+  --text-secondary: var(--gray-650); /* rótulos e contagens, mais forte que o muted */
+  --text-muted: var(--gray-600);
+
+  /* ação (botões, links, aba ativa) */
+  --action: #1f3b57;
+  --on-action: var(--gray-0);
+  --selected-bg: #dbe7f3;            /* item de lista ou ferramenta ativa */
+  --selected-bg-soft: #e7eef7;       /* etiqueta, linha selecionada de tabela */
+
+  /* foco: âmbar da marca */
+  --focus-ring: var(--brand-amber);
+  --brand-amber-tint: #fdf3e1;
+  --brand-amber-ink: #b86f00;
+
+  /* seleção no 3D e controles ativos ligados a ela */
+  --selection: #2F6FEB;
+  --selection-tint: #e3ecfd;
+  --info-tint: #eaf1fe;
+  --info-border: #b8cdf6;
+
+  /* perigo / erro */
+  --danger: #b3261e;
+  --danger-tint: #fde3e1;
+  --danger-tint-subtle: #fff6f4;
+  --danger-border-soft: #f0c2b8;
+  --hide-tint: #f4e4e2;              /* etiqueta "ocultar" do filtro */
+  --hide-ink: #7a2a22;
+
+  /* sucesso */
+  --success-tint: #dff3e4;
+  --success-ink: #1e6b34;
+
+  /* atenção */
+  --caution-tint: #fff7e0;           /* modo consulta (versão anterior) */
+  --caution-border: #ecd79a;
+  --caution-ink: #5c4400;
+  --notice-tint: #fff4e5;
+  --notice-border: #d9822b;
+  --warn-tint: #ffe8cc;
+  --warn-ink: #8a4a00;
+  --highlight-tint: #fdf1d6;         /* etiqueta "destacar" do filtro */
+  --highlight-ink: #6b4d06;
+
+  /* revisar (reconciliação de versões) */
+  --review: var(--status-review);
+  --review-tint: #fdeee6;
+  --review-tint-banner: #fff4ec;
+  --review-border-soft: #f4c2a6;
+  --review-ink: #7a3410;
+
+  --required: #c2410c;               /* asterisco de campo obrigatório */
+
+  /* superfície invertida (aviso com Desfazer) */
+  --inverse-bg: var(--gray-800);
+  --inverse-text: var(--gray-0);
+  --inverse-link: #9fd0ff;
+  --inverse-danger: #ffb4a8;
+  --inverse-muted: #cbd5e1;
+
+  --spinner: #9fb3c8;
+
+  /* ---------------------------------------------------------------- forma */
+
+  --radius-sm: 4px;      /* selos, células */
+  --radius: 6px;         /* campos, botões, itens de lista */
+  --radius-md: 8px;      /* cartões, grupos, avisos */
+  --radius-lg: 10px;     /* barras e menus flutuantes */
+  --radius-xl: 12px;     /* janelas e popovers grandes */
+  --radius-pill: 999px;  /* chips e etiquetas */
+  --float-pad: 3px;      /* respiro interno da barra flutuante */
+
+  --shadow-float: 0 2px 8px rgb(20 40 70 / 0.08);    /* barras e legenda sobre o 3D */
+  --shadow-raised: 0 4px 14px rgb(20 40 70 / 0.12);  /* avisos flutuantes */
+  --shadow-overlay: 0 8px 24px rgb(20 40 70 / 0.16); /* menus e popovers */
+  --shadow-modal: 0 20px 50px rgb(0 0 0 / 0.25);     /* janela modal e aviso escuro */
+
+  /* ---------------------------------------------------------------- tipo */
+
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, Consolas, monospace;
+
+  /* ---------------------------------------------------------------- toque */
+
+  --tap: 40px;           /* alvo padrão (tablet) */
+  --tap-sm: 36px;        /* botões compactos e chips */
+}

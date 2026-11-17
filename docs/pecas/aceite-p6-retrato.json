@@ -1,0 +1,65 @@
+{
+  "obra_id": 5,
+  "version_id": 14,
+  "version_number": 2,
+  "mark": "PP005",
+  "mark_id": 224,
+  "param_id": 12,
+  "param": "Data de fabricação",
+  "units": [
+    {
+      "unit_id": 374,
+      "label": "PP005-1",
+      "external_id": "f6c5d130-0254-44a5-9353-a5410320f029-00659504",
+      "revit_element_id": 6657284,
+      "dbid": 87,
+      "level": "TÉRREO",
+      "value": "2026-11-01"
+    },
+    {
+      "unit_id": 375,
+      "label": "PP005-2",
+      "external_id": "f6c5d130-0254-44a5-9353-a5410320f029-00659505",
+      "revit_element_id": 6657285,
+      "dbid": 88,
+      "level": "TÉRREO",
+      "value": "2026-11-02"
+    },
+    {
+      "unit_id": 376,
+      "label": "PP005-3",
+      "external_id": "f6c5d130-0254-44a5-9353-a5410320f029-00659506",
+      "revit_element_id": 6657286,
+      "dbid": 89,
+      "level": "TÉRREO",
+      "value": "2026-11-03"
+    },
+    {
+      "unit_id": 377,
+      "label": "PP005-4",
+      "external_id": "f6c5d130-0254-44a5-9353-a5410320f029-006595b0",
+      "revit_element_id": 6657456,
+      "dbid": 91,
+      "level": "TÉRREO",
+      "value": "2026-11-04"
+    },
+    {
+      "unit_id": 378,
+      "label": "PP005-5",
+      "external_id": "f6c5d130-0254-44a5-9353-a5410320f029-006595b1",
+      "revit_element_id": 6657457,
+      "dbid": 92,
+      "level": "TÉRREO",
+      "value": "2026-11-05"
+    },
+    {
+      "unit_id": 379,
+      "label": "PP005-6",
+      "external_id": "f6c5d130-0254-44a5-9353-a5410320f029-006595b2",
+      "revit_element_id": 6657458,
+      "dbid": 93,
+      "level": "TÉRREO",
+      "value": "2026-11-06"
+    }
+  ]
+}

@@ -264,7 +264,7 @@ async def list_fields(session: AsyncSession, version_id: int) -> list[FilterFiel
     factory = await _live_stats(session, version_id, FACTORY)
     for p in await session.scalars(
         select(ParamDef)
-        .where(ParamDef.active.is_(True), in_obra(version.obra_id))
+        .where(ParamDef.active.is_(True), in_obra(version.obra_id, level=None))
         .order_by(func.lower(ParamDef.name), ParamDef.id)
     ):
         distinct, pieces = factory.get(str(p.id), (0, 0))
@@ -299,7 +299,9 @@ async def resolve_field(session: AsyncSession, version: ModelVersion, ref: Field
     if ref.source == FACTORY and ref.key.isdigit():
         param = await session.scalar(
             select(ParamDef).where(
-                ParamDef.id == int(ref.key), ParamDef.active.is_(True), in_obra(version.obra_id)
+                ParamDef.id == int(ref.key),
+                ParamDef.active.is_(True),
+                in_obra(version.obra_id, level=None),
             )
         )
         if param is not None:
@@ -479,14 +481,14 @@ class _Context:
     version: ModelVersion
     today: date
     notes: list[str] = field(default_factory=list)
-    _labels: dict[int, str] | None = None
+    _labels: dict[int, str] | None = None  # element_id -> status da peça
     _previous: tuple[ModelVersion | None] | None = None
 
     async def status_labels(self) -> dict[int, str]:
-        """marca (com peças na versão) -> status ("Pendente", "Parcial"...)."""
+        """peça (com marca, na versão) -> status dela ("Pendente", "Parcial"...)."""
         if self._labels is None:
             result = await version_statuses(self.session, self.version.id)
-            self._labels = {m: STATUS_LABELS[st] for m, st in result.statuses.items()}
+            self._labels = {e: STATUS_LABELS[st] for e, st in result.piece_statuses.items()}
         return self._labels
 
     async def previous(self) -> ModelVersion | None:
@@ -517,8 +519,8 @@ async def _computed_condition(
     if field.key == "status":
         args = _text_args(index, field, rule)
         labels = await ctx.status_labels()
-        ids = [m for m, label in labels.items() if _text_matches(rule.op, args, label)]
-        cond: ColumnElement[bool] = Element.mark_id.in_(ids)
+        ids = [e for e, label in labels.items() if _text_matches(rule.op, args, label)]
+        cond: ColumnElement[bool] = Element.id.in_(ids)
         if _text_matches(rule.op, args, None):  # peças sem marca não têm status
             cond = or_(cond, Element.mark_id.is_(None))
         return cond

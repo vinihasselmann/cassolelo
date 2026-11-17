@@ -25,6 +25,7 @@ from app.api import (
     orphans,
     param_defs,
     saved_filters,
+    units,
     versions,
     viewer,
     webhooks,
@@ -120,7 +121,7 @@ def create_app(
     app.add_middleware(RequestContextMiddleware)  # request_id, obra e linha de acesso
 
     errors.register(app)
-    core = (health, me, dev, acc, obras, events, export, batches, marks, orphans)
+    core = (health, me, dev, acc, obras, events, export, batches, marks, orphans, units)
     views = (saved_filters, color_schemes)
     for module in (*core, param_defs, *views, versions, viewer, webhooks):
         app.include_router(module.router, prefix="/api")

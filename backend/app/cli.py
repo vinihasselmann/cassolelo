@@ -8,6 +8,8 @@
     uv run python -m app.cli alerts test               # manda um alerta de teste (Teams/e-mail)
     uv run python -m app.cli versions retry --version 7   # reconsulta o Docs e reprocessa
     uv run python -m app.cli sync --obra 1 | --all     # "Sincronizar agora" pela linha de comando
+    uv run python -m app.cli dates list [--obra 12]    # datas fora de 1900–2100 (por marca e peça)
+    uv run python -m app.cli dates fix p:34 --clear | --set 2026-05-05 [--user email]
 
 O callback é PUBLIC_BASE_URL + /api/webhooks/aps (ex.: URL do túnel).
 """
@@ -29,12 +31,13 @@ from app.aps.client import ApsClient
 from app.aps.errors import ApsError
 from app.config import Settings, get_settings
 from app.db import create_engine, create_sessionmaker
-from app.models import ModelVersion, Obra
-from app.models.enums import VersionStatus
+from app.models import ModelVersion, Obra, User
+from app.models.enums import Role, VersionStatus
 from app.observability import alerts
-from app.services import piece_props
+from app.services import invalid_dates, piece_props
 from app.services import versions as versions_service
 from app.services import webhooks as hooks_service
+from app.services.errors import DomainError
 from app.services.translation import PROCESS_VERSION_JOB, Outcome, check_translation
 from app.workers.queue import ArqQueue, JobQueue
 
@@ -67,6 +70,16 @@ def _parser() -> argparse.ArgumentParser:
     pp_target = backfill.add_mutually_exclusive_group(required=True)
     pp_target.add_argument("--version", type=int, help="id da versão")
     pp_target.add_argument("--all", action="store_true", help="todas as versões prontas")
+    dates_cmd = sub.add_parser("dates", help="datas gravadas fora de 1900–2100")
+    dates_cmds = dates_cmd.add_subparsers(dest="cmd", required=True)
+    dates_list = dates_cmds.add_parser("list", help="lista as datas inválidas")
+    dates_list.add_argument("--obra", type=int, help="só esta obra")
+    dates_fix = dates_cmds.add_parser("fix", help="limpa ou corrige uma data inválida (auditado)")
+    dates_fix.add_argument("key", help='id da lista ("m:12" por marca, "p:34" por peça)')
+    action = dates_fix.add_mutually_exclusive_group(required=True)
+    action.add_argument("--clear", action="store_true", help="apaga o valor")
+    action.add_argument("--set", metavar="AAAA-MM-DD", help="grava esta data")
+    dates_fix.add_argument("--user", help="e-mail de quem corrige (padrão: 1º admin)")
     sync_cmd = sub.add_parser("sync", help='"Sincronizar agora" (uma obra ou todas as ativas)')
     target = sync_cmd.add_mutually_exclusive_group(required=True)
     target.add_argument("--obra", type=int, help="id da obra")
@@ -160,6 +173,34 @@ async def _backfill_piece_props(session: AsyncSession, version_id: int | None) -
     return 0
 
 
+async def _dates(session: AsyncSession, args: argparse.Namespace) -> int:
+    """Datas inválidas (docs/bugs/data-por-peca.md): listar, limpar ou corrigir."""
+    if args.cmd == "list":
+        found = await invalid_dates.list_invalid(session, args.obra)
+        for d in found:
+            print(f"{d.key}\t{d.obra}\t{d.level}\t{d.where}\t{d.param}\t{d.value}")
+        print(f"{len(found)} data(s) inválida(s).")
+        return 0
+    actor = await session.scalar(
+        select(User)
+        .where(User.email == args.user if args.user else User.role == Role.ADMIN.value)
+        .order_by(User.id)
+        .limit(1)
+    )
+    if actor is None:
+        print("ERRO: usuário não encontrado (use --user com o e-mail).", file=sys.stderr)
+        return 2
+    try:
+        item = await invalid_dates.fix(session, args.key, None if args.clear else args.set, actor)
+    except DomainError as exc:
+        print(f"ERRO: {exc.message}", file=sys.stderr)
+        return 2
+    await session.commit()
+    what = "apagada" if args.clear else f"corrigida para {args.set}"
+    print(f"{item.obra} · {item.where} · {item.param}: {item.value} {what} (por {actor.name}).")
+    return 0
+
+
 async def run(
     argv: Sequence[str],
     settings: Settings,
@@ -170,6 +211,8 @@ async def run(
     args = _parser().parse_args(argv)
     if args.group == "piece-props":
         return await _backfill_piece_props(session, None if args.all else args.version)
+    if args.group == "dates":
+        return await _dates(session, args)
     if args.group == "sync":
         if queue is None:  # pragma: no cover - _main sempre passa
             raise RuntimeError("fila não configurada")

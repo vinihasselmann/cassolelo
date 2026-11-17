@@ -25,7 +25,7 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import AuthorMixin, Base, TimestampMixin
-from app.models.enums import OrphanStatus, ParamScope, ParamType, check_in
+from app.models.enums import OrphanStatus, ParamLevel, ParamScope, ParamType, check_in
 
 
 class ParamDef(TimestampMixin, AuthorMixin, Base):
@@ -33,6 +33,7 @@ class ParamDef(TimestampMixin, AuthorMixin, Base):
     __table_args__ = (
         CheckConstraint(check_in("type", ParamType), name="ck_param_defs_type"),
         CheckConstraint(check_in("scope", ParamScope), name="ck_param_defs_scope"),
+        CheckConstraint(check_in("level", ParamLevel), name="ck_param_defs_level"),
         CheckConstraint(
             "(scope = 'global' AND obra_id IS NULL) OR (scope = 'obra' AND obra_id IS NOT NULL)",
             name="ck_param_defs_scope_obra",
@@ -65,6 +66,10 @@ class ParamDef(TimestampMixin, AuthorMixin, Base):
         BigInteger, ForeignKey("obras.id", ondelete="RESTRICT")
     )
     active: Mapped[bool] = mapped_column(Boolean, default=True, server_default=true())
+    # por marca ou por peça; imutável depois que houver valores
+    level: Mapped[str] = mapped_column(
+        String(10), default=ParamLevel.MARK, server_default=text("'mark'")
+    )
 
 
 class ObraParam(Base):

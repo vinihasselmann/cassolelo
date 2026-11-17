@@ -7,6 +7,7 @@ import {
   updateParamDef,
   type ParamDef,
   type ParamDefBody,
+  type ParamLevel,
   type ParamScope,
   type ParamType,
 } from '../../api/paramDefs';
@@ -37,6 +38,7 @@ export function ParamDefDialog({ obraId, obraCode, categories, param, presetCate
   const [options, setOptions] = useState((param?.options ?? []).join('\n'));
   const [cats, setCats] = useState<string[]>(param ? (param.categories ?? []) : presetCategory ? [presetCategory] : []);
   const [scope, setScope] = useState<ParamScope>(param?.scope ?? 'global');
+  const [level, setLevel] = useState<ParamLevel>(param?.level ?? 'mark');
   const [required, setRequired] = useState(param?.required ?? false);
   const [localError, setLocalError] = useState<string | null>(null);
 
@@ -66,6 +68,7 @@ export function ParamDefDialog({ obraId, obraCode, categories, param, presetCate
       required,
       categories: cats.length === allCats.length && allCats.length > 0 ? [] : cats,
       scope,
+      level,
       obra_id: scope === 'obra' ? obraId : null,
       // criado da biblioteca aqui dentro: já entra nesta obra (as outras incluem se quiserem)
       ...(param ? {} : { include_in_obra_id: scope === 'global' ? obraId : null }),
@@ -81,7 +84,9 @@ export function ParamDefDialog({ obraId, obraCode, categories, param, presetCate
     <Modal title={param ? 'Editar parâmetro' : 'Novo parâmetro da fábrica'} onClose={onClose}>
       <p className="muted small">
         {param
-          ? `Usado em ${used} marca(s).`
+          ? param.level === 'piece'
+            ? `Preenchido em ${used} peça(s).`
+            : `Usado em ${used} marca(s).`
           : 'O parâmetro fica disponível nas marcas a que se aplica e aparece no painel, na busca e nas cores.'}
       </p>
       <form onSubmit={submit} noValidate>
@@ -108,6 +113,35 @@ export function ParamDefDialog({ obraId, obraCode, categories, param, presetCate
           </select>
           {used > 0 && <p className="hint">O tipo não pode ser alterado porque já existem valores.</p>}
         </div>
+
+        <fieldset className="field level-choice">
+          <legend>Preenchido</legend>
+          <label className="check">
+            <input
+              type="radio"
+              name="pd-level"
+              value="mark"
+              checked={level === 'mark'}
+              disabled={used > 0}
+              onChange={() => { setLevel('mark'); }}
+            />{' '}
+            Por marca
+          </label>
+          <p className="hint">Um valor só para a marca, que vale para todas as peças idênticas dela.</p>
+          <label className="check">
+            <input
+              type="radio"
+              name="pd-level"
+              value="piece"
+              checked={level === 'piece'}
+              disabled={used > 0}
+              onChange={() => { setLevel('piece'); }}
+            />{' '}
+            Por peça
+          </label>
+          <p className="hint">Cada peça da marca tem o seu valor (PP001-1, PP001-2…), preenchido na tabela do painel.</p>
+          {used > 0 && <p className="hint">Não pode ser alterado porque já existem valores.</p>}
+        </fieldset>
 
         {type === 'number' && (
           <div className="field">

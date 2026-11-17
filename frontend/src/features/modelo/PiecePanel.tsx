@@ -3,11 +3,15 @@ import { useState } from 'react';
 
 import { fetchElement, type PropertyGroup } from '../../api/versions';
 import type { BatchApplyResult } from '../../api/markBatch';
+import type { UnitBatchResult } from '../../api/units';
+import { PieceUnitsSection } from '../pecas/PieceUnitsSection';
 import { BatchValuesSection } from '../params/BatchValuesSection';
 import { MarkValuesSection } from '../params/MarkValuesSection';
 import { errorMessage } from '../../lib/errors';
 import { formatValue } from '../../lib/format';
+import { AxisCoordinatesSection } from './AxisCoordinatesSection';
 import { pieceCount, type Selection } from './selection';
+import type { AxisState } from './useAxisCoordinates';
 
 const num = (n: number) => n.toLocaleString('pt-BR');
 const pieces = (n: number) => `${num(n)} ${n === 1 ? 'peça' : 'peças'}`;
@@ -150,11 +154,28 @@ interface PanelProps {
   canEditParams: boolean;
   onNewParam: (category: string | null) => void;
   onBatchApplied: (result: BatchApplyResult) => void;
+  /** Lote de valores POR PEÇA aplicado (aviso com Desfazer). */
+  onUnitBatchApplied: (result: UnitBatchResult) => void;
+  /** Clique numa linha da tabela por peça: destacar só aquela peça no 3D. */
+  onPickPiece: (dbid: number) => void;
   /** Modo consulta (versão anterior): rótulo da versão ativa, para o aviso dos valores. */
   activeLabel?: string | null;
+  /** Coordenadas do eixo da peça clicada (a instância, não a marca). */
+  axis?: AxisState;
 }
 
-export function PiecePanel({ versionId, obraId, selection, canEditParams, onNewParam, onBatchApplied, activeLabel = null }: PanelProps) {
+export function PiecePanel({
+  versionId,
+  obraId,
+  selection,
+  canEditParams,
+  onNewParam,
+  onBatchApplied,
+  onUnitBatchApplied,
+  onPickPiece,
+  activeLabel = null,
+  axis = { status: 'unavailable' },
+}: PanelProps) {
   const focus = selection.focus;
   const element = useQuery({
     queryKey: ['versions', versionId, 'elements', focus],
@@ -167,6 +188,9 @@ export function PiecePanel({ versionId, obraId, selection, canEditParams, onNewP
   // Categoria da marca (uma só marca) ou da peça clicada: decide quais parâmetros valem.
   const category =
     selection.marks.length === 1 ? (selection.marks[0]?.category ?? null) : (element.data?.category ?? null);
+
+  // Uma marca só: a tabela "Parâmetros por peça" (se houver parâmetros por peça).
+  const onlyMark = selection.marks.length === 1 && selection.unmarked.length === 0 ? selection.marks[0] : undefined;
 
   if (focus === null) {
     return (
@@ -189,6 +213,8 @@ export function PiecePanel({ versionId, obraId, selection, canEditParams, onNewP
         )}
       </div>
 
+      <AxisCoordinatesSection state={axis} />
+
       <section className="model-sec" aria-labelledby="factory-params">
         <div className="reshead">
           <h4 id="factory-params">Parâmetros da fábrica</h4>
@@ -203,7 +229,21 @@ export function PiecePanel({ versionId, obraId, selection, canEditParams, onNewP
             Valores atuais da marca: valem para a versão ativa ({activeLabel}). Nesta versão só é possível consultar.
           </p>
         )}
-        <FactoryValues obraId={obraId} selection={selection} canEdit={canEditParams} onBatchApplied={onBatchApplied} />
+        <section className="factory-sub" aria-labelledby="mark-params">
+          <h5 id="mark-params">Parâmetros por marca</h5>
+          <FactoryValues obraId={obraId} selection={selection} canEdit={canEditParams} onBatchApplied={onBatchApplied} />
+        </section>
+        {onlyMark && (
+          <PieceUnitsSection
+            obraId={obraId}
+            markId={onlyMark.mark_id}
+            versionId={versionId}
+            canEdit={canEditParams}
+            focus={focus}
+            onPickPiece={onPickPiece}
+            onBatchApplied={onUnitBatchApplied}
+          />
+        )}
       </section>
 
       <section className="model-sec" aria-labelledby="model-props">

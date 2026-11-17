@@ -1,3 +1,5 @@
+import type { Ref } from 'react';
+
 import { MIXED_KEEP, type FieldShape } from './fieldDraft';
 
 interface InputProps {
@@ -6,11 +8,54 @@ interface InputProps {
   onChange: (v: string) => void;
   /** Lote com valores diferentes entre as marcas: vazio = manter o de cada uma. */
   mixed?: boolean;
+  /** Campo sem <label> visível (célula da tabela por peça): id e nome acessível próprios. */
+  id?: string;
+  ariaLabel?: string;
+  autoFocus?: boolean;
+  onBlur?: () => void;
+  onKeyDown?: (e: { key: string; preventDefault: () => void }) => void;
+  /** Mensagem de erro do campo (ex.: data inválida), mostrada abaixo dele. */
+  error?: string | null | undefined;
+  inputRef?: Ref<HTMLInputElement> | undefined;
 }
 
-export function FieldInput({ f, value, onChange, mixed = false }: InputProps) {
-  const id = `pv-${String(f.def_id)}`;
-  const common = { id, value, onChange: (e: { target: { value: string } }) => { onChange(e.target.value); } };
+export function FieldInput({ error, inputRef, ...props }: InputProps) {
+  const errId = `${props.id ?? `pv-${String(props.f.def_id)}`}-err`;
+  const control = <Control {...props} inputRef={inputRef} errId={error ? errId : undefined} />;
+  if (!error) return control;
+  return (
+    <>
+      {control}
+      <p id={errId} role="alert" className="error small field-error">
+        {error}
+      </p>
+    </>
+  );
+}
+
+function Control({
+  f,
+  value,
+  onChange,
+  mixed = false,
+  id,
+  ariaLabel,
+  autoFocus,
+  onBlur,
+  onKeyDown,
+  inputRef,
+  errId,
+}: Omit<InputProps, 'error'> & { errId: string | undefined }) {
+  const common = {
+    id: id ?? `pv-${String(f.def_id)}`,
+    value,
+    onChange: (e: { target: { value: string } }) => { onChange(e.target.value); },
+    ...(errId ? { 'aria-invalid': true, 'aria-describedby': errId } : {}),
+    ...(ariaLabel ? { 'aria-label': ariaLabel } : {}),
+    ...(autoFocus ? { autoFocus } : {}),
+    ...(onBlur ? { onBlur } : {}),
+    ...(onKeyDown ? { onKeyDown } : {}),
+  };
   const empty = mixed ? MIXED_KEEP : '—';
   const placeholder = mixed ? { placeholder: MIXED_KEEP } : {};
   switch (f.type) {
@@ -34,7 +79,7 @@ export function FieldInput({ f, value, onChange, mixed = false }: InputProps) {
         </select>
       );
     case 'date':
-      return <input type="date" {...common} {...placeholder} />;
+      return <input type="date" ref={inputRef} {...common} {...placeholder} />;
     case 'number':
       return <input inputMode="decimal" placeholder={mixed ? MIXED_KEEP : 'Ex.: 12,5'} {...common} />;
     default:

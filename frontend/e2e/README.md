@@ -29,6 +29,14 @@ Usa o Viewer v7 e o APS de verdade, clica no centro do modelo, confere o painel 
 falha se o modelo levar mais que `E2E_MAX_LOAD_MS` para aparecer. O tempo sai no
 terminal e nas anotações do relatório (`npx playwright show-report`).
 
+## Parâmetros por peça (P4)
+O seed cria a obra **E2E-PEC** (fixture `pecas`: P-06 com 6 pilares, V-02 com 2 vigas) com o
+parâmetro POR PEÇA "Data de fabricação". Cada teste zera os valores pela API antes de começar.
+
+**P5 (peças órfãs):** a obra **E2E-PECREV** tem a v1 (`pecas`) e a v2 (`pecas_v2`, sem a peça
+pec-0012). O seed apaga as unidades da obra, preenche a data só na unidade da pec-0012 e
+processa a v2: ela fica órfã com o valor. O teste roda o seed de novo para começar desse estado.
+
 ## Reconciliação (Fase 7)
 - O seed cria também a obra **E2E-REV** (fixtures `revisao_v1` → `revisao_v2`, os 7 casos).
   O teste "aceite da Fase 7" roda o seed de novo para começar do estado "v2 acabou de

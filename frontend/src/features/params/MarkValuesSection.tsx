@@ -15,6 +15,7 @@ import { keepValues } from '../../api/reconcile';
 import { errorMessage } from '../../lib/errors';
 import { formatDateTime, formatParamValue, formatRelative } from '../../lib/format';
 import { fieldLabel as label, fromDraft, toDraft, type Draft } from './fieldDraft';
+import { dateErrors, withoutKey } from './dateDraft';
 import { FieldInput } from './fieldInput';
 import { invalidateValueQueries } from './invalidate';
 
@@ -39,6 +40,7 @@ export function MarkValuesSection({ obraId, markId, canEdit }: Props) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<Draft>({});
   const [conflict, setConflict] = useState<StaleConflict | null>(null);
+  const [errors, setErrors] = useState<Record<number, string>>({});
   const [showHistory, setShowHistory] = useState(false);
   const history = useQuery({
     queryKey: [...key, 'history'],
@@ -79,6 +81,7 @@ export function MarkValuesSection({ obraId, markId, canEdit }: Props) {
     const start = initial();
     setBase({ draft: start, versions: Object.fromEntries(fields.map((f) => [f.def_id, f.row_version])) });
     setDraft(start);
+    setErrors({});
     setConflict(null);
     save.reset();
     setEditing(true);
@@ -109,6 +112,9 @@ export function MarkValuesSection({ obraId, markId, canEdit }: Props) {
 
   function submit(e: FormEvent) {
     e.preventDefault();
+    const bad = dateErrors(fields, draft, e.currentTarget as HTMLFormElement, (f) => `pv-${String(f.def_id)}`);
+    setErrors(bad);
+    if (Object.keys(bad).length > 0) return; // data inválida: não salva
     const changes: ValueChange[] = fields
       .filter((f) => (draft[f.def_id] ?? '') !== (base.draft[f.def_id] ?? ''))
       .map((f) => ({
@@ -171,7 +177,15 @@ export function MarkValuesSection({ obraId, markId, canEdit }: Props) {
                 {label(f)}
                 {f.required && <span className="req"> *</span>}
               </label>
-              <FieldInput f={f} value={draft[f.def_id] ?? ''} onChange={(v) => { setDraft((d) => ({ ...d, [f.def_id]: v })); }} />
+              <FieldInput
+                f={f}
+                value={draft[f.def_id] ?? ''}
+                error={errors[f.def_id]}
+                onChange={(v) => {
+                  setDraft((d) => ({ ...d, [f.def_id]: v }));
+                  setErrors((errs) => withoutKey(errs, f.def_id));
+                }}
+              />
             </div>
           ))}
           {save.isError && !conflict && (
@@ -205,7 +219,7 @@ export function MarkValuesSection({ obraId, markId, canEdit }: Props) {
             })}
           </dl>
           {canEdit && (
-            <button type="button" className="secondary small-btn" onClick={startEdit}>
+            <button type="button" className="secondary btn-sm" onClick={startEdit}>
               Editar
             </button>
           )}

@@ -5,6 +5,7 @@ import {
   buildMarkIndex,
   EMPTY_SELECTION,
   pieceCount,
+  refreshSelection,
   resolveClick,
   selectionDbIds,
   type Selection,
@@ -78,5 +79,23 @@ describe('buildMarkIndex com montagens', () => {
     expect(idx.get(4)).toBe(V01); // 4 é peça da V-01: não vira membro de outra marca
     const sel = resolveClick([17], idx, EMPTY_SELECTION, false);
     expect(selectionDbIds(sel)).toEqual([10]); // seleciona a peça (o nó do vínculo)
+  });
+});
+
+describe('refreshSelection (clique antes de as marcas carregarem)', () => {
+  it('a peça que entrou "sem Marca" passa para a marca quando o índice chega; o foco fica', () => {
+    const early = resolveClick([2], buildMarkIndex([]), EMPTY_SELECTION, false);
+    expect(early).toEqual({ marks: [], unmarked: [2], focus: 2 });
+    const fixed = refreshSelection(early, index);
+    expect(fixed.marks.map((m) => m.code)).toEqual(['PP001']);
+    expect(fixed.unmarked).toEqual([]);
+    expect(fixed.focus).toBe(2);
+  });
+
+  it('sem nada a corrigir devolve a mesma seleção (peça realmente sem Marca, ou já com marca)', () => {
+    const none = click([99]);
+    expect(refreshSelection(none, index)).toBe(none);
+    const marked = click([1]);
+    expect(refreshSelection(marked, index)).toBe(marked);
   });
 });

@@ -29,6 +29,18 @@ export interface VersionDiff {
   orphans_open: number;
   review_properties: string[];
   marks: DiffMark[];
+  /** Parâmetros por peça (P5): unidades que perderam a peça (com valores), novas, que voltaram. */
+  units?: UnitDiff;
+}
+
+export interface UnitDiff {
+  lost: number;
+  new: number;
+  returned: number;
+  by_order: number;
+  lost_units: { unit_id: number; label: string }[];
+  new_units: { unit_id: number; label: string }[];
+  orphans_open: number;
 }
 
 export type OrphanStatus = 'open' | 'relinked' | 'archived' | 'returned';

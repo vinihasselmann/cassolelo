@@ -258,7 +258,7 @@ async def test_types_formats_section_and_layout(
     )
     assert v01[col["Obs viga"]].value == "içar com cuidado"
     assert pp2[col["Autor"]].value == ctx["users"][Role.ADMIN].name
-    # peças: nível e externalId
+    # peças: nível, externalId e a unidade de peça
     pieces = {p["dbId"]: p for p in _rows(wb["Peças"])}
     assert pieces[10] == {
         "Marca": "PP001",
@@ -266,6 +266,7 @@ async def test_types_formats_section_and_layout(
         "externalId": "val-0010",
         "Nível": "TÉRREO",
         "dbId": 10,
+        "Peça": "PP001-1",  # unidade de peça (P3)
     }
     assert 30 not in pieces  # sem Marca
     about = dict((r[0].value, r[1].value) for r in wb["Sobre"].iter_rows())

@@ -25,10 +25,11 @@ from app.models import (
     Orphan,
     ParamDef,
     ParamValue,
+    PieceUnit,
     User,
     VersionDiff,
 )
-from app.models.enums import OrphanStatus, ParamScope, ReviewStatus
+from app.models.enums import OrphanStatus, ParamScope, ReviewStatus, UnitStatus
 from app.services import audit, events, param_defs, piece_props
 from app.services.errors import ConflictError, NotFoundError, ValidationError
 from app.services.param_defs import has_value
@@ -54,6 +55,7 @@ class DiffView:
     diff: dict[str, Any]
     review_open: int  # marcas desta versão ainda em revisão (agora)
     orphans_open: int  # órfãs abertas da obra (agora)
+    unit_orphans_open: int = 0  # unidades de peça órfãs abertas da obra (agora, P5)
 
 
 async def get_diff(session: AsyncSession, version_id: int) -> DiffView:
@@ -76,8 +78,18 @@ async def get_diff(session: AsyncSession, version_id: int) -> DiffView:
         .join(Mark, Mark.id == Orphan.mark_id)
         .where(Mark.obra_id == version.obra_id, Orphan.status == OrphanStatus.OPEN.value)
     )
+    unit_orphans_open = await session.scalar(
+        select(func.count(PieceUnit.id)).where(
+            PieceUnit.obra_id == version.obra_id, PieceUnit.status == UnitStatus.ORPHAN.value
+        )
+    )
     return DiffView(
-        version.id, version.version_number, row.diff, review_open or 0, orphans_open or 0
+        version.id,
+        version.version_number,
+        row.diff,
+        review_open or 0,
+        orphans_open or 0,
+        unit_orphans_open or 0,
     )
 
 

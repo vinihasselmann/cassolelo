@@ -30,5 +30,19 @@ export function describeEvent(ev: ObraEvent): string | null {
       return `A versão ${str(d.version_number)} não pôde ser processada`;
     case 'version_ready':
       return null; // vira o banner "Nova versão disponível"
+    case 'unit_values_changed':
+      return `${who} alterou a peça ${str(d.unit)}`;
+    case 'unit_batch_applied': {
+      const n = num(d.units);
+      return `${who} alterou ${String(n)} ${n === 1 ? 'peça' : 'peças'} em lote`;
+    }
+    case 'unit_batch_undone':
+      return `${who} desfez uma edição em lote de peças`;
+    case 'unit_orphan_changed':
+      if (d.status === 'relinked') return `${who} religou a peça órfã ${str(d.unit)} (no lugar de ${str(d.target_unit)})`;
+      if (d.status === 'archived') return `${who} arquivou a peça órfã ${str(d.unit)}`;
+      return `Peça órfã ${str(d.unit)} atualizada`;
+    default:
+      return null; // tipo novo que esta versão da tela ainda não conhece
   }
 }

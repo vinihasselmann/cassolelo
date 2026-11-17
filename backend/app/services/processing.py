@@ -38,6 +38,7 @@ from app.services import (
     mark_rule,
     mark_validation,
     piece_props,
+    piece_units,
     version_reconcile,
 )
 from app.services.extraction import ExtractedElement, extract_elements, find_prop
@@ -170,6 +171,9 @@ async def process_version(
         if orphan_missing:
             actor = await session.get(User, actor_id) if actor_id else None
             rule_result = await mark_rule.orphan_missing_marks(session, version, before, actor)
+        # Unidades de peça (parâmetros por peça): ligadas aos elementos desta versão.
+        actor_user = await session.get(User, actor_id) if actor_id else None
+        units = await piece_units.link_version(session, version, actor_user)
         # Motor de filtros: valores das peças (modelo + sistema) e, para a obra toda,
         # fábrica + status (a reconciliação pode ter mudado o "a revisar").
         await piece_props.build_version(session, version.id)
@@ -188,6 +192,7 @@ async def process_version(
                 "diff": {**diff.totals, "review": diff.review, "orphans": diff.orphans},
                 "rule_orphans": rule_result.orphans if rule_result else [],
                 "rule_relinked": rule_result.relinked if rule_result else [],
+                "units": units.as_dict(),
                 "mark_names": config.mark_names,
                 "view_guid": view.guid,
                 "seconds": seconds,

@@ -2,6 +2,8 @@ import { apiFetch } from './client';
 
 export type ParamType = 'text' | 'number' | 'list' | 'date' | 'bool';
 export type ParamScope = 'global' | 'obra';
+/** Por marca (vale para todas as peças da marca) ou por peça (cada unidade tem o seu). */
+export type ParamLevel = 'mark' | 'piece';
 
 export const PARAM_TYPE_LABELS: Record<ParamType, string> = {
   text: 'Texto',
@@ -20,6 +22,7 @@ export interface ParamDef {
   required: boolean;
   categories: string[] | null; // null = todas
   scope: ParamScope;
+  level: ParamLevel;
   obra_id: number | null;
   obra_code: string | null;
   active: boolean;
@@ -42,6 +45,7 @@ export interface ParamDefBody {
   required: boolean;
   categories: string[]; // [] = todas
   scope: ParamScope;
+  level?: ParamLevel; // padrão: mark
   obra_id: number | null;
   /** criar da biblioteca de dentro de uma obra: já inclui nela */
   include_in_obra_id?: number | null;

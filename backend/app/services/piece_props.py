@@ -37,6 +37,8 @@ from app.models import (
     ParamDef,
     ParamValue,
     PieceProp,
+    PieceUnitLink,
+    PieceValue,
     VersionPropertyName,
 )
 from app.models.enums import ParamScope, ReviewStatus
@@ -306,41 +308,77 @@ async def sync_factory(
     if not marks:
         return 0
     params = list(
-        await session.scalars(select(ParamDef).where(ParamDef.active.is_(True), in_obra(obra_id)))
+        await session.scalars(
+            select(ParamDef).where(ParamDef.active.is_(True), in_obra(obra_id, level=None))
+        )
     )
     by_id = {p.id: p for p in params}
+    mark_defs = [p.id for p in params if not mark_status.is_piece(p)]
+    piece_defs = [p.id for p in params if mark_status.is_piece(p)]
     values: dict[int, dict[int, Any]] = defaultdict(dict)  # mark -> def -> valor
-    if params:
+    if mark_defs:
         for mark_id, def_id, value in await session.execute(
             select(ParamValue.mark_id, ParamValue.def_id, ParamValue.value).where(
                 ParamValue.mark_id.in_(list(marks)),
-                ParamValue.def_id.in_(list(by_id)),
+                ParamValue.def_id.in_(mark_defs),
                 has_value(ParamValue.value),
             )
         ):
             values[mark_id][def_id] = value
 
-    status_text: dict[int, str] = {}
-    for mark_id, mark in marks.items():
-        if mark.review_status == ReviewStatus.REVIEW.value:
-            status = mark_status.MarkStatus.REVIEW
-        else:
-            status = mark_status.status_of(params, mark.category, set(values[mark_id]))
-        status_text[mark_id] = STATUS_LABELS[status]
+    # Valores POR PEÇA: cada elemento recebe o valor da unidade ligada a ele na versão.
+    unit_values: dict[int, dict[int, Any]] = defaultdict(dict)  # unit -> def -> valor
+    element_unit: dict[int, int] = {}  # elemento -> unidade (em qualquer versão da obra)
+    if piece_defs:
+        for el_id, unit_id in await session.execute(
+            select(PieceUnitLink.element_id, PieceUnitLink.unit_id)
+            .join(Element, Element.id == PieceUnitLink.element_id)
+            .where(
+                PieceUnitLink.version_id.in_(versions),
+                Element.mark_id.in_(list(marks)),
+            )
+        ):
+            element_unit[el_id] = unit_id
+        if element_unit:
+            for unit_id, def_id, value in await session.execute(
+                select(PieceValue.unit_id, PieceValue.def_id, PieceValue.value).where(
+                    PieceValue.unit_id.in_(set(element_unit.values())),
+                    PieceValue.def_id.in_(piece_defs),
+                    has_value(PieceValue.value),
+                )
+            ):
+                unit_values[unit_id][def_id] = value
 
-    rows: list[dict[str, Any]] = []
-    pieces = await session.execute(
-        select(Element.version_id, Element.id, Element.mark_id).where(
-            Element.version_id.in_(versions), Element.mark_id.in_(list(marks))
+    pieces = list(
+        await session.execute(
+            select(Element.version_id, Element.id, Element.mark_id).where(
+                Element.version_id.in_(versions), Element.mark_id.in_(list(marks))
+            )
         )
     )
+    # Status de CADA peça: parâmetros por marca pela marca; por peça, pela unidade ligada
+    # a esta peça (preencher uma peça não muda as outras da marca).
+    rows: list[dict[str, Any]] = []
     for version_id, piece_id, mark_id in pieces:
         if mark_id is None:  # pragma: no cover - a consulta só traz peças com marca
             continue
-        rows.append(_row(version_id, piece_id, mark_id, SYSTEM, "status", status_text[mark_id]))
-        for def_id, value in values[mark_id].items():
+        mark = marks[mark_id]
+        category = mark.category
+        unit = element_unit.get(piece_id)
+        if mark.review_status == ReviewStatus.REVIEW.value:
+            status = mark_status.MarkStatus.REVIEW
+        else:
+            status = mark_status.status_of(
+                params,
+                category,
+                set(values[mark_id]),
+                set(unit_values.get(unit, {})) if unit is not None else set(),
+            )
+        rows.append(_row(version_id, piece_id, mark_id, SYSTEM, "status", STATUS_LABELS[status]))
+        own = {**values[mark_id], **(unit_values.get(unit, {}) if unit is not None else {})}
+        for def_id, value in own.items():
             param = by_id[def_id]
-            if not mark_status.applies(param, marks[mark_id].category):
+            if not mark_status.applies(param, category):
                 continue
             text = _factory_text(param.type, value)
             if text is not None:

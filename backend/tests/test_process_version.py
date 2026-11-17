@@ -13,7 +13,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.aps.client import ApsClient
-from app.models import AuditLog, Element, Mark, ModelVersion, Obra
+from app.models import AuditLog, Element, Mark, ModelVersion, Obra, PieceUnit, PieceUnitLink
 from app.services.processing import UNEXPECTED_MSG, ProcessingConfig, process_version
 from app.workers import tasks
 from tests.apsfakes import MD, MODEL_FORMATS, Sleeps, mock_model, mock_token, model_fixture
@@ -71,6 +71,15 @@ async def _version(
 
 async def _run(session: AsyncSession, aps: ApsClient, version_id: int, sleeps: Sleeps) -> Any:
     return await process_version(session, aps, version_id, CONFIG, sleep=sleeps)
+
+
+async def _units(session: AsyncSession, obra_id: int) -> list[tuple[int, int, int]]:
+    rows = await session.execute(
+        select(PieceUnit.id, PieceUnit.mark_id, PieceUnit.number)
+        .where(PieceUnit.obra_id == obra_id)
+        .order_by(PieceUnit.id)
+    )
+    return [tuple(r) for r in rows]  # type: ignore[misc]
 
 
 async def _marks(session: AsyncSession, obra_id: int) -> dict[tuple[str, str], int]:
@@ -180,6 +189,9 @@ async def test_reprocess_is_idempotent(
     await _run(session, aps, v.id, sleeps)
     marks_before = await _marks(session, obra.id)
     ids_before = {e.dbid: e.mark_id for e in await _elements(session, v.id)}
+    units_before = await _units(session, obra.id)
+    marked = sum(1 for m in ids_before.values() if m is not None)
+    assert len(units_before) == marked  # uma unidade de peça por peça com marca
 
     again = await _run(session, aps, v.id, sleeps)
     assert again.status == "ready" and again.marks_created == 0
@@ -189,6 +201,12 @@ async def test_reprocess_is_idempotent(
         select(func.count()).select_from(Element).where(Element.version_id == v.id)
     )
     assert total == 7
+    # reprocessar não duplica unidades nem ligações (unidades de peça, P1)
+    assert await _units(session, obra.id) == units_before
+    links = await session.scalar(
+        select(func.count()).select_from(PieceUnitLink).where(PieceUnitLink.version_id == v.id)
+    )
+    assert links == marked
 
 
 @respx.mock

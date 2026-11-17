@@ -4,14 +4,91 @@
  * desenha cada peça (window.__E2E_PIECES = [{dbid, label}]) como um botão
  * "3D" clicável. Selecionadas: aria-pressed="true". Ctrl+clique acumula, como
  * no Viewer real. Cor aplicada por setThemingColor: data-color="#rrggbb" (borda do botão).
+ *
+ * Coordenadas do eixo: cada peça tem uma caixa (piece.geom = {origin, a, b, c}, em PÉS,
+ * coordenadas de mundo; sem geom, uma caixa vertical própria) servida como no SVF2: malha
+ * unitária normalizada + matriz do fragmento. Modelo em pés (getUnitScale 0,3048) com
+ * globalOffset (100, 200, 5) e refPointTransformation identidade no AEC. O marcador do
+ * eixo (overlay) aparece em data-eixo="ponto|linha" no contêiner das peças.
  */
 (function () {
   'use strict';
   var SELECTION = 'selection';
   var SELECTION_HEX = '#2F6FEB'; // SELECTION_COLOR do app
 
+  var GLOBAL_OFFSET = { x: 100, y: 200, z: 5 };
+  // cubo unitário (malha normalizada do SVF2): 8 vértices, 12 triângulos
+  var UNIT_VB = [0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1];
+  var UNIT_IB = [0, 3, 2, 0, 2, 1, 4, 5, 6, 4, 6, 7, 0, 1, 5, 0, 5, 4, 1, 2, 6, 1, 6, 5, 2, 3, 7, 2, 7, 6, 3, 0, 4, 3, 4, 7];
+
+  function pieceOf(dbid) {
+    return (window.__E2E_PIECES || []).find(function (p) { return p.dbid === dbid; }) || null;
+  }
+  function geomOf(piece) {
+    if (piece.geom) return piece.geom;
+    // padrão: pilar 1 x 1 x 10 pés, cada peça num lugar
+    return { origin: [piece.dbid * 5, 0, 0], a: [1, 0, 0], b: [0, 1, 0], c: [0, 0, 10] };
+  }
+
+  function makeModel() {
+    var root = 1;
+    return {
+      getData: function () { return { globalOffset: GLOBAL_OFFSET }; },
+      getUnitScale: function () { return 0.3048; },
+      getInstanceTree: function () {
+        return {
+          getRootId: function () { return root; },
+          getNodeParentId: function (id) { return id === root ? 0 : root; },
+          getNodeName: function (id) { var p = pieceOf(id); return p ? p.label : ''; },
+          enumNodeChildren: function (id, cb) {
+            if (id !== root) return;
+            (window.__E2E_PIECES || []).forEach(function (p) { cb(p.dbid); });
+          },
+          enumNodeFragments: function (id, cb) { if (pieceOf(id)) cb(id); },
+        };
+      },
+      getFragmentList: function () {
+        return {
+          getWorldMatrix: function (fragId, out) {
+            var g = geomOf(pieceOf(fragId));
+            out.elements = [g.a[0], g.a[1], g.a[2], 0, g.b[0], g.b[1], g.b[2], 0, g.c[0], g.c[1], g.c[2], 0, g.origin[0], g.origin[1], g.origin[2], 1];
+          },
+        };
+      },
+      getProperties: function (id, ok, fail) {
+        var p = pieceOf(id);
+        if (!p) { fail(new Error('sem propriedades')); return; }
+        ok({
+          name: p.label,
+          properties: [
+            { displayName: 'Category', displayCategory: 'Element', displayValue: p.category || 'Pilares estruturais' },
+            { displayName: 'Material', displayCategory: 'Materiais', displayValue: 'Concreto, Pré-moldado' },
+          ],
+        });
+      },
+    };
+  }
+
   function GuiViewer3D(container) {
     this.container = container;
+    var self = this;
+    this.overlay = [];
+    this.impl = {
+      getRenderProxy: function (model, fragId) {
+        return pieceOf(fragId) ? { geometry: { vb: UNIT_VB, vbstride: 3, attributes: { position: { offset: 0 } }, ib: UNIT_IB } } : null;
+      },
+      createOverlayScene: function () {},
+      addOverlay: function (name, obj) { self.overlay.push(obj); },
+      removeOverlay: function (name, obj) { self.overlay = self.overlay.filter(function (o) { return o !== obj; }); },
+      invalidate: function () {
+        if (!self.root) return;
+        var line = self.overlay.some(function (o) { return o.kind === 'line'; });
+        var dots = self.overlay.filter(function (o) { return o.kind === 'mesh'; }).length;
+        if (line) self.root.setAttribute('data-eixo', 'linha');
+        else if (dots) self.root.setAttribute('data-eixo', 'ponto');
+        else self.root.removeAttribute('data-eixo');
+      },
+    };
     this.listeners = [];
     this.selected = [];
     this.hiddenIds = []; // escondidos por hide() (isolate/showAll mostram de novo)
@@ -61,6 +138,7 @@
   };
   GuiViewer3D.prototype.loadDocumentNode = function () {
     var self = this;
+    var model = makeModel();
     return new Promise(function (resolve) {
       setTimeout(function () {
         // Nova carga (troca de versão): começa do zero.
@@ -92,7 +170,7 @@
           self.root.appendChild(btn);
         });
         self._paint();
-        resolve({});
+        resolve(model);
       }, 300);
     });
   };
@@ -117,7 +195,18 @@
   };
   GuiViewer3D.prototype.clearThemingColors = function () { this.colors.clear(); this.selTheme.clear(); this._paint(); };
 
-  window.THREE = { Vector4: function (x, y, z, w) { this.x = x; this.y = y; this.z = z; this.w = w; } };
+  function Obj(kind) { this.kind = kind; this.position = { set: function () {} }; }
+  window.THREE = {
+    Vector4: function (x, y, z, w) { this.x = x; this.y = y; this.z = z; this.w = w; },
+    Vector3: function (x, y, z) { this.x = x; this.y = y; this.z = z; },
+    Matrix4: function () { this.elements = []; },
+    Geometry: function () { this.vertices = []; },
+    SphereGeometry: function () {},
+    MeshBasicMaterial: function () {},
+    LineBasicMaterial: function () {},
+    Mesh: function () { Obj.call(this, 'mesh'); },
+    Line: function () { Obj.call(this, 'line'); },
+  };
   window.Autodesk = {
     Viewing: {
       SELECTION_CHANGED_EVENT: SELECTION,
@@ -130,6 +219,9 @@
         load: function (urn, ok) {
           window.__E2E_URN = urn;
           ok({ getRoot: function () { return { getDefaultGeometry: function () { return {}; } }; } });
+        },
+        getAecModelData: function () {
+          return Promise.resolve({ refPointTransformation: [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0] });
         },
       },
     },

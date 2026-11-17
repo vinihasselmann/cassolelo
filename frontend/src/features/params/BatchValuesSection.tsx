@@ -14,6 +14,7 @@ import { Modal } from '../../components/Modal';
 import { errorMessage } from '../../lib/errors';
 import { formatParamValue } from '../../lib/format';
 import { fieldLabel, fromDraft, toDraft, type Draft } from './fieldDraft';
+import { dateErrors, withoutKey } from './dateDraft';
 import { FieldInput } from './fieldInput';
 import { invalidateValueQueries } from './invalidate';
 
@@ -49,6 +50,7 @@ export function BatchValuesSection({ obraId, markIds, canEdit, unmarked, onAppli
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<Draft>({});
   const [confirm, setConfirm] = useState<Confirm | null>(null);
+  const [errors, setErrors] = useState<Record<number, string>>({});
 
   const check = useMutation({
     mutationFn: (changes: Record<number, unknown>) =>
@@ -88,6 +90,7 @@ export function BatchValuesSection({ obraId, markIds, canEdit, unmarked, onAppli
 
   function startEdit() {
     setDraft(Object.fromEntries(fields.map((f) => [f.def_id, initialDraft(f)])));
+    setErrors({});
     check.reset();
     apply.reset();
     setEditing(true);
@@ -95,6 +98,9 @@ export function BatchValuesSection({ obraId, markIds, canEdit, unmarked, onAppli
 
   function submit(e: FormEvent) {
     e.preventDefault();
+    const bad = dateErrors(fields, draft, e.currentTarget as HTMLFormElement, (f) => `pv-${String(f.def_id)}`);
+    setErrors(bad);
+    if (Object.keys(bad).length > 0) return; // data inválida: não aplica
     const changes: Record<number, unknown> = {};
     for (const f of fields) {
       const text = draft[f.def_id] ?? '';
@@ -139,7 +145,11 @@ export function BatchValuesSection({ obraId, markIds, canEdit, unmarked, onAppli
                 f={f}
                 mixed={f.mixed}
                 value={draft[f.def_id] ?? ''}
-                onChange={(v) => { setDraft((d) => ({ ...d, [f.def_id]: v })); }}
+                error={errors[f.def_id]}
+                onChange={(v) => {
+                  setDraft((d) => ({ ...d, [f.def_id]: v }));
+                  setErrors((errs) => withoutKey(errs, f.def_id));
+                }}
               />
               {f.applies_to < total && <div className="hint">Vale para {marcas(f.applies_to)} de {num(total)}.</div>}
             </div>
@@ -180,7 +190,7 @@ export function BatchValuesSection({ obraId, markIds, canEdit, unmarked, onAppli
             })}
           </dl>
           {canEdit && (
-            <button type="button" className="secondary small-btn" onClick={startEdit}>
+            <button type="button" className="secondary btn-sm" onClick={startEdit}>
               Editar em lote
             </button>
           )}

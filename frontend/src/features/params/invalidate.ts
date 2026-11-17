@@ -11,6 +11,9 @@ export function invalidateValueQueries(queryClient: QueryClient) {
   return Promise.all([
     queryClient.invalidateQueries({ queryKey: ['mark-batch'] }),
     queryClient.invalidateQueries({ queryKey: ['mark-values'] }),
+    queryClient.invalidateQueries({ queryKey: ['mark-units'] }),
+    queryClient.invalidateQueries({ queryKey: ['unit-batch'] }),
+    queryClient.invalidateQueries({ queryKey: ['unit-orphans'] }),
     queryClient.invalidateQueries({ queryKey: ['param-defs'] }),
     queryClient.invalidateQueries({ queryKey: ['orphans'] }),
     queryClient.invalidateQueries({
