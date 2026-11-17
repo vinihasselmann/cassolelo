@@ -1,6 +1,7 @@
 import { useId, useState } from 'react';
 
 import type { FilterField, FilterOp } from '../../api/filters';
+import { plural } from '../../lib/format';
 import { defaultValue, needsValue, OP_LABELS, OPS_BY_TYPE, str } from './filterModel';
 import { useFieldValues } from './useFieldValues';
 
@@ -120,7 +121,7 @@ function TextValue({ versionId, field, value, onChange, label }: Omit<ValueProps
       />
       <datalist id={listId}>
         {(values.data ?? []).map((v) => (
-          <option key={v.value} value={v.value}>{`${num(v.pieces)} peça(s)`}</option>
+          <option key={v.value} value={v.value}>{plural(v.pieces, 'peça', 'peças')}</option>
         ))}
       </datalist>
     </>

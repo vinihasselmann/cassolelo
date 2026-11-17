@@ -1,8 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import type { Evaluation } from '../../api/filters';
+import type { MarkStatus } from '../../api/status';
 import type { MarkPieces } from '../../api/versions';
 import { errorMessage } from '../../lib/errors';
+import { StatusDot } from '../modelo/StatusBadge';
+import { STATUS_LABEL } from '../modelo/statusLabel';
 
 const num = (n: number) => n.toLocaleString('pt-BR');
 export const LIST_PAGE_SIZE = 50;
@@ -29,13 +32,28 @@ interface Props {
   onPickMark: (markId: number) => void;
   onPickPieces: (dbids: number[]) => void;
   onSelectAll: (markIds: number[]) => void;
+  /** Status de produção de cada marca (agregado das peças); sem dado, a linha fica sem marcador. */
+  statusById?: ReadonlyMap<number, MarkStatus>;
 }
+
+const NO_STATUS: ReadonlyMap<number, MarkStatus> = new Map();
 
 /**
  * Coluna esquerda: as marcas agrupadas pelo Nome da montagem. Com filtro, cada linha diz
  * quantas peças da marca bateram ("12 de 194 peças"); peças sem marca ficam no fim.
  */
-export function FilterResultList({ marks, evaluation, filtered, loading, error, selectedMarkIds, onPickMark, onPickPieces, onSelectAll }: Props) {
+export function FilterResultList({
+  marks,
+  evaluation,
+  filtered,
+  loading,
+  error,
+  selectedMarkIds,
+  onPickMark,
+  onPickPieces,
+  onSelectAll,
+  statusById = NO_STATUS,
+}: Props) {
   const [page, setPage] = useState(1);
   const rows = useMemo((): Row[] => {
     if (!filtered) {
@@ -65,10 +83,10 @@ export function FilterResultList({ marks, evaluation, filtered, loading, error, 
   return (
     <div className="model-sec">
       <div className="reshead">
-        <h4 id="result-title">
+        <h3 id="result-title" className="section-title">
           Marcas ({num(filtered ? (evaluation?.matched_marks ?? 0) : marks.length)})
           {loading && <span className="muted small"> filtrando…</span>}
-        </h4>
+        </h3>
         <button type="button" className="link" disabled={markIds.length === 0} onClick={() => { onSelectAll(markIds); }}>
           Selecionar todas
         </button>
@@ -95,6 +113,7 @@ export function FilterResultList({ marks, evaluation, filtered, loading, error, 
               : filtered
                 ? `${num(r.matched)} de ${num(r.total)} ${r.total === 1 ? 'peça' : 'peças'}`
                 : `${num(r.total)} ${r.total === 1 ? 'peça' : 'peças'}`;
+            const status = r.markId !== null && !orphan ? statusById.get(r.markId) : undefined;
             return (
               <li key={r.key}>
                 <button
@@ -105,9 +124,15 @@ export function FilterResultList({ marks, evaluation, filtered, loading, error, 
                   title={orphan ? 'Marca órfã: não tem peças nesta versão' : undefined}
                   onClick={() => { if (r.markId === null) onPickPieces(r.dbids); else onPickMark(r.markId); }}
                 >
+                  <span className="mark-item__status" title={status ? STATUS_LABEL[status] : undefined}>
+                    {status && <StatusDot status={status} />}
+                  </span>
                   <span className="mark-item__code">{r.code}</span>
                   <span className="mark-item__cat">{r.category}</span>
-                  <span className="mark-item__qty">{qty}</span>
+                  <span className="mark-item__qty">
+                    {qty}
+                    {status && <span className="sr-only">, {STATUS_LABEL[status]}</span>}
+                  </span>
                 </button>
               </li>
             );

@@ -11,7 +11,7 @@ import {
 } from '../../api/paramDefs';
 import { Modal } from '../../components/Modal';
 import { errorMessage } from '../../lib/errors';
-import { formatDateTime } from '../../lib/format';
+import { formatDateTime, plural } from '../../lib/format';
 import { invalidateValueQueries } from './invalidate';
 
 function describe(p: ParamDef): string {
@@ -19,9 +19,9 @@ function describe(p: ParamDef): string {
   if (p.type === 'list') parts.push(`${p.options?.length ?? 0} opções`);
   parts.push(p.categories?.length ? p.categories.join(', ') : 'todas as categorias');
   if (p.scope === 'obra') parts.push(`só a obra ${p.obra_code ?? ''}`.trim());
-  else parts.push(`biblioteca · em ${p.obras_count ?? 0} obra(s)`);
-  if (p.level === 'piece') parts.push('por peça', `${p.values_count} peça(s) com valor`);
-  else parts.push(`${p.values_count} marca(s) com valor`);
+  else parts.push(`biblioteca · em ${plural(p.obras_count ?? 0, 'obra', 'obras')}`);
+  if (p.level === 'piece') parts.push('por peça', `${plural(p.values_count, 'peça', 'peças')} com valor`);
+  else parts.push(`${plural(p.values_count, 'marca', 'marcas')} com valor`);
   return parts.join(' · ');
 }
 
@@ -35,8 +35,9 @@ function question({ action, param }: Pending): string {
   if (action === 'remove') {
     return `Retirar “${param.name}” desta obra? Ele some das telas desta obra; os valores ficam guardados e voltam se ele for incluído de novo.`;
   }
-  const unit = param.level === 'piece' ? 'peça(s)' : 'marca(s)';
-  const values = param.values_count ? ` Os valores de ${param.values_count} ${unit} ficam só na auditoria.` : '';
+  const n = param.values_count;
+  const unit = param.level === 'piece' ? plural(n, 'peça', 'peças') : plural(n, 'marca', 'marcas');
+  const values = n ? ` Os valores de ${unit} ficam só na auditoria.` : '';
   if (param.scope === 'global') {
     return `Excluir “${param.name}” da biblioteca? Ele sai de TODAS as obras (${param.obras_count ?? 0}).${values}`;
   }

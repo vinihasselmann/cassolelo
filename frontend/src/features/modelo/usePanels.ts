@@ -32,9 +32,6 @@ export function usePanels() {
     } catch {
       // sem armazenamento: vale só nesta visita
     }
-    // O Viewer recalcula o tamanho do desenho no "resize" da janela.
-    const timer = setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 0);
-    return () => { clearTimeout(timer); };
   }, [panels]);
   const toggle = useCallback((side: keyof Panels) => {
     setPanels((p) => ({ ...p, [side]: !p[side] }));

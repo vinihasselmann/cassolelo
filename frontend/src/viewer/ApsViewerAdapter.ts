@@ -96,6 +96,7 @@ export interface AvViewer {
   setGhosting(enabled: boolean): void;
   showAll(): void;
   fitToView(dbIds?: number[]): void;
+  resize(): void;
   setThemingColor(dbId: number, color: unknown, model?: AvModel, recursive?: boolean): void;
   clearThemingColors(model?: AvModel): void;
   /** Cor do destaque da seleção (Viewer v7). */
@@ -242,7 +243,7 @@ export class ApsViewerAdapter implements ViewerAdapter {
   private model: AvModel | null = null;
   private readonly listeners = new Set<SelectionListener>();
   private loadSeq = 0;
-  /** Coloração em vigor e seleção atual: a seleção fica azul POR CIMA das cores. */
+  /** Coloração em vigor e seleção atual: a seleção fica grafite POR CIMA das cores. */
   private colors = new Map<DbId, HexColor>();
   private selected = new Set<DbId>();
   private paintedSelection = new Set<DbId>();
@@ -472,6 +473,10 @@ export class ApsViewerAdapter implements ViewerAdapter {
     this.withViewer((v) => { v.fitToView(dbIds && dbIds.length > 0 ? [...dbIds] : undefined); });
   }
 
+  resize(): void {
+    this.withViewer((v) => { v.resize(); });
+  }
+
   setColors(colors: ReadonlyMap<DbId, HexColor>): void {
     this.colors = new Map(colors);
     this.paintedSelection = new Set();
@@ -479,7 +484,7 @@ export class ApsViewerAdapter implements ViewerAdapter {
       const model = this.model ?? undefined;
       v.clearThemingColors(model);
       colors.forEach((hex, dbId) => {
-        this.theme(v, dbId, hex); // a cor de base também nas selecionadas; o azul vai por cima
+        this.theme(v, dbId, hex); // a cor de base também nas selecionadas; o grafite vai por cima
       });
       this.paintSelection(v);
     });
@@ -501,7 +506,7 @@ export class ApsViewerAdapter implements ViewerAdapter {
 
   /**
    * As cores de tema do Viewer ficam por cima do destaque de seleção: com coloração
-   * ativa, a seleção é pintada de azul (SELECTION_COLOR) e, ao sair da seleção, a peça
+   * ativa, a seleção é pintada de grafite (SELECTION_COLOR) e, ao sair da seleção, a peça
    * volta à cor da coloração. Sem coloração, vale o destaque normal do Viewer.
    */
   private paintSelection(v: AvViewer): void {

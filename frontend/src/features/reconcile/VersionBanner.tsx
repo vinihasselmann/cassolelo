@@ -2,6 +2,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 
 import { diffKey, fetchDiff } from '../../api/reconcile';
+import { versionName } from '../../lib/format';
+import { Icon } from '../../components/Icon';
 
 const num = (n: number) => n.toLocaleString('pt-BR');
 
@@ -43,7 +45,7 @@ export function VersionBanner({ versionId, onShowNew, onShowReview, onShowOrphan
   return (
     <div className="version-banner" role="region" aria-label="Versão nova">
       <span>
-        <b>Versão {d.version_number}</b> comparada com a {d.prev_version_number}:
+        <b>{versionName(d.version_number)}</b> comparada com a {versionName(d.prev_version_number)}:
       </span>
       <button type="button" className="link" onClick={onShowNew}>
         {num(news)} {news === 1 ? 'nova' : 'novas'}
@@ -88,7 +90,7 @@ export function VersionBanner({ versionId, onShowNew, onShowReview, onShowOrphan
         aria-label="Fechar aviso da versão"
         onClick={() => { setClosed(versionId); }}
       >
-        ×
+        <Icon name="close" />
       </button>
     </div>
   );

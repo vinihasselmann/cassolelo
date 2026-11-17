@@ -9,9 +9,9 @@
  * As cores de status e da seleção também existem em src/lib/palette.ts, porque o Viewer
  * precisa do hex em JS; palette.test.ts garante que os dois lugares batem.
  *
- * Paleta: o PRODUCT.md pede só as cores do logo (âmbar + grafite) e uma cor de destaque.
- * --action (marinho) e --selection (azul) ainda são herança anterior a essa regra:
- * a troca é um passo separado, feito só nos valores abaixo.
+ * Paleta (PRODUCT.md): só as cores do logo. Grafite é a cor de ação e da seleção no 3D;
+ * âmbar é o único destaque (fio do cabeçalho, aba ativa, item selecionado, foco).
+ * Não há azul na interface; outras cores só para status e perigo.
  */
 
 :root {
@@ -27,20 +27,26 @@
   --status-complete: #33A06F;
   --status-review: #E8743B;
 
-  /* neutros */
+  /* neutros sem matiz (o grafite do logo é neutro; nada puxando para o azul) */
   --gray-0: #ffffff;
-  --gray-50: #f7f9fb;
-  --gray-75: #f5f6f8;
-  --gray-100: #eef1f5;
-  --gray-150: #e3e7ec;
-  --gray-200: #dde2e8;
-  --gray-250: #dce2ea;
-  --gray-300: #c4ccd6;
-  --gray-350: #b9c3d0;
-  --gray-600: #5b6676;
-  --gray-650: #475467;
-  --gray-800: #1d2939;
-  --gray-900: #1c2430;
+  --gray-50: #f8f8f7;
+  --gray-75: #f4f4f3;
+  --gray-100: #ededec;
+  --gray-150: #e4e4e2;
+  --gray-200: #dbdbd9;
+  --gray-250: #d3d3d1;
+  --gray-300: #c4c4c1;
+  --gray-350: #b3b3b0;
+  --gray-500: #8a8a86;   /* borda de campo: 3,4:1 sobre branco (WCAG 1.4.11) */
+  --gray-600: #5e5e5b;
+  --gray-650: #484846;
+  --gray-800: #2b2b2a;
+  --gray-900: #1f1f1e;
+
+  /* âmbar da marca em tons de apoio */
+  --amber-50: #fdf6e8;
+  --amber-100: #fcebc8;
+  --amber-700: #a86500;
 
   /* ---------------------------------------------------------------- semânticas */
 
@@ -51,38 +57,38 @@
   --surface-muted: var(--gray-100);  /* cabeçalho de tabela, selos, código */
   --surface-hover: var(--gray-100);  /* hover de item de lista e botão sem fundo */
   --surface-translucent: rgb(255 255 255 / 0.95); /* legenda sobre o 3D */
-  --overlay: rgb(16 24 40 / 0.45);   /* fundo atrás de janela modal */
-  --viewer-bg-top: var(--gray-100);
-  --viewer-bg-bottom: var(--gray-250);
+  --overlay: rgb(20 20 20 / 0.45);   /* fundo atrás de janela modal */
+  --viewer-bg: var(--gray-100);      /* área do 3D enquanto o modelo carrega (liso, sem gradiente) */
 
   /* bordas */
   --border: var(--gray-200);         /* contorno de painel, cartão, barra */
   --border-subtle: var(--gray-150);  /* separador de seção e de linha */
   --divider: var(--gray-100);        /* separador fraco entre itens */
-  --border-control: var(--gray-300); /* campo, select, chip */
-  --border-control-hover: var(--gray-350);
+  --border-control: var(--gray-500); /* campo, select, chip: contorno visível sob luz forte (≥ 3:1) */
+  --border-control-hover: var(--gray-600);
 
   /* texto */
   --text: var(--gray-900);
   --text-secondary: var(--gray-650); /* rótulos e contagens, mais forte que o muted */
   --text-muted: var(--gray-600);
 
-  /* ação (botões, links, aba ativa) */
-  --action: #1f3b57;
+  /* ação (botões, links): grafite do logo */
+  --action: var(--brand-graphite);
   --on-action: var(--gray-0);
-  --selected-bg: #dbe7f3;            /* item de lista ou ferramenta ativa */
-  --selected-bg-soft: #e7eef7;       /* etiqueta, linha selecionada de tabela */
+  --accent: var(--brand-amber);      /* o único destaque: fio do cabeçalho, aba ativa */
+  --selected-bg: var(--amber-100);   /* item de lista ou ferramenta ativa */
+  --selected-bg-soft: var(--amber-50); /* etiqueta, linha selecionada de tabela */
 
-  /* foco: âmbar da marca */
-  --focus-ring: var(--brand-amber);
-  --brand-amber-tint: #fdf3e1;
-  --brand-amber-ink: #b86f00;
+  /* foco: âmbar escuro (≥ 3:1 sobre branco; o âmbar puro dá 2,1:1) */
+  --focus-ring: var(--amber-700);
+  --brand-amber-tint: var(--amber-50);
+  --brand-amber-ink: var(--amber-700);
 
-  /* seleção no 3D e controles ativos ligados a ela */
-  --selection: #2F6FEB;
-  --selection-tint: #e3ecfd;
-  --info-tint: #eaf1fe;
-  --info-border: #b8cdf6;
+  /* seleção no 3D: grafite (o âmbar se confundiria com Parcial/Revisar) */
+  --selection: #3C3C3C;
+  --selection-tint: var(--amber-50); /* linha da peça em foco na tabela por peça */
+  --info-tint: var(--gray-50);       /* avisos neutros (nova versão, tempo real) */
+  --info-border: var(--gray-200);
 
   /* perigo / erro */
   --danger: #b3261e;
@@ -119,31 +125,43 @@
   /* superfície invertida (aviso com Desfazer) */
   --inverse-bg: var(--gray-800);
   --inverse-text: var(--gray-0);
-  --inverse-link: #9fd0ff;
+  --inverse-link: var(--brand-amber);
   --inverse-danger: #ffb4a8;
   --inverse-muted: #cbd5e1;
 
-  --spinner: #9fb3c8;
+  --spinner: var(--gray-350);
 
   /* ---------------------------------------------------------------- forma */
 
   --radius-sm: 4px;      /* selos, células */
   --radius: 6px;         /* campos, botões, itens de lista */
-  --radius-md: 8px;      /* cartões, grupos, avisos */
-  --radius-lg: 10px;     /* barras e menus flutuantes */
-  --radius-xl: 12px;     /* janelas e popovers grandes */
+  --radius-md: 6px;      /* cartões, grupos, avisos */
+  --radius-lg: 6px;      /* barras e menus flutuantes */
+  --radius-xl: 8px;      /* janelas e popovers grandes */
   --radius-pill: 999px;  /* chips e etiquetas */
   --float-pad: 3px;      /* respiro interno da barra flutuante */
 
-  --shadow-float: 0 2px 8px rgb(20 40 70 / 0.08);    /* barras e legenda sobre o 3D */
-  --shadow-raised: 0 4px 14px rgb(20 40 70 / 0.12);  /* avisos flutuantes */
-  --shadow-overlay: 0 8px 24px rgb(20 40 70 / 0.16); /* menus e popovers */
-  --shadow-modal: 0 20px 50px rgb(0 0 0 / 0.25);     /* janela modal e aviso escuro */
+  /* Sombras curtas: só separam a camada; a borda de 1px faz o contorno. */
+  --shadow-float: 0 1px 2px rgb(0 0 0 / 0.06);    /* barras e legenda sobre o 3D */
+  --shadow-raised: 0 2px 6px rgb(0 0 0 / 0.10);   /* avisos flutuantes */
+  --shadow-overlay: 0 6px 16px rgb(0 0 0 / 0.12); /* menus e popovers */
+  --shadow-modal: 0 12px 32px rgb(0 0 0 / 0.18);  /* janela modal e aviso escuro */
 
   /* ---------------------------------------------------------------- tipo */
 
-  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: ui-monospace, Consolas, monospace;
+  /* IBM Plex: a mesma letra no computador e no tablet (antes: Segoe UI x Roboto). */
+  --font-sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, Consolas, monospace; /* só dado: coordenadas, ids, código */
+
+  /* Escala por papel (rem: respeita o zoom e a fonte do usuário). */
+  --fs-2xs: 0.75rem;   /* 12px · selos, cabeçalho de tabela, rótulo de campo da barra */
+  --fs-xs: 0.8125rem;  /* 13px · metadados, dicas, legenda, rodapé, título de seção */
+  --fs-sm: 0.875rem;   /* 14px · texto de painel, listas, botões compactos e de barra */
+  --fs-md: 1rem;       /* 16px · corpo, campos e botões (16px evita zoom automático no tablet) */
+  --fs-lg: 1.125rem;   /* 18px · título do painel da peça e de janela */
+  --fs-xl: 1.375rem;   /* 22px · título de página */
+  --lh-body: 1.45;
+  --lh-tight: 1.25;
 
   /* ---------------------------------------------------------------- toque */
 

@@ -133,7 +133,7 @@ async function removeFilters(page: Page) {
 /** Abre o popover "Colorir" (se ainda não estiver aberto) e devolve-o. */
 async function colorPop(page: Page) {
   const pop = page.getByRole('dialog', { name: 'Colorir' });
-  if (!(await pop.isVisible())) await viewerBar(page).getByRole('button', { name: 'Colorir ▾' }).click();
+  if (!(await pop.isVisible())) await viewerBar(page).getByRole('button', { name: 'Colorir' }).click();
   await expect(pop).toBeVisible();
   return pop;
 }
@@ -278,7 +278,7 @@ test('Isolar e Limpar seleção', async ({ page }, testInfo) => {
 
   await page.getByRole('button', { name: 'Limpar seleção' }).click();
   await expect(fake3d.getByRole('button', { name: 'Peça 20' })).toHaveAttribute('aria-pressed', 'false');
-  await expect(page.getByText('Clique numa peça no modelo para ver a marca e as propriedades.')).toBeVisible();
+  await expect(page.getByText('Toque numa peça no modelo, ou escolha uma marca na lista, para ver e preencher os parâmetros da fábrica.')).toBeVisible();
 });
 
 test('Ctrl+clique acumula marcas (desktop)', async ({ page }, testInfo) => {
@@ -506,7 +506,7 @@ test('aceite da Fase 6: cores, legenda, progresso e atalhos acompanham marca, lo
 
   await expect(legend.getByRole('button', { name: 'Pendente: 3 marcas' })).toBeVisible();
   await expect(piece(10)).toHaveAttribute('data-base-color', GRAY);
-  await expect(piece(30)).toHaveAttribute('data-base-color', '#9AA0A6'); // sem Marca: "Sem valor" (cinza)
+  await expect(piece(30)).toHaveAttribute('data-base-color', '#9AA0A6'); // sem Marca: "Sem marca" (cinza)
   await expect(foot).toContainText('0/3 marcas · 0/6 peças (0%)');
 
   // 1. uma marca
@@ -515,7 +515,7 @@ test('aceite da Fase 6: cores, legenda, progresso e atalhos acompanham marca, lo
   await panel.getByLabel(/Tipo de forma/).selectOption('F-12');
   await panel.getByRole('button', { name: 'Salvar' }).click();
   await expect(legend.getByRole('button', { name: 'Completa: 1 marca' })).toBeVisible();
-  await expect(piece(10)).toHaveAttribute('data-base-color', GREEN); // base: a peça está selecionada (azul por cima)
+  await expect(piece(10)).toHaveAttribute('data-base-color', GREEN); // base: a peça está selecionada (grafite por cima)
   await expect(piece(11)).toHaveAttribute('data-base-color', GREEN); // a marca inteira
   await expect(foot).toContainText('1/3 marcas · 2/6 peças (33%)');
   await expect(bar).toHaveAttribute('aria-valuenow', '33');
@@ -541,7 +541,7 @@ test('aceite da Fase 6: cores, legenda, progresso e atalhos acompanham marca, lo
   await expect(piece(21)).toHaveAttribute('data-base-color', GRAY);
   await expect(foot).toContainText('1/3 marcas · 2/6 peças (33%)');
 
-  // Colorir por parâmetro e por categoria (popover "Colorir ▾" da barra inferior)
+  // Colorir por parâmetro e por categoria (popover "Colorir" da barra inferior)
   const colors = await colorByField(page, 'Tipo de forma');
   await expect(legend.getByRole('button', { name: 'F-12: 1 marca' })).toBeVisible();
   await expect(legend.getByRole('button', { name: 'Sem valor: 2 marcas' })).toBeVisible();
@@ -600,7 +600,7 @@ test('aceite da Fase 7: versão nova com revisar (40x60 → 40x80), órfãs reli
   const GREEN = '#33A06F';
 
   // Banner da versão nova
-  await expect(banner).toContainText('Versão 2 comparada com a 1:');
+  await expect(banner).toContainText('V2 comparada com a V1:');
   await expect(banner).toContainText(/2 novas\s*·\s*1 a revisar\s*·\s*2 órfãs/);
 
   // Marca com seção alterada: laranja e o diff 40x60 → 40x80
@@ -634,8 +634,9 @@ test('aceite da Fase 7: versão nova com revisar (40x60 → 40x80), órfãs reli
   await removeFilters(page);
 
   // Órfãs: religar PP004 → PP004A clicando no 3D (peça 17)
-  await page.getByRole('button', { name: 'Fila de órfãs' }).click();
-  const dialog = page.getByRole('dialog', { name: 'Órfãs' });
+  await page.getByRole('button', { name: /^Gerenciar/ }).click(); // gestão recolhida no "Gerenciar"
+  await page.getByRole('button', { name: 'Marcas órfãs' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Marcas órfãs' });
   await expect(dialog).toContainText('PP004');
   await expect(dialog).toContainText('Tipo de forma: F-12');
   await dialog.getByRole('button', { name: 'Religar PP004' }).click();
@@ -649,7 +650,8 @@ test('aceite da Fase 7: versão nova com revisar (40x60 → 40x80), órfãs reli
   await expect(panel.getByLabel('Valores da marca')).toContainText('Tipo de forma *F-12');
 
   // Arquivar PP005: a fila esvazia
-  await page.getByRole('button', { name: 'Fila de órfãs' }).click();
+  await page.getByRole('button', { name: /^Gerenciar/ }).click(); // gestão recolhida no "Gerenciar"
+  await page.getByRole('button', { name: 'Marcas órfãs' }).click();
   await dialog.getByRole('button', { name: 'Arquivar PP005' }).click();
   await expect(dialog.getByText('Nenhuma órfã pendente.')).toBeVisible();
   await dialog.getByRole('button', { name: 'Fechar' }).click();
@@ -784,25 +786,26 @@ test('troca de versão: a anterior abre em modo consulta (somente leitura) e vol
   await openRev(page, rev, '(Fábrica)');
 
   const select = page.getByRole('combobox', { name: 'Versão ativa' });
-  await expect(select.locator('option:checked')).toHaveText(/^Rev\.02.* \(ativa\)$/);
+  await expect(select.locator('option:checked')).toHaveText(/^V2.* \(ativa\)$/);
   await expect(page.getByRole('region', { name: 'Modo consulta' })).toBeHidden();
   const panel = page.getByRole('complementary', { name: 'Peça selecionada' });
   const fake3d = page.getByTestId('fake-3d');
 
-  // Rev.01: modo consulta
-  const rev01 = (await select.locator('option', { hasText: 'Rev.01' }).textContent()) ?? '';
+  // V1: modo consulta
+  const rev01 = (await select.locator('option', { hasText: 'V1 ' }).textContent()) ?? '';
   await select.selectOption({ label: rev01 });
   const banner = page.getByRole('region', { name: 'Modo consulta' });
-  await expect(banner).toContainText('Visualizando Rev.01 · somente leitura');
+  await expect(banner).toContainText('Visualizando V1 · somente leitura');
   await expect(page.locator('[data-load="ready"]')).toBeVisible();
-  // PP005 só existe na Rev.01 (sumiu na Rev.02): consultável, com os valores atuais da marca
+  // PP005 só existe na V1 (sumiu na V2): consultável, com os valores atuais da marca
   await fake3d.getByRole('button', { name: 'Peça 18' }).click();
   await expect(header(page)).toHaveText('PP005 · Structural Columns · 1 peça');
-  await expect(panel.getByRole('note')).toContainText('valem para a versão ativa (Rev.02)');
+  await expect(panel.getByRole('note')).toContainText('valem para a versão ativa (V2)');
   await expect(panel.getByLabel('Valores da marca')).toContainText('Tipo de forma *F-13');
   await expect(panel.getByRole('button', { name: 'Editar' })).toHaveCount(0);
+  await page.getByRole('button', { name: /^Gerenciar/ }).click(); // gestão recolhida no "Gerenciar"
   await expect(page.getByRole('button', { name: '+ Novo parâmetro' })).toHaveCount(0);
-  // PP001 na Rev.01: em revisão, mas sem ações; propriedades da Rev.01 (40x60)
+  // PP001 na V1: em revisão, mas sem ações; propriedades da V1 (40x60)
   await fake3d.getByRole('button', { name: 'Peça 10' }).click();
   await expect(panel.getByRole('region', { name: 'Revisar' })).toBeVisible();
   await expect(panel.getByRole('button', { name: 'Manter valores' })).toHaveCount(0);
@@ -812,7 +815,7 @@ test('troca de versão: a anterior abre em modo consulta (somente leitura) e vol
   // Voltar para a versão ativa
   await banner.getByRole('button', { name: 'Voltar para a versão ativa' }).click();
   await expect(banner).toBeHidden();
-  await expect(select.locator('option:checked')).toHaveText(/^Rev\.02/);
+  await expect(select.locator('option:checked')).toHaveText(/^V2 /);
   await expect(page.locator('[data-load="ready"]')).toBeVisible();
   await fake3d.getByRole('button', { name: 'Peça 10' }).click();
   await panel.getByLabel('Filtrar propriedades').fill('Seção');
@@ -835,7 +838,7 @@ test('aceite da Fase 8: dois navegadores recebem a versão nova e as edições s
   await openRev(a, rev, '(Projetos)');
   await openRev(page, rev, '(Fábrica)');
 
-  // Chega a Rev.03 (processada como o worker faz, com eventos no Redis)
+  // Chega a V3 (processada como o worker faz, com eventos no Redis)
   const childProcess = await import('node:child_process');
   childProcess.execFileSync('uv', ['run', 'python', '-m', 'tests.e2e_new_version'], {
     cwd: resolve(process.cwd(), '../backend'),
@@ -844,16 +847,16 @@ test('aceite da Fase 8: dois navegadores recebem a versão nova e as edições s
   });
   for (const p of [a, page]) {
     const banner = p.getByRole('region', { name: 'Nova versão disponível' });
-    await expect(banner).toContainText('Nova versão disponível: Rev.03 acabou de ficar pronta.', { timeout: 15_000 });
-    // a versão aberta (Rev.02) virou anterior: modo consulta, sem trocar o modelo sozinho
-    await expect(p.getByRole('region', { name: 'Modo consulta' })).toContainText('Visualizando Rev.02 · somente leitura');
+    await expect(banner).toContainText('Nova versão disponível: V3 acabou de ficar pronta.', { timeout: 15_000 });
+    // a versão aberta (V2) virou anterior: modo consulta, sem trocar o modelo sozinho
+    await expect(p.getByRole('region', { name: 'Modo consulta' })).toContainText('Visualizando V2 · somente leitura');
     await banner.getByRole('button', { name: 'Carregar' }).click();
     await expect(p.getByRole('region', { name: 'Modo consulta' })).toBeHidden();
-    await expect(p.getByRole('combobox', { name: 'Versão ativa' }).locator('option:checked')).toHaveText(/^Rev\.03.* \(ativa\)$/);
+    await expect(p.getByRole('combobox', { name: 'Versão ativa' }).locator('option:checked')).toHaveText(/^V3.* \(ativa\)$/);
     await expect(p.locator('[data-load="ready"]')).toBeVisible();
   }
 
-  // B edita o PP007 na Rev.03; A vê sem recarregar
+  // B edita o PP007 na V3; A vê sem recarregar
   const fakeA = a.getByTestId('fake-3d');
   await fakeA.getByRole('button', { name: 'Peça 19' }).click();
   const panelA = a.getByRole('complementary', { name: 'Peça selecionada' });
@@ -867,7 +870,7 @@ test('aceite da Fase 8: dois navegadores recebem a versão nova e as edições s
   await expect(panelA.getByLabel('Valores da marca')).toContainText('Tipo de forma *F-12');
   await expect(fakeA.getByRole('button', { name: 'Peça 19' })).toHaveAttribute('data-base-color', '#33A06F');
   await ctxA.close();
-  runSeed(); // tira a Rev.03 (estado limpo para os próximos testes)
+  runSeed(); // tira a V3 (estado limpo para os próximos testes)
 });
 
 // ------------------------------------------------------------------ Fase 9.1
@@ -908,7 +911,7 @@ test('Exportar Excel: o arquivo tem as mesmas marcas, quantidades e valores da t
     page.waitForEvent('download'),
     page.getByRole('button', { name: 'Exportar Excel' }).click(),
   ]);
-  expect(download.suggestedFilename()).toMatch(/^E2E-01_Rev\.01_\d{4}-\d{2}-\d{2}\.xlsx$/);
+  expect(download.suggestedFilename()).toMatch(/^E2E-01_V1_\d{4}-\d{2}-\d{2}\.xlsx$/);
   const file = testInfo.outputPath(download.suggestedFilename());
   await download.saveAs(file);
   const { execFileSync } = await import('node:child_process');
@@ -991,7 +994,7 @@ test.describe('Filtros (F3)', () => {
     const pop = await openFilter(page);
     await pop.getByRole('button', { name: /^Nível/ }).click();
     await pop.getByRole('group', { name: 'Nível' }).getByRole('checkbox', { name: /TÉRREO/ }).check();
-    await pop.getByRole('button', { name: 'Salvar ▾' }).click();
+    await pop.getByRole('button', { name: 'Salvar' }).click();
     await pop.getByRole('menuitem', { name: 'Salvar como novo…' }).click();
     const save = page.getByRole('dialog', { name: 'Salvar filtro' });
     await save.getByRole('textbox', { name: 'Nome' }).fill(name);
@@ -1025,7 +1028,7 @@ test.describe('Filtros (F3)', () => {
     await removeFilters(page);
     for (const dbid of [10, 11, 12, 13, 20, 21, 30]) await expect(piece(page, dbid)).toHaveAttribute('data-state', 'normal');
     await expect(rows(page)).toHaveCount(3);
-    await expect(rows(page).first()).toHaveText(/^PP001.*2 peças$/);
+    await expect(rows(page).first()).toHaveText(/^PP001.*2 peças(, (Pendente|Parcial|Completa|Revisar))?$/); // o status vai no fim (leitor de tela)
     await expect(page).not.toHaveURL(/[?&]f=/);
   });
 
@@ -1074,9 +1077,9 @@ test.describe('Coloração (F4)', () => {
   test.skip(REAL, 'usa a obra de teste semeada');
   const piece = (page: Page, dbid: number) => page.getByTestId('fake-3d').getByRole('button', { name: `Peça ${dbid}` });
   const legend = (page: Page) => page.getByRole('region', { name: 'Legenda' });
-  const BLUE = '#2F6FEB';
+  const SELECTED = '#3C3C3C';
 
-  test('colorir por um parâmetro da fábrica e conferir a legenda; a seleção fica azul por cima', async ({ page }, testInfo) => {
+  test('colorir por um parâmetro da fábrica e conferir a legenda; a seleção fica grafite por cima', async ({ page }, testInfo) => {
     await formaOnlyPP001(page);
     await openModel(page, testInfo);
     await colorByField(page, 'Tipo de forma');
@@ -1093,17 +1096,18 @@ test.describe('Coloração (F4)', () => {
     expect(pp001).not.toBe('#9AA0A6');
     await expect(piece(page, 11)).toHaveAttribute('data-color', pp001 ?? '');
 
-    // clicar no item seleciona as peças do valor; a seleção fica azul por cima da cor
+    // clicar no item seleciona as peças do valor; a seleção fica grafite por cima da cor
     await f11.click();
     await expect(header(page)).toHaveText('PP001 · Structural Columns · 2 peças');
-    for (const dbid of [10, 11]) await expect(piece(page, dbid)).toHaveAttribute('data-color', BLUE);
+    for (const dbid of [10, 11]) await expect(piece(page, dbid)).toHaveAttribute('data-color', SELECTED);
     await page.getByRole('button', { name: 'Limpar seleção' }).click();
     await expect(piece(page, 10)).toHaveAttribute('data-color', pp001 ?? '');
 
-    // ocultar a legenda e "Remover coloração" volta às cores originais
-    await legend(page).getByRole('button', { name: 'Ocultar legenda' }).click();
+    // retrair a legenda (pílula com resumo), expandir, e "Remover coloração" volta às cores originais
+    await legend(page).getByRole('button', { name: 'Retrair legenda' }).click();
     await expect(legend(page)).toBeHidden();
-    await page.getByRole('button', { name: 'Mostrar legenda' }).click();
+    await page.getByRole('button', { name: /^Expandir legenda: Tipo de forma · / }).click();
+    await expect(legend(page)).toBeVisible();
     await viewerBar(page).getByRole('button', { name: 'Remover coloração' }).click();
     await expect(legend(page)).toBeHidden();
     for (const dbid of [10, 12, 30]) await expect(piece(page, dbid)).not.toHaveAttribute('data-color', /.+/);
@@ -1112,7 +1116,7 @@ test.describe('Coloração (F4)', () => {
   test('esquema com 2 regras: a ordem define a prioridade', async ({ page }, testInfo) => {
     await formaOnlyPP001(page); // pendentes: PP002 (12, 13) e V-01 (20, 21)
     await openModel(page, testInfo);
-    await viewerBar(page).getByRole('button', { name: 'Editar cores' }).click();
+    await (await colorPop(page)).getByRole('button', { name: 'Editar cores' }).click(); // fica no popover Colorir
     const cores = page.getByRole('dialog', { name: 'Cores' });
 
     // regra 1: filtro salvo de sistema "Pendentes", vermelho
@@ -1151,7 +1155,7 @@ test.describe('Coloração (F4)', () => {
     for (const dbid of [12, 13, 21]) await expect(piece(page, dbid)).toHaveAttribute('data-color', '#FF0000');
 
     // o esquema salvo aparece no seletor da janela e reabre com as regras na ordem
-    await viewerBar(page).getByRole('button', { name: 'Editar cores' }).click();
+    await (await colorPop(page)).getByRole('button', { name: 'Editar cores' }).click(); // fica no popover Colorir
     await expect(cores.getByRole('combobox', { name: 'Esquema de cores' }).locator('option:checked')).toHaveText(new RegExp(`Prioridade ${testInfo.project.name}`));
     await expect(cores.locator('tbody tr')).toHaveText([new RegExp(terreo), /Pendentes/]);
     await cores.getByRole('button', { name: 'Cancelar' }).click();
@@ -1168,8 +1172,8 @@ test.describe('Coloração (F4)', () => {
     const year = new Date(Date.now() - 365 * 86_400_000).toISOString().slice(0, 10);
     await expect(rows.first()).toHaveAccessibleName(new RegExp(`^${year} – .*: 1 marca · 2 peças`));
     await expect(rows.last()).toHaveAccessibleName(/^Sem valor: 1 marca · 3 peças/);
-    await expect(piece(page, 20)).toHaveAttribute('data-color', '#C6DBEF');
-    await expect(piece(page, 10)).toHaveAttribute('data-color', '#0B3C78');
+    await expect(piece(page, 20)).toHaveAttribute('data-color', '#FBE3B0');
+    await expect(piece(page, 10)).toHaveAttribute('data-color', '#A86500');
     await expect(piece(page, 12)).toHaveAttribute('data-color', '#9AA0A6');
   });
 });
@@ -1276,6 +1280,7 @@ test.describe('Parâmetros por peça (P4)', () => {
   test('catálogo: o botão Excluir é um link vermelho com texto legível', async ({ page }) => {
     await fakeViewerOn(page, PEC_PIECES);
     await openRev(page, pec(), '(Fábrica)');
+    await page.getByRole('button', { name: /^Gerenciar/ }).click(); // gestão recolhida no "Gerenciar"
     await page.getByRole('button', { name: 'Catálogo', exact: true }).click();
     const dialog = page.getByRole('dialog', { name: 'Catálogo de parâmetros da fábrica' });
     const del = dialog.getByRole('button', { name: 'Excluir Data de fabricação' });
@@ -1405,6 +1410,7 @@ test.describe('Unidades órfãs (P5)', () => {
     expect(await api<unknown[]>(`/obras/${obra}/unit-orphans`)).toEqual([]);
     const history = await api<{ action: string }[]>(`/obras/${obra}/units/${String(orphan?.id)}/history`);
     expect(history.map((h) => h.action)).toEqual(expect.arrayContaining(['orphan', 'relink']));
+    await page.getByRole('button', { name: /^Gerenciar/ }).click(); // gestão recolhida no "Gerenciar"
     await page.getByRole('button', { name: 'Peças órfãs', exact: true }).click();
     await expect(page.getByRole('dialog', { name: 'Peças órfãs' })).toContainText('Nenhuma peça órfã pendente.');
   });
@@ -1577,5 +1583,220 @@ test.describe('Bug: editor de data por peça (docs/bugs/data-por-peca.md)', () =
     await expect(panel(page).getByText('Data inválida: use dd/mm/aaaa')).toBeVisible();
     expect(puts).toHaveLength(0);
     expect(await valueOf(page, 6)).toBeNull();
+  });
+});
+
+// ------------------------------------------------------------------ rolagem fantasma (docs/bugs/rolagem-fantasma.md)
+test.describe('Tela da obra não rola como página', () => {
+  test.skip(REAL, 'usa marcas simuladas');
+  // 316 marcas COM status: o texto do status (só para leitor de tela) é o que vazava antes.
+  const MARKS = Array.from({ length: 316 }, (_, i) => ({ mark_id: 9000 + i, code: `M${String(i + 1).padStart(3, '0')}`, category: 'Structural Columns', count: 2, dbids: [] }));
+  const STATUS = {
+    items: MARKS.map((m, i) => ({ mark_id: m.mark_id, status: (['pending', 'partial', 'complete', 'review'] as const)[i % 4] })),
+    counts: [],
+  };
+  const pageHeights = (page: Page) =>
+    page.evaluate(() => ({ doc: document.documentElement.scrollHeight, win: window.innerHeight, scrollY: window.scrollY }));
+
+  for (const [w, h] of [[1440, 900], [1180, 820]] as const) {
+    test(`${String(w)}x${String(h)}: documento do tamanho da janela com o painel aberto e fechado; a lista rola por dentro`, async ({ page }, testInfo) => {
+      await page.setViewportSize({ width: w, height: h });
+      await page.route(/\/api\/versions\/\d+\/marks$/, (route) => route.fulfill({ json: MARKS }));
+      await page.route(/\/api\/versions\/\d+\/marks\/status$/, (route) => route.fulfill({ json: STATUS }));
+      await openModel(page, testInfo);
+      await expect(page.getByRole('heading', { name: 'Marcas (316)' })).toBeVisible();
+
+      // painel esquerdo aberto
+      expect(await pageHeights(page)).toEqual({ doc: h, win: h, scrollY: 0 });
+      const left = page.locator('.model-left');
+      const box = await left.evaluate((el) => ({ scroll: el.scrollHeight, client: el.clientHeight }));
+      expect(box.scroll).toBeGreaterThan(box.client); // a lista é maior que o painel…
+      await left.evaluate((el) => { el.scrollTop = 600; });
+      expect(await left.evaluate((el) => el.scrollTop)).toBeGreaterThan(0); // …e rola por dentro
+      expect(await pageHeights(page)).toEqual({ doc: h, win: h, scrollY: 0 }); // sem mexer na página
+
+      // fechar e abrir de novo: o documento continua do tamanho da janela e o Viewer é avisado
+      const before = await page.evaluate(() => (window as unknown as { __E2E_RESIZES?: number }).__E2E_RESIZES ?? 0);
+      await page.getByRole('button', { name: 'Esconder painel esquerdo' }).click();
+      await expect.poll(() => page.evaluate(() => (window as unknown as { __E2E_RESIZES?: number }).__E2E_RESIZES ?? 0)).toBeGreaterThan(before);
+      expect(await pageHeights(page)).toEqual({ doc: h, win: h, scrollY: 0 });
+      await page.getByRole('button', { name: 'Mostrar painel esquerdo' }).click();
+      await expect(page.getByRole('heading', { name: 'Marcas (316)' })).toBeVisible();
+      expect(await pageHeights(page)).toEqual({ doc: h, win: h, scrollY: 0 });
+    });
+  }
+});
+
+// ------------------------------------------------------------------ barra do visualizador móvel (FloatingPanel)
+test.describe('Barra do visualizador móvel', () => {
+  test.skip(REAL, 'usa o Viewer falso (barra nativa simulada)');
+  const floating = (page: Page) => page.locator('.viewer-float');
+  const grip = (page: Page) => page.getByRole('button', { name: 'Mover a barra do visualizador' });
+  const rect = (page: Page, selector: string) =>
+    page.locator(selector).first().evaluate((el) => {
+      const r = el.getBoundingClientRect();
+      return { left: r.left, top: r.top, right: r.right, bottom: r.bottom, width: r.width, height: r.height };
+    });
+  async function dragGrip(page: Page, dx: number, dy: number) {
+    const box = await grip(page).boundingBox();
+    if (!box) throw new Error('alça sem área visível');
+    const x = box.x + box.width / 2;
+    const y = box.y + box.height / 2;
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    await page.mouse.move(x + dx / 2, y + dy / 2, { steps: 4 });
+    await page.mouse.move(x + dx, y + dy, { steps: 4 });
+    await page.mouse.up();
+  }
+
+  test('padrão no topo, centralizada e longe da barra nativa (que fica clicável)', async ({ page }, testInfo) => {
+    await openModel(page, testInfo);
+    const area = await rect(page, '.model-viewer');
+    const bar = await rect(page, '.viewer-float');
+    expect(bar.top - area.top).toBeLessThan(40);
+    expect(Math.abs(bar.left + bar.width / 2 - (area.left + area.width / 2))).toBeLessThan(4);
+    expect(bar.height).toBeLessThanOrEqual(testInfo.project.name === 'tablet' ? 48 : 36); // ~70%
+    const native = await rect(page, '#guiviewer3d-toolbar');
+    expect(bar.bottom).toBeLessThan(native.top); // não se sobrepõem
+    // a barra nativa recebe o clique (o Playwright falha se algo estiver por cima)
+    await page.getByRole('toolbar', { name: 'Barra nativa do Viewer' }).getByRole('button', { name: 'Órbita' }).click();
+    expect(await page.evaluate(() => (window as unknown as { __E2E_NATIVE_CLICKS?: number }).__E2E_NATIVE_CLICKS)).toBe(1);
+    // e o 3D fora do painel continua clicável (o painel não cobre a área toda)
+    await page.getByTestId('fake-3d').getByRole('button', { name: 'Peça 10' }).click();
+    await expect(page.getByTestId('fake-3d').getByRole('button', { name: 'Peça 10' })).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  test('arrastar muda a posição, que fica guardada ao recarregar; duplo clique volta ao padrão', async ({ page }, testInfo) => {
+    await openModel(page, testInfo);
+    const before = await rect(page, '.viewer-float');
+    const area = await rect(page, '.model-viewer');
+    await dragGrip(page, -120, 160);
+    await expect(floating(page)).toHaveAttribute('data-moved', 'true');
+    const moved = await rect(page, '.viewer-float');
+    // no tablet a barra ocupa quase a largura do 3D: o arraste para a esquerda para na borda
+    expect(Math.round(moved.left - before.left)).toBe(Math.round(Math.max(-120, area.left - before.left)));
+    expect(Math.round(moved.top - before.top)).toBe(160);
+
+    // recarregar (o usuário simulado é escolhido de novo): a barra volta para onde foi deixada
+    await page.reload();
+    await openModel(page, testInfo);
+    await expect(floating(page)).toHaveAttribute('data-moved', 'true');
+    const again = await rect(page, '.viewer-float');
+    expect(Math.round(again.left)).toBe(Math.round(moved.left));
+    expect(Math.round(again.top)).toBe(Math.round(moved.top));
+
+    // duplo clique na alça: posição padrão (topo, centralizada)
+    await grip(page).dblclick();
+    await expect(floating(page)).toHaveAttribute('data-moved', 'false');
+    const back = await rect(page, '.viewer-float');
+    expect(Math.round(back.top)).toBe(Math.round(before.top));
+    expect(Math.round(back.left)).toBe(Math.round(before.left));
+  });
+
+  test('arrastar além da borda mantém a barra dentro do 3D; o popover abre para cima perto do fundo', async ({ page }, testInfo) => {
+    await openModel(page, testInfo);
+    await dragGrip(page, 3000, 3000);
+    const area = await rect(page, '.model-viewer');
+    const bar = await rect(page, '.viewer-float');
+    expect(bar.right).toBeLessThanOrEqual(area.right + 0.5);
+    expect(bar.bottom).toBeLessThanOrEqual(area.bottom + 0.5);
+    await dragGrip(page, -3000, -3000);
+    const bar2 = await rect(page, '.viewer-float');
+    expect(bar2.left).toBeGreaterThanOrEqual(area.left - 0.5);
+    expect(bar2.top).toBeGreaterThanOrEqual(area.top - 0.5);
+
+    // no canto de baixo, o popover abre para cima e fica dentro do 3D
+    await dragGrip(page, 3000, 3000);
+    await page.getByRole('toolbar', { name: 'Barra do visualizador' }).getByRole('button', { name: 'Colorir' }).click();
+    const pop = await rect(page, '.viewer-bar__pop');
+    const barLow = await rect(page, '.viewer-float');
+    expect(pop.bottom).toBeLessThanOrEqual(barLow.top);
+    expect(pop.top).toBeGreaterThanOrEqual(area.top - 0.5);
+    expect(pop.left).toBeGreaterThanOrEqual(area.left - 0.5);
+    expect(pop.right).toBeLessThanOrEqual(area.right + 0.5);
+  });
+
+  test('teclado: com a alça em foco, setas movem 10 px e Shift+setas 50 px', async ({ page }, testInfo) => {
+    await openModel(page, testInfo);
+    const before = await rect(page, '.viewer-float');
+    await grip(page).focus();
+    await page.keyboard.press('ArrowDown');
+    await page.keyboard.press('Shift+ArrowDown');
+    await page.keyboard.press('ArrowLeft');
+    const after = await rect(page, '.viewer-float');
+    expect(Math.round(after.top - before.top)).toBe(60);
+    expect(Math.round(after.left - before.left)).toBe(-10);
+  });
+});
+
+// ------------------------------------------------------------------ legenda móvel e retrátil (FloatingPanel)
+test.describe('Legenda móvel e retrátil', () => {
+  test.skip(REAL, 'usa o Viewer falso');
+  const legendPanel = (page: Page) => page.locator('.legend-float');
+  const legendGrip = (page: Page) => page.getByRole('button', { name: 'Mover a legenda' });
+  const box = (page: Page, selector: string) =>
+    page.locator(selector).first().evaluate((el) => {
+      const r = el.getBoundingClientRect();
+      return { left: r.left, top: r.top, right: r.right, bottom: r.bottom, width: r.width };
+    });
+  async function drag(page: Page, dx: number, dy: number) {
+    const b = await legendGrip(page).boundingBox();
+    if (!b) throw new Error('alça da legenda sem área visível');
+    const x = b.x + b.width / 2;
+    const y = b.y + b.height / 2;
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    await page.mouse.move(x + dx, y + dy, { steps: 6 });
+    await page.mouse.up();
+  }
+
+  test('padrão no canto superior direito; retrair vira pílula com resumo e expandir volta', async ({ page }, testInfo) => {
+    await openModel(page, testInfo);
+    const area = await box(page, '.model-viewer');
+    const panel = await box(page, '.legend-float');
+    expect(area.right - panel.right).toBeLessThan(20);
+    await page.getByRole('button', { name: 'Retrair legenda' }).click();
+    await expect(page.getByRole('region', { name: 'Legenda' })).toBeHidden();
+    // o resumo depende do estado dos dados (ex.: "Status · 2 completas · 4 pendentes")
+    const pill = page.getByRole('button', { name: /^Expandir legenda: Status · .*\d+ (pendentes?|completas?|parciais|parcial|a revisar)$/ });
+    await expect(pill).toBeVisible();
+    expect((await box(page, '.legend-float')).width).toBeLessThan(panel.width + 200); // pílula compacta, numa linha
+    await pill.click();
+    await expect(page.getByRole('region', { name: 'Legenda' })).toBeVisible();
+  });
+
+  test('arrastar e retrair: ao recarregar, posição e estado voltam; duplo clique volta ao canto', async ({ page }, testInfo) => {
+    await openModel(page, testInfo);
+    const start = await box(page, '.legend-float');
+    await drag(page, -200, 120);
+    await expect(legendPanel(page)).toHaveAttribute('data-moved', 'true');
+    const moved = await box(page, '.legend-float');
+    expect(Math.round(moved.top - start.top)).toBe(120);
+    await page.getByRole('button', { name: 'Retrair legenda' }).click();
+
+    await page.reload();
+    await openModel(page, testInfo);
+    await expect(page.getByRole('button', { name: /^Expandir legenda: / })).toBeVisible(); // continua retraída
+    const again = await box(page, '.legend-float');
+    expect(Math.round(again.left)).toBe(Math.round(moved.left));
+    expect(Math.round(again.top)).toBe(Math.round(moved.top));
+
+    await legendGrip(page).dblclick();
+    await expect(legendPanel(page)).toHaveAttribute('data-moved', 'false');
+    const back = await box(page, '.legend-float');
+    expect(Math.round(back.top)).toBe(Math.round(start.top));
+  });
+
+  test('a legenda não sai da área do 3D', async ({ page }, testInfo) => {
+    await openModel(page, testInfo);
+    const area = await box(page, '.model-viewer');
+    await drag(page, 3000, 3000);
+    let p = await box(page, '.legend-float');
+    expect(p.right).toBeLessThanOrEqual(area.right + 0.5);
+    expect(p.bottom).toBeLessThanOrEqual(area.bottom + 0.5);
+    await drag(page, -3000, -3000);
+    p = await box(page, '.legend-float');
+    expect(p.left).toBeGreaterThanOrEqual(area.left - 0.5);
+    expect(p.top).toBeGreaterThanOrEqual(area.top - 0.5);
   });
 });

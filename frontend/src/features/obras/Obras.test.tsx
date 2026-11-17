@@ -99,12 +99,12 @@ describe('Obras e versões', () => {
 
     expect(await screen.findByRole('heading', { name: 'OB-001 — Galpão' })).toBeInTheDocument();
     const table = await screen.findByRole('table');
-    expect(within(table).getByText('v1')).toBeInTheDocument();
+    expect(within(table).getByText('V1')).toBeInTheDocument();
     expect(within(table).getByText('Aguardando processamento')).toBeInTheDocument();
 
     await user.click(await screen.findByRole('button', { name: 'Sincronizar agora' }));
     expect(await screen.findByRole('status')).toHaveTextContent('1 versão nova importada.');
-    expect(screen.getByRole('status')).toHaveTextContent('1 pronta(s) para processamento');
+    expect(screen.getByRole('status')).toHaveTextContent('1 pronta para processamento');
     expect(await screen.findByText('Revisão das vigas')).toBeInTheDocument();
     expect(syncCalls).toBe(1);
   });
@@ -143,7 +143,7 @@ describe('Obras e versões', () => {
     });
     setDevUser('4');
     renderApp('/obras/7/versoes');
-    expect(await screen.findByText('v1')).toBeInTheDocument();
+    expect(await screen.findByText('V1')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Sincronizar agora' })).not.toBeInTheDocument();
   });
 

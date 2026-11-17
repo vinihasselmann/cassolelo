@@ -236,14 +236,15 @@ export function PieceUnitsSection({ obraId, markId, versionId, canEdit, focus, o
                 </th>
               )}
               <th>Peça</th>
-              <th>Nível</th>
-              <th>Id</th>
+              {/* Parâmetros logo depois da peça: é o que se preenche; Nível e Id ficam no fim. */}
               {params.map((p) => (
                 <th key={p.def_id}>
                   {fieldLabel(p)}
                   {p.required && <span className="req"> *</span>}
                 </th>
               ))}
+              <th className="unit-meta">Nível</th>
+              <th className="unit-meta">Id</th>
             </tr>
           </thead>
           <tbody>
@@ -273,10 +274,6 @@ export function PieceUnitsSection({ obraId, markId, versionId, canEdit, focus, o
                       {u.label}
                     </button>
                   </th>
-                  <td>{u.element?.level ?? '—'}</td>
-                  <td className="mono small" title={u.element?.external_id ?? u.external_id ?? undefined}>
-                    {shortId(u)}
-                  </td>
                   {params.map((p) => (
                     <ValueCell
                       key={p.def_id}
@@ -291,6 +288,10 @@ export function PieceUnitsSection({ obraId, markId, versionId, canEdit, focus, o
                       onError={onError}
                     />
                   ))}
+                  <td className="unit-meta">{u.element?.level ?? '—'}</td>
+                  <td className="unit-meta mono" title={u.element?.external_id ?? u.external_id ?? undefined}>
+                    {shortId(u)}
+                  </td>
                 </tr>
               );
             })}

@@ -221,6 +221,7 @@ class FakeViewer implements ViewerAdapter {
   hide = vi.fn<(ids: DbId[]) => void>();
   showAll = vi.fn();
   fitTo = vi.fn<(ids?: DbId[]) => void>();
+  resize = vi.fn<() => void>();
   setColors = vi.fn();
   clearColors = vi.fn();
   destroy = vi.fn();
@@ -310,6 +311,13 @@ function renderModel(
   return { viewer, containers, view };
 }
 
+/** textContent sem os trechos .sr-only (só para leitor de tela). */
+function visibleText(el: HTMLElement): string {
+  const copy = el.cloneNode(true) as HTMLElement;
+  copy.querySelectorAll('.sr-only').forEach((n) => { n.remove(); });
+  return copy.textContent ?? '';
+}
+
 describe('Tela do modelo', () => {
   afterEach(() => {
     setDevUser(null);
@@ -322,8 +330,8 @@ describe('Tela do modelo', () => {
     const select = screen.getByRole('combobox', { name: 'Versão ativa' });
     await vi.waitFor(() => { expect(select).toHaveValue('2'); }); // v3 ainda processando
     expect(within(select).getAllByRole('option').map((o) => o.textContent)).toEqual([
-      expect.stringMatching(/^Rev\.02 · .+ \(ativa\)$/),
-      expect.stringMatching(/^Rev\.01 · [^(]+$/),
+      expect.stringMatching(/^V2 · .+ \(ativa\)$/),
+      expect.stringMatching(/^V1 · [^(]+$/),
     ]);
     expect(screen.queryByRole('region', { name: 'Modo consulta' })).not.toBeInTheDocument();
 
@@ -337,11 +345,14 @@ describe('Tela do modelo', () => {
 
   it('esconder e mostrar os painéis laterais; a escolha fica no navegador', async () => {
     const user = userEvent.setup();
-    const { view } = renderModel([version(1)]);
+    const { view, viewer } = renderModel([version(1)]);
     await screen.findByRole('heading', { name: 'Marcas (3)' });
     const left = screen.getByRole('button', { name: 'Esconder painel esquerdo' });
     expect(left).toHaveAttribute('aria-expanded', 'true');
+    const resizes = viewer.resize.mock.calls.length;
     await user.click(left);
+    // a área do 3D mudou: o Viewer é avisado pelo ViewerAdapter (não por um "resize" falso na janela)
+    await vi.waitFor(() => { expect(viewer.resize.mock.calls.length).toBeGreaterThan(resizes); });
     expect(screen.queryByRole('complementary', { name: 'Marcas e filtros' })).not.toBeInTheDocument(); // hidden
     expect(screen.getByRole('button', { name: 'Mostrar painel esquerdo' })).toHaveAttribute('aria-expanded', 'false');
     await user.click(screen.getByRole('button', { name: 'Esconder painel direito' }));
@@ -365,7 +376,7 @@ describe('Tela do modelo', () => {
     await user.selectOptions(screen.getByRole('combobox', { name: 'Versão ativa' }), '1');
     await vi.waitFor(() => { expect(viewer.load).toHaveBeenLastCalledWith('urn-v1'); });
     const banner = await screen.findByRole('region', { name: 'Modo consulta' });
-    expect(banner).toHaveTextContent('Visualizando Rev.01 · somente leitura');
+    expect(banner).toHaveTextContent('Visualizando V1 · somente leitura');
     await user.click(within(banner).getByRole('button', { name: 'Voltar para a versão ativa' }));
     await vi.waitFor(() => { expect(viewer.load).toHaveBeenLastCalledWith('urn-v2'); });
     expect(screen.getByRole('combobox', { name: 'Versão ativa' })).toHaveValue('2');
@@ -389,7 +400,7 @@ describe('Tela do modelo', () => {
     await screen.findByRole('region', { name: 'Modo consulta' });
     await screen.findByRole('heading', { name: 'Marcas (3)' });
     viewer.click([10]);
-    expect(await panel().findByRole('note')).toHaveTextContent('Valores atuais da marca: valem para a versão ativa (Rev.02).');
+    expect(await panel().findByRole('note')).toHaveTextContent('Valores atuais da marca: valem para a versão ativa (V2).');
     expect(await panel().findByLabelText('Valores da marca')).toHaveTextContent('Tipo de forma *F-11');
     expect(panel().queryByRole('button', { name: 'Editar' })).not.toBeInTheDocument();
     expect(panel().queryByRole('button', { name: 'Manter valores' })).not.toBeInTheDocument();
@@ -398,6 +409,44 @@ describe('Tela do modelo', () => {
     viewer.click([10, 20]); // várias marcas: lote também só leitura
     expect(await panel().findByText('2 marcas selecionadas')).toBeInTheDocument();
     expect(panel().queryByRole('button', { name: 'Editar em lote' })).not.toBeInTheDocument();
+  });
+
+  it('layout: status de produção na lista de marcas e no cabeçalho; parâmetros antes das coordenadas', async () => {
+    const { viewer } = renderModel([version(1)]);
+    const list = await screen.findByRole('list', { name: 'Marcas (3)' });
+    // status agregado da marca no nome acessível da linha (no fim: a linha continua começando pelo código)
+    await vi.waitFor(() => { expect(within(list).getByRole('button', { name: /^PP001/ })).toHaveAccessibleName(/, Completa$/); });
+    expect(within(list).getByRole('button', { name: /^PP002/ })).toHaveAccessibleName(/, Parcial$/);
+
+    viewer.click([11]);
+    const panel = await screen.findByRole('complementary', { name: 'Peça selecionada' });
+    await within(panel).findByRole('heading', { name: 'PP001 · Structural Columns · 2 peças' });
+    expect(within(panel).getByTitle('Status de produção da marca')).toHaveTextContent('Completa');
+    const headings = within(panel).getAllByRole('heading', { level: 4 }).map((h) => h.textContent ?? '');
+    const factory = headings.findIndex((t) => t.startsWith('Parâmetros da fábrica'));
+    const props = headings.findIndex((t) => t.startsWith('Propriedades do modelo'));
+    expect(factory).toBeGreaterThanOrEqual(0);
+    expect(factory).toBeLessThan(props);
+  });
+
+  it('Gerenciar: gestão recolhida acima da lista; escolher uma ação fecha o menu', async () => {
+    renderModel([version(1)]);
+    const user = userEvent.setup();
+    const manage = await screen.findByRole('button', { name: /^Gerenciar/ });
+    expect(manage).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.queryByRole('button', { name: 'Catálogo' })).not.toBeInTheDocument();
+    await user.click(manage);
+    expect(manage).toHaveAttribute('aria-expanded', 'true');
+    for (const name of ['+ Novo parâmetro', 'Catálogo', 'Marcas órfãs', 'Peças órfãs']) {
+      expect(screen.getByRole('button', { name })).toBeInTheDocument();
+    }
+    await user.keyboard('{Escape}');
+    expect(manage).toHaveAttribute('aria-expanded', 'false');
+    expect(manage).toHaveFocus();
+    await user.click(manage);
+    await user.click(screen.getByRole('button', { name: 'Catálogo' }));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(manage).toHaveAttribute('aria-expanded', 'false');
   });
 
   it('versão escolhida pela URL', async () => {
@@ -432,7 +481,7 @@ describe('Tela do modelo', () => {
     expect(viewer.fitTo).toHaveBeenLastCalledWith();
     await user.click(screen.getByRole('button', { name: 'Limpar seleção' }));
     expect(viewer.selectDbIds).toHaveBeenLastCalledWith([]);
-    expect(screen.getByText('Clique numa peça no modelo para ver a marca e as propriedades.')).toBeInTheDocument();
+    expect(screen.getByText('Toque numa peça no modelo, ou escolha uma marca na lista, para ver e preencher os parâmetros da fábrica.')).toBeInTheDocument();
   });
 
   it('Ctrl+clique e modo Seleção múltipla acumulam marcas', async () => {
@@ -522,12 +571,18 @@ describe('Filtro (F3)', () => {
     return within(await screen.findByRole('dialog', { name: 'Filtro' }));
   };
   const list = () => screen.getByRole('list', { name: /^Marcas/ });
-  const rows = () => within(list()).getAllByRole('button').map((b) => b.textContent);
+  // texto visível da linha (sem o status, que vai só para o leitor de tela)
+  const rows = () =>
+    within(list())
+      .getAllByRole('button')
+      .map((b) => [...b.childNodes].map((n) => (n instanceof HTMLElement ? visibleText(n) : n.textContent)).join(''));
 
   it('barra inferior: Filtro, Ampliar tudo, Colorir; Remover só com algo ativo; sem Medida', async () => {
     const { viewer, user } = await ready();
-    expect(bar().getAllByRole('button').map((b) => b.textContent)).toEqual([
-      'Filtro ▾', 'Ampliar tudo', 'Editar cores', 'Colorir ▾', 'Remover coloração', // status vem ligado
+    // barra única: Filtro · Colorir (✕ só com algo ativo) │ seleção │ Ampliar tudo; Editar cores fica no popover Colorir
+    expect(bar().getAllByRole('button').map((b) => (b.getAttribute('aria-label') ?? b.textContent ?? '').trim())).toEqual([
+      'Filtro', 'Colorir', 'Remover coloração', // status vem ligado
+      'Enquadrar seleção', 'Isolar', 'Limpar seleção', 'Seleção múltipla', 'Ampliar tudo',
     ]);
     expect(screen.queryByRole('button', { name: 'Medida' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Enquadrar tudo' })).not.toBeInTheDocument(); // foi para a barra
@@ -547,7 +602,7 @@ describe('Filtro (F3)', () => {
     expect(screen.getByText('2 de 6 peças no filtro')).toBeInTheDocument();
     await vi.waitFor(() => { expect(viewer.highlight).toHaveBeenLastCalledWith([10, 11]); }); // texto destaca
 
-    // Isolar (barra do topo) sem seleção isola o resultado
+    // Isolar (grupo Seleção da barra) sem seleção isola o resultado
     await user.click(screen.getByRole('button', { name: 'Isolar' }));
     expect(viewer.isolate).toHaveBeenLastCalledWith([10, 11]);
     await user.click(screen.getByRole('button', { name: 'Isolar' }));
@@ -663,7 +718,7 @@ describe('Filtro (F3)', () => {
     const { user } = await ready(undefined, { userId: '1', routes }); // projetos: não compartilha
     const pop = await openFilter(user);
     await user.type(pop.getByRole('searchbox', { name: 'Pesquisar por objetos' }), 'PP');
-    await user.click(pop.getByRole('button', { name: 'Salvar ▾' }));
+    await user.click(pop.getByRole('button', { name: 'Salvar' }));
     await user.click(pop.getByRole('menuitem', { name: 'Salvar como novo…' }));
     const dialog = within(await screen.findByRole('dialog', { name: 'Salvar filtro' }));
     expect(dialog.queryByRole('checkbox')).not.toBeInTheDocument();
@@ -680,7 +735,7 @@ describe('Filtro (F3)', () => {
     const { user } = await ready();
     const pop = await openFilter(user);
     await user.type(pop.getByRole('searchbox', { name: 'Pesquisar por objetos' }), 'PP');
-    await user.click(pop.getByRole('button', { name: 'Salvar ▾' }));
+    await user.click(pop.getByRole('button', { name: 'Salvar' }));
     expect(pop.getByRole('menuitem', { name: /Atualizar o filtro/ })).toBeDisabled(); // não veio de um salvo
     await user.click(pop.getByRole('menuitem', { name: 'Salvar como novo…' }));
     expect(await screen.findByRole('checkbox', { name: 'Compartilhar com todos (filtro da obra)' })).toBeInTheDocument();
@@ -789,6 +844,7 @@ describe('Catálogo de parâmetros da fábrica (6.1)', () => {
 
   it('fábrica cria um parâmetro de lista pela barra lateral', async () => {
     const { calls, user } = await open([]);
+    await user.click(await screen.findByRole('button', { name: /^Gerenciar/ })); // gestão fica recolhida no "Gerenciar"
     await user.click(await screen.findByRole('button', { name: '+ Novo parâmetro' }));
     const dialog = screen.getByRole('dialog', { name: 'Novo parâmetro da fábrica' });
 
@@ -813,11 +869,12 @@ describe('Catálogo de parâmetros da fábrica (6.1)', () => {
       obra_id: null,
       include_in_obra_id: 7, // criado da biblioteca aqui: já entra nesta obra
     });
-    expect(await screen.findByText('1 parâmetro(s) no catálogo desta obra.')).toBeInTheDocument();
+    expect(await screen.findByText('1 parâmetro no catálogo desta obra.')).toBeInTheDocument();
   });
 
   it('número mostra unidade; escopo da obra envia obra_id; erro do servidor aparece', async () => {
     const { calls, user } = await open([def({ id: 1, name: 'Forma' })]);
+    await user.click(await screen.findByRole('button', { name: /^Gerenciar/ })); // gestão fica recolhida no "Gerenciar"
     await user.click(await screen.findByRole('button', { name: '+ Novo parâmetro' }));
     const dialog = screen.getByRole('dialog');
     await user.selectOptions(within(dialog).getByLabelText('Tipo'), 'number');
@@ -838,12 +895,13 @@ describe('Catálogo de parâmetros da fábrica (6.1)', () => {
     const used = def({ id: 1, values_count: 2, options_in_use: ['F-02'] });
     const free = def({ id: 2, name: 'Ciclo de cura', type: 'number', unit: 'h', options: null, required: false, categories: null });
     const { calls, user } = await open([used, free]);
+    await user.click(await screen.findByRole('button', { name: /^Gerenciar/ })); // gestão fica recolhida no "Gerenciar"
     await user.click(await screen.findByRole('button', { name: 'Catálogo' }));
     const catalog = screen.getByRole('dialog', { name: 'Catálogo de parâmetros da fábrica' });
     const rows = within(catalog).getAllByRole('listitem');
     expect(rows).toHaveLength(2);
-    expect(rows[0]).toHaveTextContent('Lista de opções · 3 opções · Structural Columns · biblioteca · em 0 obra(s) · 2 marca(s) com valor');
-    expect(rows[1]).toHaveTextContent('Número (h) · todas as categorias · biblioteca · em 0 obra(s) · 0 marca(s) com valor');
+    expect(rows[0]).toHaveTextContent('Lista de opções · 3 opções · Structural Columns · biblioteca · em 0 obras · 2 marcas com valor');
+    expect(rows[1]).toHaveTextContent('Número (h) · todas as categorias · biblioteca · em 0 obras · 0 marcas com valor');
 
     // Editar um parâmetro com valores: tipo e escopo travados, opções em uso avisadas
     await user.click(within(catalog).getByRole('button', { name: 'Editar Tipo de forma' }));
@@ -859,6 +917,7 @@ describe('Catálogo de parâmetros da fábrica (6.1)', () => {
     expect(calls.find((c) => c.method === 'PATCH')?.body).toMatchObject({ name: 'Forma', type: 'list' });
 
     // Excluir: confirmação dentro do app (o window.confirm pode não aparecer no tablet)
+    await user.click(await screen.findByRole('button', { name: /^Gerenciar/ })); // gestão fica recolhida no "Gerenciar"
     await user.click(screen.getByRole('button', { name: 'Catálogo' }));
     await user.click(screen.getByRole('button', { name: 'Excluir Ciclo de cura' }));
     const ask = screen.getByRole('alertdialog', { name: 'Confirmar' });
@@ -880,6 +939,7 @@ describe('Catálogo de parâmetros da fábrica (6.1)', () => {
     api.routes['DELETE /api/obras/7/params/1'] = (req) => { api.calls.push({ method: req.method, path: req.path, body: null }); return { obra_id: 7, def_id: 1, in_obra: false, changed: true }; };
     renderModel([version(1)], undefined, undefined, { userId: '2', routes: api.routes });
     const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', { name: /^Gerenciar/ })); // gestão fica recolhida no "Gerenciar"
     await user.click(await screen.findByRole('button', { name: 'Catálogo' }));
     const catalog = screen.getByRole('dialog', { name: 'Catálogo de parâmetros da fábrica' });
 
@@ -887,7 +947,7 @@ describe('Catálogo de parâmetros da fábrica (6.1)', () => {
     const library = within(catalog).getByRole('list', { name: 'Biblioteca' });
     expect(within(here).getAllByRole('listitem').map((li) => li.querySelector('b')?.textContent)).toEqual(['Tipo de forma', 'Observação']);
     expect(within(library).getAllByRole('listitem')).toHaveLength(1);
-    expect(within(here).getAllByRole('listitem')[0]).toHaveTextContent('biblioteca · em 2 obra(s)');
+    expect(within(here).getAllByRole('listitem')[0]).toHaveTextContent('biblioteca · em 2 obras');
     // parâmetro só desta obra: sem "Retirar" (exclui-se)
     expect(within(here).queryByRole('button', { name: 'Retirar Observação desta obra' })).not.toBeInTheDocument();
 
@@ -904,7 +964,8 @@ describe('Catálogo de parâmetros da fábrica (6.1)', () => {
 
   it('projetos vê o catálogo só para leitura', async () => {
     const { user } = await open([def({})], '1');
-    await screen.findByText('1 parâmetro(s) no catálogo desta obra.');
+    await screen.findByText('1 parâmetro no catálogo desta obra.');
+    await user.click(await screen.findByRole('button', { name: /^Gerenciar/ })); // gestão fica recolhida no "Gerenciar"
     expect(screen.queryByRole('button', { name: '+ Novo parâmetro' })).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Catálogo' }));
     const catalog = screen.getByRole('dialog');
@@ -1302,13 +1363,13 @@ describe('Coloração, legenda e progresso (6.4 / F4)', () => {
   async function open(routes: Parameters<typeof installFakeApi>[0] = {}) {
     const r = renderModel([version(1)], undefined, undefined, { routes: { 'GET /api/param-defs': [FORMA], ...routes } });
     await screen.findByRole('heading', { name: 'Marcas (3)' });
-    await vi.waitFor(() => { expect(screen.getByRole('button', { name: 'Colorir ▾' })).toBeEnabled(); });
+    await vi.waitFor(() => { expect(screen.getByRole('button', { name: 'Colorir' })).toBeEnabled(); });
     return { ...r, user: userEvent.setup() };
   }
   const legend = () => screen.findByRole('region', { name: 'Legenda' });
   const lastColors = (viewer: FakeViewer) => viewer.setColors.mock.lastCall?.[0] as ReadonlyMap<DbId, string> | undefined;
   const colorPop = async (user: ReturnType<typeof userEvent.setup>) => {
-    if (!screen.queryByRole('dialog', { name: 'Colorir' })) await user.click(screen.getByRole('button', { name: 'Colorir ▾' }));
+    if (!screen.queryByRole('dialog', { name: 'Colorir' })) await user.click(screen.getByRole('button', { name: 'Colorir' }));
     return within(screen.getByRole('dialog', { name: 'Colorir' }));
   };
 
@@ -1325,15 +1386,18 @@ describe('Coloração, legenda e progresso (6.4 / F4)', () => {
     expect([lastColors(viewer)?.get(12), lastColors(viewer)?.get(20)]).toEqual(['#E3B341', '#B9BEC6']);
   });
 
-  it('clicar num item da legenda seleciona as peças dele; a legenda pode ser ocultada', async () => {
+  it('clicar num item da legenda seleciona as peças dele; a legenda pode ser retraída numa pílula com resumo', async () => {
     const { viewer, user } = await open();
     await user.click(within(await legend()).getByRole('button', { name: /^Parcial/ }));
     expect(await screen.findByRole('heading', { name: 'PP002 · Structural Columns · 2 peças' })).toBeInTheDocument();
     expect(viewer.selectDbIds).toHaveBeenLastCalledWith([12, 13]);
-    await user.click(screen.getByRole('button', { name: 'Ocultar legenda' }));
+    await user.click(screen.getByRole('button', { name: 'Retrair legenda' }));
     expect(screen.queryByRole('region', { name: 'Legenda' })).not.toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Mostrar legenda' }));
+    const pill = screen.getByRole('button', { name: /^Expandir legenda: Status · / });
+    expect(pill).toHaveAttribute('aria-expanded', 'false');
+    await user.click(pill);
     expect(await legend()).toBeInTheDocument();
+    localStorage.clear();
   });
 
   it('popover Colorir: Status e Categoria no topo, busca em todos os campos, cor por gama', async () => {
@@ -1414,6 +1478,7 @@ describe('Coloração, legenda e progresso (6.4 / F4)', () => {
         return { ...(req.body as object), id: 70, owner_id: 2, editable: true, created_at: '', updated_at: '', created_by: 2, updated_by: 2 };
       },
     });
+    await user.click(screen.getByRole('button', { name: 'Colorir' })); // "Editar cores" fica no popover Colorir
     await user.click(screen.getByRole('button', { name: 'Editar cores' }));
     const dialog = within(await screen.findByRole('dialog', { name: 'Cores' }));
     expect(dialog.getByRole('combobox', { name: 'Esquema de cores' })).toHaveValue('');
@@ -1450,7 +1515,7 @@ describe('Coloração, legenda e progresso (6.4 / F4)', () => {
     expect(within(box).getAllByRole('button', { name: /: / }).map((b) => b.getAttribute('aria-label'))).toEqual([
       'Novas na versão: 1 marca · 2 peças', 'Parciais: 1 marca · 2 peças',
     ]);
-    expect(box).toHaveTextContent('2 peça(s) sem regra ficam com a cor original.');
+    expect(box).toHaveTextContent('2 peças sem regra ficam com a cor original.');
     await vi.waitFor(() => { expect(lastColors(viewer)?.get(20)).toBe('#00FF00'); });
   });
 
@@ -1460,12 +1525,12 @@ describe('Coloração, legenda e progresso (6.4 / F4)', () => {
     expect(bar).toHaveAttribute('aria-valuenow', '50');
     const foot = screen.getByRole('region', { name: 'Progresso' });
     expect(foot).toHaveTextContent('1/2 marcas · 2/4 peças (50%)');
-    expect(foot).toHaveTextContent('OB-001 · v1 · 3 marcas · 6 peças');
+    expect(foot).toHaveTextContent('OB-001 · V1 · 3 marcas · 6 peças');
   });
 
   it('sem obrigatórios o rodapé explica', async () => {
     await open({ 'GET /api/versions/1/progress': { marks: 3, pieces: 6, required: [] } });
-    expect(await screen.findByText(/Nenhum parâmetro obrigatório definido/)).toBeInTheDocument();
+    expect(await screen.findByText(/Nenhum parâmetro obrigatório\./)).toBeInTheDocument();
   });
 
   it('salvar valores atualiza status, cores e progresso', async () => {
@@ -1567,14 +1632,14 @@ describe('Reconciliação: banner, revisar e órfãs (7.2)', () => {
   it('banner da versão nova: "N novas · N a revisar · N órfãs" com atalhos', async () => {
     const { user } = await open();
     const banner = await screen.findByRole('region', { name: 'Versão nova' });
-    expect(banner).toHaveTextContent('Versão 2 comparada com a 1:');
+    expect(banner).toHaveTextContent('V2 comparada com a V1:');
     expect(banner).toHaveTextContent(/2 novas\s*·\s*1 a revisar\s*·\s*1 órfã/);
     await user.click(within(banner).getByRole('button', { name: '1 a revisar' }));
     await vi.waitFor(() => { expect(evalCalls.at(-1)?.rules).toEqual([{ ...statusRule('Revisar'), mode: 'highlight' }]); });
     await user.click(within(banner).getByRole('button', { name: '2 novas' }));
     await vi.waitFor(() => { expect(evalCalls.at(-1)?.rules[0]?.field.key).toBe('new'); });
     await user.click(within(banner).getByRole('button', { name: '1 órfã' }));
-    expect(await screen.findByRole('dialog', { name: 'Órfãs' })).toHaveTextContent('PP009');
+    expect(await screen.findByRole('dialog', { name: 'Marcas órfãs' })).toHaveTextContent('PP009');
     await user.click(screen.getByRole('button', { name: 'Fechar' }));
     await user.click(screen.getByRole('button', { name: 'Fechar aviso da versão' }));
     expect(screen.queryByRole('region', { name: 'Versão nova' })).not.toBeInTheDocument();
@@ -1609,9 +1674,10 @@ describe('Reconciliação: banner, revisar e órfãs (7.2)', () => {
   it('Órfãs: arquivar com confirmação', async () => {
     vi.spyOn(window, 'confirm').mockReturnValue(true);
     const { user, calls } = await open();
-    await user.click(screen.getByRole('button', { name: 'Fila de órfãs' }));
-    const dialog = await screen.findByRole('dialog', { name: 'Órfãs' });
-    expect(dialog).toHaveTextContent('Sumiu na versão 2');
+    await user.click(await screen.findByRole('button', { name: /^Gerenciar/ })); // gestão fica recolhida no "Gerenciar"
+    await user.click(screen.getByRole('button', { name: 'Marcas órfãs' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Marcas órfãs' });
+    expect(dialog).toHaveTextContent('Sumiu na V2');
     expect(dialog).toHaveTextContent('Tipo de forma: F-12');
     await user.click(within(dialog).getByRole('button', { name: 'Arquivar PP009' }));
     expect(await within(dialog).findByText('Nenhuma órfã pendente.')).toBeInTheDocument();
@@ -1620,7 +1686,8 @@ describe('Reconciliação: banner, revisar e órfãs (7.2)', () => {
 
   it('Religar: clicar na marca de destino no 3D, confirmar e copiar', async () => {
     const { viewer, user, calls } = await open();
-    await user.click(screen.getByRole('button', { name: 'Fila de órfãs' }));
+    await user.click(await screen.findByRole('button', { name: /^Gerenciar/ })); // gestão fica recolhida no "Gerenciar"
+    await user.click(screen.getByRole('button', { name: 'Marcas órfãs' }));
     await user.click(await screen.findByRole('button', { name: 'Religar PP009' }));
     expect(screen.getByRole('status', { name: 'Religar órfã' })).toHaveTextContent('Religar PP009: clique na marca de destino');
     viewer.click([20]);
@@ -1635,7 +1702,8 @@ describe('Reconciliação: banner, revisar e órfãs (7.2)', () => {
 
   it('Religar pela lista; conflito pede para sobrescrever', async () => {
     const { user, calls } = await open({ relinkConflict: true });
-    await user.click(screen.getByRole('button', { name: 'Fila de órfãs' }));
+    await user.click(await screen.findByRole('button', { name: /^Gerenciar/ })); // gestão fica recolhida no "Gerenciar"
+    await user.click(screen.getByRole('button', { name: 'Marcas órfãs' }));
     await user.click(await screen.findByRole('button', { name: 'Religar PP009' }));
     await user.click(screen.getByRole('button', { name: /^PP002/ }));
     const confirm = await screen.findByRole('dialog', { name: 'Religar órfã' });
@@ -1770,7 +1838,7 @@ describe('Tempo real (8.1)', () => {
     list = [version(2), version(1)];
     ch.send('version_ready', { version_id: 2, version_number: 2, status: 'ready' }, null);
     const banner = await screen.findByRole('region', { name: 'Nova versão disponível' });
-    expect(banner).toHaveTextContent('Nova versão disponível: Rev.02 acabou de ficar pronta.');
+    expect(banner).toHaveTextContent('Nova versão disponível: V2 acabou de ficar pronta.');
     expect(r.viewer.load).not.toHaveBeenCalledWith('urn-v2'); // não troca sozinho
 
     await userEvent.setup().click(within(banner).getByRole('button', { name: 'Carregar' }));

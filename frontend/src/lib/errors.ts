@@ -6,5 +6,7 @@ export function errorMessage(error: unknown): string {
     if (error.status === 401) return 'Selecione um usuário no cabeçalho.';
     return error.message;
   }
-  return 'Erro inesperado. Tente novamente.';
+  // fetch rejeita com TypeError quando não chega ao servidor (Wi-Fi caiu, servidor fora do ar)
+  if (error instanceof TypeError) return 'Sem conexão com o servidor. Confira o Wi-Fi e tente de novo.';
+  return 'Erro inesperado. Tente de novo.';
 }

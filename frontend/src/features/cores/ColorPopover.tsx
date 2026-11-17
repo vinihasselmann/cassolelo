@@ -6,6 +6,8 @@ interface Props {
   fields: readonly FilterField[];
   choice: ColoringChoice | null;
   onChoose: (choice: ColoringChoice) => void;
+  /** "Editar cores": abre a janela de esquemas de cores (regras por filtro). */
+  onEditColors?: () => void;
 }
 
 const isRangeable = (f: FilterField | undefined) => f?.type === 'number' || f?.type === 'date';
@@ -15,7 +17,7 @@ const isRangeable = (f: FilterField | undefined) => f?.type === 'number' || f?.t
  * mesma lista do "Selecionar parâmetro"). Escolher um campo pinta cada valor com uma cor;
  * "Cor por gama" (números e datas) pinta por faixas.
  */
-export function ColorPopover({ fields, choice, onChoose }: Props) {
+export function ColorPopover({ fields, choice, onChoose, onEditColors }: Props) {
   const current = choice?.kind === 'field' ? choice : null;
   const currentField = current ? fields.find((f) => sameRef(f, current.field)) : undefined;
   const byRange = current?.mode === 'range';
@@ -64,6 +66,14 @@ export function ColorPopover({ fields, choice, onChoose }: Props) {
         </label>
         <FieldList fields={colorable} onPick={(f) => { pick(f, byRange && isRangeable(f)); }} />
       </div>
+      {onEditColors && (
+        <div className="model-sec color-pop__more">
+          <button type="button" className="ghost btn-sm" onClick={onEditColors}>
+            Editar cores
+          </button>
+          <span className="hint">Esquemas com regras por filtro</span>
+        </div>
+      )}
     </div>
   );
 }

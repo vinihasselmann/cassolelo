@@ -150,7 +150,8 @@ def notifiers_from_settings(settings: Settings) -> list[Notifier]:
 
 
 def _rev(n: int) -> str:
-    return f"Rev.{n:02d}"
+    """Nome da versão como no Autodesk Docs (V1, V2…)."""
+    return f"V{n}"
 
 
 def _link(settings: Settings, obra_id: int) -> str:

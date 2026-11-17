@@ -19,7 +19,7 @@ export function ProgressFooter({ versionId, label }: { versionId: number; label:
       {progress.isError && <span className="error small">{errorMessage(progress.error)}</span>}
       {data && data.required.length === 0 && (
         <span className="muted">
-          Nenhum parâmetro obrigatório definido · o progresso aparece aqui quando um parâmetro for marcado como obrigatório
+          Nenhum parâmetro obrigatório. Marque um como obrigatório (Gerenciar › Catálogo) para ver o progresso aqui.
         </span>
       )}
       {data?.required.map((p) => {

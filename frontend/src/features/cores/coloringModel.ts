@@ -5,6 +5,7 @@
 
 import type { ColorizeMode, ColorizeResult, SchemeResult } from '../../api/colors';
 import type { FieldRef } from '../../api/filters';
+import { plural } from '../../lib/format';
 import { STATUS_COLORS, STATUS_ORDER } from '../../lib/palette';
 import type { DbId, HexColor } from '../../viewer/ViewerAdapter';
 
@@ -85,7 +86,7 @@ export function fromScheme(result: SchemeResult, name: string, markOf: MarkOf): 
   }));
   const rest = result.total_pieces - result.colored_pieces;
   const notes = [...result.notes];
-  if (rest > 0) notes.push(`${rest.toLocaleString('pt-BR')} peça(s) sem regra ficam com a cor original.`);
+  if (rest > 0) notes.push(`${plural(rest, 'peça sem regra fica', 'peças sem regra ficam')} com a cor original.`);
   const coloring: Coloring = { title: name, colors: toMap(result.colors), legend };
   if (notes.length) coloring.note = notes.join(' ');
   return coloring;

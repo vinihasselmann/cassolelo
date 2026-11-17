@@ -44,3 +44,13 @@ export function formatParamValue(type: string, value: unknown): string | null {
   }
   return formatValue(value);
 }
+
+/** "1 peça", "2 peças", "1.234 peças": número em pt-BR com a palavra no singular ou no plural. */
+export function plural(n: number, singular: string, pluralForm: string): string {
+  return `${n.toLocaleString('pt-BR')} ${n === 1 ? singular : pluralForm}`;
+}
+
+/** Nome da versão do modelo como no Autodesk Docs: "V1", "V2"… (não confundir com revisão de desenho). */
+export function versionName(n: number): string {
+  return `V${String(n)}`;
+}

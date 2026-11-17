@@ -190,7 +190,7 @@ export function BatchValuesSection({ obraId, markIds, canEdit, unmarked, onAppli
             })}
           </dl>
           {canEdit && (
-            <button type="button" className="secondary btn-sm" onClick={startEdit}>
+            <button type="button" className="btn-sm" onClick={startEdit}>
               Editar em lote
             </button>
           )}

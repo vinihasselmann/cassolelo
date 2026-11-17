@@ -67,8 +67,10 @@ PALETTE = (
 )
 NO_VALUE_COLOR = "#9AA0A6"
 NO_VALUE_LABEL = "Sem valor"
+NO_MARK_LABEL = "Sem marca"
 # Gradiente das 5 faixas (claro → escuro)
-RANGE_COLORS = ("#C6DBEF", "#8DB7DD", "#4F8FC9", "#2565A8", "#0B3C78")
+# âmbar claro → âmbar escuro (marca, sem azul); longe do grafite da seleção no 3D
+RANGE_COLORS = ("#FBE3B0", "#F6CB78", "#EBA53A", "#CC7F0E", "#A86500")
 RANGE_BANDS = len(RANGE_COLORS)
 # Status de produção: as mesmas cores da tela (mockup)
 STATUS_COLORS = {
@@ -312,7 +314,9 @@ async def colorize(session: AsyncSession, version_id: int, body: ColorizeInput) 
         )
     ]
     if ids.get(None):
-        legend.append(LegendItem(NO_VALUE_LABEL, NO_VALUE_COLOR, len(ids[None]), dbids=ids[None]))
+        # no status, peça sem valor é peça sem marca (não entra na contagem de produção)
+        label = NO_MARK_LABEL if is_status else NO_VALUE_LABEL
+        legend.append(LegendItem(label, NO_VALUE_COLOR, len(ids[None]), dbids=ids[None]))
     return ColorizeResult("distinct", fdef.name, fdef.type, colors, legend, len(pieces))
 
 

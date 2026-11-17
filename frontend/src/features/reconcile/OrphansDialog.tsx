@@ -5,6 +5,7 @@ import { Modal } from '../../components/Modal';
 import { errorMessage } from '../../lib/errors';
 import { invalidateValueQueries } from '../params/invalidate';
 import { describeValues } from './orphanText';
+import { versionName } from '../../lib/format';
 
 interface Props {
   obraId: number;
@@ -30,7 +31,7 @@ export function OrphansDialog({ obraId, canEdit, onClose, onRelink }: Props) {
   }
 
   return (
-    <Modal title="Órfãs" onClose={onClose} wide>
+    <Modal title="Marcas órfãs" onClose={onClose} wide>
       <p className="muted small">
         Marcas que sumiram do modelo e tinham valores da fábrica. Religue a uma marca do modelo atual (os valores são
         copiados) ou arquive. Nada é apagado.
@@ -46,7 +47,7 @@ export function OrphansDialog({ obraId, canEdit, onClose, onRelink }: Props) {
             <li key={o.id}>
               <div>
                 <b>{o.code}</b> · {o.category}
-                <div className="hint">Sumiu na versão {o.since_version_number}</div>
+                <div className="hint">Sumiu na {versionName(o.since_version_number)}</div>
                 <div className="small">{describeValues(o)}</div>
               </div>
               {canEdit && (

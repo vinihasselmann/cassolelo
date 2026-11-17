@@ -320,7 +320,7 @@ async def test_distinct_status_uses_app_colors(
     assert [(i["label"], i["pieces"]) for i in body["legend"]] == [
         ("Pendente", 3),
         ("Completa", 2),
-        ("Sem valor", 1),
+        ("Sem marca", 1),  # no status, "sem valor" é peça sem marca
     ]
     assert [i["dbids"] for i in body["legend"]] == [[12, 20, 21], [10, 11], [30]]
 

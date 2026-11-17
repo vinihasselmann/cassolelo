@@ -42,8 +42,21 @@ export async function toApiError(res: Response): Promise<ApiError> {
   } catch {
     // corpo não é JSON
   }
-  const detail = typeof body.detail === 'string' ? body.detail : res.statusText || `Erro HTTP ${res.status}`;
+  const detail = typeof body.detail === 'string' ? body.detail : fallbackMessage(res.status);
   return new ApiError(res.status, detail, body);
+}
+
+/**
+ * Mensagem quando o servidor não manda uma em português (proxy fora do ar, validação em lista…).
+ * Nunca o statusText HTTP, que vem em inglês.
+ */
+export function fallbackMessage(status: number): string {
+  if (status >= 500) return `O servidor não respondeu (erro ${String(status)}). Tente de novo em instantes.`;
+  if (status === 403) return 'Seu papel não permite esta ação.';
+  if (status === 404) return 'Não encontrado. Pode ter sido removido: recarregue a página.';
+  if (status === 409) return 'Outra pessoa alterou isto ao mesmo tempo. Recarregue e confira.';
+  if (status === 422) return 'Dados inválidos. Confira os campos e tente de novo.';
+  return `Não foi possível concluir (erro ${String(status)}). Tente de novo.`;
 }
 
 export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {

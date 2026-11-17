@@ -219,7 +219,7 @@ export function MarkValuesSection({ obraId, markId, canEdit }: Props) {
             })}
           </dl>
           {canEdit && (
-            <button type="button" className="secondary btn-sm" onClick={startEdit}>
+            <button type="button" className="btn-sm" onClick={startEdit}>
               Editar
             </button>
           )}

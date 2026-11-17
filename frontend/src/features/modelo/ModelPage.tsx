@@ -6,9 +6,10 @@ import { ApiError } from '../../api/client';
 import { fetchObra, fetchVersions, type ModelVersion } from '../../api/obras';
 import { fetchParamDefs, type ParamDef } from '../../api/paramDefs';
 import { fetchFields, fetchSavedFilters, savedFiltersKey } from '../../api/filters';
+import { fetchMarkStatus, markStatusKey } from '../../api/status';
 import { fetchFacets, fetchMarks, type MarkPieces } from '../../api/versions';
 import { errorMessage } from '../../lib/errors';
-import { formatDateTime } from '../../lib/format';
+import { formatDateTime, plural, versionName } from '../../lib/format';
 import { useViewerAdapter } from '../../viewer/viewerContext';
 import { hasRole, PARAM_EDITOR_ROLES, useCurrentUser } from '../dev-user/useCurrentUser';
 import { useObraId } from '../obras/useObraId';
@@ -16,6 +17,7 @@ import { CatalogDialog } from '../params/CatalogDialog';
 import { ParamDefDialog } from '../params/ParamDefDialog';
 import { UndoToast } from '../params/UndoToast';
 import { ExportButton } from './ExportButton';
+import { ManageMenu } from './ManageMenu';
 import { LiveNotices } from '../live/LiveNotices';
 import { useObraEvents } from '../live/useObraEvents';
 import { OrphansDialog } from '../reconcile/OrphansDialog';
@@ -47,6 +49,7 @@ import {
   type MarkIndex,
   type Selection,
 } from './selection';
+import { Icon } from '../../components/Icon';
 
 type ParamDialog =
   | { kind: 'new'; category: string | null }
@@ -65,13 +68,10 @@ function viewerError(err: unknown): string {
 }
 
 /** "Rev.02": número da versão do Docs, como o escritório chama as revisões. */
-function revLabel(n: number): string {
-  return `Rev.${String(n).padStart(2, '0')}`;
-}
 
 function versionLabel(v: ModelVersion, latest: boolean): string {
   const date = v.published_at ? ` · ${formatDateTime(v.published_at)}` : '';
-  return `${revLabel(v.version_number)}${date}${latest ? ' (ativa)' : ''}`;
+  return `${versionName(v.version_number)}${date}${latest ? ' (ativa)' : ''}`;
 }
 
 /** Tela da obra: barra superior + 3 colunas (lista e filtros | modelo 3D | painel). */
@@ -133,6 +133,17 @@ export function ModelPage() {
   });
   const index = useMemo(() => buildMarkIndex(marks.data ?? []), [marks.data]);
   const marksById = useMemo(() => new Map((marks.data ?? []).map((m) => [m.mark_id, m])), [marks.data]);
+  // Status de produção de cada marca (agregado das peças): lista e painel da peça.
+  const markStatus = useQuery({
+    queryKey: markStatusKey(active?.id ?? 0),
+    queryFn: () => fetchMarkStatus(active?.id ?? 0),
+    enabled: active !== undefined,
+    retry: false,
+  });
+  const statusById = useMemo(
+    () => new Map((markStatus.data?.items ?? []).map((i) => [i.mark_id, i.status])),
+    [markStatus.data],
+  );
   // Filtro da tela (F3): estado único na URL, avaliado no backend.
   const filterState = useActiveFilter(active?.id);
   const fields = useQuery({
@@ -187,6 +198,11 @@ export function ModelPage() {
   const closeUndo = useCallback(() => { setUndo(null); }, []);
   const [multi, setMulti] = useState(false);
   const { panels, toggle: togglePanel } = usePanels();
+  // Painel aberto/fechado muda a largura do 3D: o Viewer recalcula o desenho depois do novo layout.
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => { viewer?.resize(); });
+    return () => { cancelAnimationFrame(frame); };
+  }, [panels.left, panels.right, viewer]);
   // Coloração (F4): por campo ou por esquema; null = cores originais do modelo.
   const [colorChoice, setColorChoice] = useState<ColoringChoice | null>(DEFAULT_COLORING);
   const [showColors, setShowColors] = useState(false);
@@ -315,10 +331,45 @@ export function ModelPage() {
   else if (load.kind === 'loading') overlay = 'Carregando modelo…';
   else if (load.kind === 'error') overlay = load.message;
 
+  // Ferramentas de seleção: vivem na barra única do visualizador (rótulo curto, nome completo no aria-label).
+  const selectionTools = (
+    <>
+      <button
+        type="button"
+        aria-label="Enquadrar seleção"
+        disabled={!modelReady || !hasSelection}
+        onClick={() => { viewer?.fitTo(selectedIds); }}
+      >
+        Enquadrar
+      </button>
+      <button type="button" aria-pressed={isolated} disabled={!modelReady || !canIsolate} onClick={toggleIsolate}>
+        Isolar
+      </button>
+      <button
+        type="button"
+        aria-label="Limpar seleção"
+        disabled={!modelReady || !hasSelection}
+        onClick={() => { setSelection(EMPTY_SELECTION); }}
+      >
+        Limpar
+      </button>
+      <button
+        type="button"
+        aria-label="Seleção múltipla"
+        aria-pressed={multi}
+        title="Acumula marcas a cada toque. No computador, Ctrl+clique faz o mesmo."
+        disabled={!modelReady}
+        onClick={() => { setMulti(!multi); }}
+      >
+        Múltipla
+      </button>
+    </>
+  );
+
   return (
     <div className="model-page">
       <div className="model-bar">
-        <Link to="/obras" className="small">‹ Obras</Link>
+        <Link to="/obras" className="small back-link"><Icon name="chevron-left" size={12} />Obras</Link>
         <div className="model-bar__item">
           <small>Obra</small>
           <strong>{obra.data ? `${obra.data.code} — ${obra.data.name}` : '…'}</strong>
@@ -350,7 +401,7 @@ export function ModelPage() {
         {consulting && (
           <div className="consult-banner" role="region" aria-label="Modo consulta">
             <span>
-              Visualizando <b>{revLabel(active.version_number)}</b> · somente leitura
+              Visualizando <b>{versionName(active.version_number)}</b> · somente leitura
             </span>
             <button type="button" onClick={() => { goVersion(latest.id); }}>
               Voltar para a versão ativa
@@ -360,7 +411,7 @@ export function ModelPage() {
         {newVersion && (
           <div className="version-banner version-banner--new" role="region" aria-label="Nova versão disponível">
             <span>
-              <b>Nova versão disponível:</b> {revLabel(newVersion.versionNumber)} acabou de ficar pronta.
+              <b>Nova versão disponível:</b> {versionName(newVersion.versionNumber)} acabou de ficar pronta.
             </span>
             <button
               type="button"
@@ -377,7 +428,7 @@ export function ModelPage() {
               aria-label="Fechar aviso de nova versão"
               onClick={realtime.clearNewVersion}
             >
-              ×
+              <Icon name="close" />
             </button>
           </div>
         )}
@@ -394,7 +445,7 @@ export function ModelPage() {
           <div className="version-banner" role="status">
             {relinkDone}
             <button type="button" className="link version-banner__close" aria-label="Fechar aviso" onClick={() => { setRelinkDone(null); }}>
-              ×
+              <Icon name="close" />
             </button>
           </div>
         )}
@@ -402,35 +453,25 @@ export function ModelPage() {
 
       <div className={`model-cols${panels.left ? '' : ' hide-left'}${panels.right ? '' : ' hide-right'}`}>
         <aside id="painel-esquerdo" className="model-left" aria-label="Marcas e filtros" hidden={!panels.left}>
+          <h2 className="sr-only">Marcas e filtros</h2>
           {active ? (
             <>
-              <div className="model-sec">
-                <h4>Parâmetros da fábrica</h4>
-                <p className="hint params-count">
-                  {paramDefs.data
-                    ? `${paramDefs.data.length} parâmetro(s) no catálogo desta obra.`
+              <ManageMenu
+                summary={
+                  paramDefs.data
+                    ? `${plural(paramDefs.data.length, 'parâmetro', 'parâmetros')} no catálogo desta obra.`
                     : paramDefs.isError
                       ? errorMessage(paramDefs.error)
-                      : 'Carregando…'}
-                </p>
-                <div className="btn-row">
-                  {canEditParams && (
-                    <button type="button" onClick={() => { setDialog({ kind: 'new', category: null }); }}>
-                      + Novo parâmetro
-                    </button>
-                  )}
-                  <button type="button" className="secondary" onClick={() => { setDialog({ kind: 'catalog' }); }}>
-                    Catálogo
-                  </button>
-                  <button type="button" className="secondary" onClick={() => { setShowOrphans(true); }}>
-                    Fila de órfãs
-                  </button>
-                  <button type="button" className="secondary" onClick={() => { setShowUnitOrphans(true); }}>
-                    Peças órfãs
-                  </button>
-                </div>
-              </div>
+                      : 'Carregando…'
+                }
+                canEditParams={canEditParams}
+                onNewParam={() => { setDialog({ kind: 'new', category: null }); }}
+                onCatalog={() => { setDialog({ kind: 'catalog' }); }}
+                onMarkOrphans={() => { setShowOrphans(true); }}
+                onUnitOrphans={() => { setShowUnitOrphans(true); }}
+              />
               <FilterResultList
+                statusById={statusById}
                 marks={marks.data ?? []}
                 evaluation={result}
                 filtered={filterState.active}
@@ -460,7 +501,7 @@ export function ModelPage() {
             title={panels.left ? 'Esconder marcas e filtros' : 'Mostrar marcas e filtros'}
             onClick={() => { togglePanel('left'); }}
           >
-            {panels.left ? '‹' : '›'}
+            <Icon name={panels.left ? 'chevron-left' : 'chevron-right'} size={18} />
           </button>
           <button
             type="button"
@@ -471,42 +512,13 @@ export function ModelPage() {
             title={panels.right ? 'Esconder o painel da peça' : 'Mostrar o painel da peça'}
             onClick={() => { togglePanel('right'); }}
           >
-            {panels.right ? '›' : '‹'}
+            <Icon name={panels.right ? 'chevron-right' : 'chevron-left'} size={18} />
           </button>
           {overlay && (
             <div className={`model-viewer__overlay${load.kind === 'error' || versions.isError ? ' error' : ''}`} role="status">
               {overlay}
             </div>
           )}
-          <div className="float-bar model-tools" role="toolbar" aria-label="Ferramentas do modelo">
-            <button type="button" disabled={!modelReady || !hasSelection} onClick={() => { viewer?.fitTo(selectedIds); }}>
-              Enquadrar seleção
-            </button>
-            <button
-              type="button"
-              aria-pressed={isolated}
-              disabled={!modelReady || !canIsolate}
-              onClick={toggleIsolate}
-            >
-              Isolar
-            </button>
-            <button
-              type="button"
-              disabled={!modelReady || !hasSelection}
-              onClick={() => { setSelection(EMPTY_SELECTION); }}
-            >
-              Limpar seleção
-            </button>
-            <button
-              type="button"
-              aria-pressed={multi}
-              title="Acumula marcas a cada toque. No computador, Ctrl+clique faz o mesmo."
-              disabled={!modelReady}
-              onClick={() => { setMulti(!multi); }}
-            >
-              Seleção múltipla
-            </button>
-          </div>
           {relinkFrom && (
             <div className="relink-bar" role="status" aria-label="Religar órfã">
               <span>
@@ -526,7 +538,8 @@ export function ModelPage() {
               onFitAll={() => { viewer?.fitTo(); }}
               onClearFilter={filterState.clear}
               onClearColoring={() => { setColorChoice(null); }}
-              onEditColors={() => { setShowColors(true); }}
+              selectionTools={selectionTools}
+              storageKey={`viewer-bar:${me.data ? String(me.data.id) : 'anon'}`}
               filterPopover={
                 <FilterPopover
                   obraId={obraId}
@@ -537,30 +550,40 @@ export function ModelPage() {
                   me={me.data}
                 />
               }
-              colorPopover={<ColorPopover fields={fields.data ?? []} choice={colorChoice} onChoose={setColorChoice} />}
+              colorPopover={
+                <ColorPopover
+                  fields={fields.data ?? []}
+                  choice={colorChoice}
+                  onChoose={setColorChoice}
+                  onEditColors={() => { setShowColors(true); }}
+                />
+              }
             />
           )}
           {modelReady && coloring && (
             <ColorLegend
               coloring={coloring}
               onPick={(item) => { setSelection(selectPieces(item.dbids, index)); }}
+              storageKey={`legend:${me.data ? String(me.data.id) : 'anon'}`}
             />
           )}
           {modelReady && coloringError !== null && (
-            <div className="legend error small" role="alert">
+            <div className="coloring-error error small" role="alert">
               {errorMessage(coloringError)}
             </div>
           )}
         </section>
 
         <aside id="painel-direito" className="model-right" aria-label="Peça selecionada" hidden={!panels.right}>
+          <h2 className="sr-only">Peça selecionada</h2>
           {active ? (
             <PiecePanel
               versionId={active.id}
               selection={selection}
+              statusById={statusById}
               obraId={obraId}
               canEditParams={canEditParams}
-              activeLabel={consulting ? revLabel(latest.version_number) : null}
+              activeLabel={consulting ? versionName(latest.version_number) : null}
               onNewParam={(category) => { setDialog({ kind: 'new', category }); }}
               onPickPiece={pickPiece}
               axis={axis}
@@ -589,7 +612,7 @@ export function ModelPage() {
         </aside>
       </div>
       {active && (
-        <ProgressFooter versionId={active.id} label={`${obra.data?.code ?? ''} · v${String(active.version_number)}`} />
+        <ProgressFooter versionId={active.id} label={`${obra.data?.code ?? ''} · ${versionName(active.version_number)}`} />
       )}
       <LiveNotices notices={realtime.notices} onDismiss={realtime.dismiss} />
       {undo && <UndoToast key={undo.batchId} batchId={undo.batchId} text={undo.text} onClose={closeUndo} />}

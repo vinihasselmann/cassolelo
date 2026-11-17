@@ -6,6 +6,7 @@ import { errorMessage } from '../../lib/errors';
 import { LiveNotices } from '../live/LiveNotices';
 import { useObraEvents } from '../live/useObraEvents';
 import { useObraId } from './useObraId';
+import { Icon } from '../../components/Icon';
 
 export function ObraPage() {
   const obraId = useObraId();
@@ -21,7 +22,7 @@ export function ObraPage() {
   return (
     <section>
       <p className="small">
-        <Link to="/obras">‹ Obras</Link>
+        <Link to="/obras" className="back-link"><Icon name="chevron-left" size={12} />Obras</Link>
       </p>
       {obra.isError && (
         <p role="alert" className="error">

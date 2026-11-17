@@ -270,11 +270,11 @@ async def test_types_formats_section_and_layout(
     }
     assert 30 not in pieces  # sem Marca
     about = dict((r[0].value, r[1].value) for r in wb["Sobre"].iter_rows())
-    assert about["Versão"] == "Rev.02" and about["Marcas"] == 3 and about["Peças"] == 6
+    assert about["Versão"] == "V2" and about["Marcas"] == 3 and about["Peças"] == 6
     assert about["Gerado por"] == ctx["users"][Role.FABRICA].name
     disposition = r.headers["content-disposition"]
     assert disposition.startswith(
-        'attachment; filename="OB-EXP-1_Rev.02_'
+        'attachment; filename="OB-EXP-1_V2_'
     ) and disposition.endswith(".xlsx")
     assert r.headers["content-type"].startswith("application/vnd.openxmlformats")
 

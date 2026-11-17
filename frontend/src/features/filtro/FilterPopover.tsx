@@ -28,6 +28,7 @@ import {
 } from './filterModel';
 import { ValueChecklist } from './RuleInputs';
 import type { ActiveFilterState } from './useActiveFilter';
+import { Icon } from '../../components/Icon';
 
 const fieldKey = (f: { source: string; key: string }) => `${f.source}:${f.key}`;
 
@@ -68,7 +69,7 @@ function QuickMenu({ label, versionId, field, filter, onChange }: QuickProps) {
     <div className="quick">
       <button type="button" className="chip" aria-expanded={open} onClick={() => { setOpen(!open); }}>
         {label}
-        {chosen.length > 0 && ` (${String(chosen.length)})`} ▾
+        {chosen.length > 0 && ` (${String(chosen.length)})`} <Icon name="chevron-down" size={12} />
       </button>
       {open && (
         <div className="popover quick__menu" role="group" aria-label={label}>
@@ -178,7 +179,7 @@ export function FilterPopover({ obraId, versionId, fields, fieldsError, state, m
                 <li key={i} className={`tag tag--${rule.mode}`}>
                   <span>{text}</span>
                   <button type="button" aria-label={`Remover filtro ${text}`} onClick={() => { removeRule(i); }}>
-                    ×
+                    <Icon name="close" />
                   </button>
                 </li>
               );
@@ -197,7 +198,7 @@ export function FilterPopover({ obraId, versionId, fields, fieldsError, state, m
           </button>
           <div className="menu">
             <button type="button" aria-expanded={saveMenu} aria-haspopup="menu" onClick={() => { setSaveMenu(!saveMenu); }}>
-              Salvar ▾
+              Salvar <Icon name="chevron-down" size={12} />
             </button>
             {saveMenu && (
               <div className="popover menu__list" role="menu" aria-label="Salvar">

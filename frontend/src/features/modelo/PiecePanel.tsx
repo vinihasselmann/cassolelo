@@ -9,9 +9,12 @@ import { BatchValuesSection } from '../params/BatchValuesSection';
 import { MarkValuesSection } from '../params/MarkValuesSection';
 import { errorMessage } from '../../lib/errors';
 import { formatValue } from '../../lib/format';
+import type { MarkStatus } from '../../api/status';
 import { AxisCoordinatesSection } from './AxisCoordinatesSection';
+import { StatusBadge } from './StatusBadge';
 import { pieceCount, type Selection } from './selection';
 import type { AxisState } from './useAxisCoordinates';
+import { Icon } from '../../components/Icon';
 
 const num = (n: number) => n.toLocaleString('pt-BR');
 const pieces = (n: number) => `${num(n)} ${n === 1 ? 'peça' : 'peças'}`;
@@ -97,7 +100,7 @@ function ModelProperties({ groups }: { groups: PropertyGroup[] }) {
               aria-expanded={open}
               onClick={() => { toggle(g.name); }}
             >
-              <span aria-hidden="true">{open ? '▾' : '▸'}</span> {g.name}{' '}
+              <Icon name={open ? 'chevron-down' : 'chevron-right'} size={12} /> {g.name}{' '}
               <span className="muted small">({g.properties.length})</span>
             </button>
             {open && (
@@ -162,7 +165,11 @@ interface PanelProps {
   activeLabel?: string | null;
   /** Coordenadas do eixo da peça clicada (a instância, não a marca). */
   axis?: AxisState;
+  /** Status de produção de cada marca (agregado das peças). */
+  statusById?: ReadonlyMap<number, MarkStatus>;
 }
+
+const NO_STATUS: ReadonlyMap<number, MarkStatus> = new Map();
 
 export function PiecePanel({
   versionId,
@@ -175,6 +182,7 @@ export function PiecePanel({
   onPickPiece,
   activeLabel = null,
   axis = { status: 'unavailable' },
+  statusById = NO_STATUS,
 }: PanelProps) {
   const focus = selection.focus;
   const element = useQuery({
@@ -192,29 +200,32 @@ export function PiecePanel({
   // Uma marca só: a tabela "Parâmetros por peça" (se houver parâmetros por peça).
   const onlyMark = selection.marks.length === 1 && selection.unmarked.length === 0 ? selection.marks[0] : undefined;
 
+  const status = onlyMark ? statusById.get(onlyMark.mark_id) : undefined;
+
   if (focus === null) {
     return (
       <div className="model-sec">
-        <h4>Seleção</h4>
-        <p className="muted">Clique numa peça no modelo para ver a marca e as propriedades.</p>
+        <h3 className="section-title">Seleção</h3>
+        <p className="muted">Toque numa peça no modelo, ou escolha uma marca na lista, para ver e preencher os parâmetros da fábrica.</p>
       </div>
     );
   }
 
   return (
     <>
-      <div className="model-sec">
+      <div className="model-sec piece-sec">
         <SelectionHeader selection={selection} />
-        {element.data && (
-          <p className="muted small">
-            Peça clicada: {element.data.name ?? '—'} (dbId {element.data.dbid})
-            {element.data.external_id && <> · {element.data.external_id}</>}
+        {status && (
+          <p className="piece-status">
+            <StatusBadge status={status} />
           </p>
+        )}
+        {element.data && (
+          <p className="muted small">Peça clicada: {element.data.name ?? '—'}</p>
         )}
       </div>
 
-      <AxisCoordinatesSection state={axis} />
-
+      {/* Ordem do painel = caminho da produção: quem é → status → preencher → conferir no modelo. */}
       <section className="model-sec" aria-labelledby="factory-params">
         <div className="reshead">
           <h4 id="factory-params">Parâmetros da fábrica</h4>
@@ -246,6 +257,8 @@ export function PiecePanel({
         )}
       </section>
 
+      <AxisCoordinatesSection state={axis} />
+
       <section className="model-sec" aria-labelledby="model-props">
         <h4 id="model-props">
           Propriedades do modelo <span className="ro">somente leitura</span>
@@ -257,6 +270,11 @@ export function PiecePanel({
           </p>
         )}
         {element.data && <ModelProperties key={element.data.dbid} groups={element.data.groups} />}
+        {element.data && (
+          <p className="hint tech-ids" title="Identificadores do elemento no modelo (para suporte)">
+            Id no modelo: {element.data.external_id ?? '—'} · dbId {element.data.dbid}
+          </p>
+        )}
       </section>
     </>
   );

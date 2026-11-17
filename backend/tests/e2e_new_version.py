@@ -2,7 +2,7 @@
 
     cd backend && uv run python -m tests.e2e_new_version
 
-Cria a próxima versão da E2E-REV (Rev.03, Rev.04…) com o conteúdo de revisao_v2 e a
+Cria a próxima versão da E2E-REV (V3, V4…) com o conteúdo de revisao_v2 e a
 processa com o MESMO process_version do worker, publicando os eventos no Redis real
 (como o worker faz): as telas abertas recebem version_ready. O seed (tests.e2e_seed)
 apaga essas versões extras. APS simulado com respx. Imprime {"version_id", "version_number"}.

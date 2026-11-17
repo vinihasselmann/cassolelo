@@ -4,6 +4,10 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 
 import { AppRoutes } from './routes';
+// IBM Plex hospedada no app (só latim, que cobre o português; só os pesos usados).
+import '@fontsource/ibm-plex-sans/latin-400.css';
+import '@fontsource/ibm-plex-sans/latin-600.css';
+import '@fontsource/ibm-plex-mono/latin-400.css';
 import './styles.css';
 
 const queryClient = new QueryClient({

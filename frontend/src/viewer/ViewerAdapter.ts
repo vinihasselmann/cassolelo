@@ -61,6 +61,8 @@ export interface ViewerAdapter {
   showAll(): void;
   /** Enquadra a câmera nestes elementos; sem ids (ou lista vazia), no modelo inteiro. */
   fitTo(dbIds?: DbId[]): void;
+  /** Recalcula o tamanho do desenho depois que a área do 3D mudou (painel lateral aberto/fechado). */
+  resize(): void;
   /** Pinta elementos (substitui as cores anteriores). */
   setColors(colors: ReadonlyMap<DbId, HexColor>): void;
   /** Remove todas as cores aplicadas por setColors. */

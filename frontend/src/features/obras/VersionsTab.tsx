@@ -8,7 +8,7 @@ import {
   VERSION_STATUS_LABELS,
 } from '../../api/obras';
 import { errorMessage } from '../../lib/errors';
-import { formatDateTime } from '../../lib/format';
+import { formatDateTime, versionName } from '../../lib/format';
 import { EDITOR_ROLES, hasRole, SYNC_ROLES, useCurrentUser } from '../dev-user/useCurrentUser';
 import { syncMessage } from './syncMessage';
 import { ValidationPanel } from './ValidationPanel';
@@ -83,7 +83,7 @@ export function VersionsTab() {
             {versions.data.map((v) => (
               <Fragment key={v.id}>
                 <tr>
-                  <td>v{v.version_number}</td>
+                  <td>{versionName(v.version_number)}</td>
                   <td>{v.published_by ?? '—'}</td>
                   <td>{formatDateTime(v.published_at)}</td>
                   <td>{v.comment ?? '—'}</td>
@@ -103,7 +103,7 @@ export function VersionsTab() {
                           type="button"
                           className="secondary"
                           aria-pressed={validated?.id === v.id}
-                          aria-label={`Validação da v${v.version_number}`}
+                          aria-label={`Validação da ${versionName(v.version_number)}`}
                           onClick={() => { setChosenId(v.id); }}
                         >
                           {validated?.id === v.id ? 'Exibindo' : 'Ver validação'}

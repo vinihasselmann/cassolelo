@@ -75,7 +75,8 @@ NA_FILL = PatternFill("solid", fgColor="EEEEEE")
 
 
 def rev_label(n: int) -> str:
-    return f"Rev.{n:02d}"
+    """Nome da versão como no Autodesk Docs (V1, V2…)."""
+    return f"V{n}"
 
 
 def _num(value: float) -> float | int:

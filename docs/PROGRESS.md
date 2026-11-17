@@ -936,6 +936,107 @@ Serviço `app/services/piece_values.py` e rotas em `app/api/units.py`, com as me
   - uma laje pré-moldada para validar a regra de laje.
 - **Testes:** `node --test spikes/coordenadas` (9) e `pytest spikes/coordenadas` (2); `ruff` e `mypy` dos spikes OK.
 
+## Legenda móvel e retrátil + polish dos painéis flutuantes (2026-11-17)
+- **Legenda da coloração no `FloatingPanel`** (`ColorLegend.tsx`, vale para "Status de produção" e para qualquer "Colorir por"):
+  - padrão no canto superior direito do 3D; alça no título; posição lembrada por usuário (`legend:<id>`); duplo clique volta ao canto;
+  - ~70% do tamanho anterior (fonte 12 px, linhas de 24 px, marcadores de 9 px; no toque, linhas de 40 px);
+  - **Retrair** (aria-label "Retrair legenda"): vira uma pílula com o resumo (`legendSummary.ts`, ex.: "Status · 9 completas · 1.522 pendentes"; parâmetro: "Tipo de forma · Sem valor 5 · F-11 2 · +2"); clicar expande. O estado é lembrado por usuário.
+  - **Decisão do usuário:** sai o × "Ocultar legenda" / "Mostrar legenda" (fazia quase o mesmo que retrair); remover a coloração continua no ✕ ao lado de "Colorir".
+- **`FloatingPanel`:** posição padrão `top-center` ou `top-right`; a alça pode ir para dentro do conteúdo (função como filho). A mensagem de erro da coloração ganhou lugar próprio (`.coloring-error`).
+- **Polish (impeccable):**
+  - no canto padrão, a legenda termina acima dos botões dos painéis (meio da altura) e rola por dentro; movida, usa o 3D todo;
+  - no toque, a legenda fica mais larga (o título cabe numa linha) e esconde a dica (mais linhas visíveis);
+  - dica neutra para mouse e toque: "Escolha um item para selecionar as peças".
+- **Testes:**
+  - Vitest `legendSummary.test.ts` (3); teste da legenda no `ModelPage` agora retrai/expande;
+  - Playwright "Legenda móvel e retrátil" (3 × desktop/tablet): padrão no canto, retrair/expandir; arrastar + retrair e recarregar mantém posição e estado; duplo clique volta; não sai do 3D. A expectativa do e2e de coloração passou a usar Retrair/Expandir; a da barra móvel usa `.viewer-float`.
+- **Verificação:** lint e typecheck OK; frontend 227/227 (+2 todo); Playwright 80 passaram + 6 pulados; detector do impeccable sem achados; backend 696 passaram + 1 falha de tempo no `test_filter_engine_under_one_second_with_20k_pieces` com a máquina carregada pelo Playwright (passa isolado, 2 de 2; backend sem mudanças); ruff e mypy OK.
+
+## Barra do visualizador móvel (FloatingPanel, 2026-11-17)
+A barra de filtros ficava por cima da barra de ferramentas nativa do Autodesk Viewer.
+- **`components/FloatingPanel.tsx` (novo, reutilizável):**
+  - alça com ícone de "grip" que arrasta com pointer events (mouse e toque, `touch-action: none`);
+  - limite às bordas do pai ao mover e quando o pai ou o painel mudam de tamanho (`ResizeObserver` + `resize`);
+  - posição lembrada por usuário e por painel no `localStorage` (try/catch; sem armazenamento usa a posição padrão);
+  - duplo clique na alça volta ao padrão; setas movem 10 px e Shift+setas 50 px;
+  - ocupa só o próprio tamanho (não captura cliques no 3D fora dele).
+- **Barra do visualizador** (`ViewerToolbar.tsx`): dentro do `FloatingPanel`, com posição padrão no **topo, centralizada** (chave `viewer-bar:<id do usuário>`); começar a mover fecha o popover aberto.
+- **Tamanho ~70%:** fonte 12 px, botões de 28 px de altura, ícones de 10–11 px, espaços menores (sem `transform: scale`). No tablet (`pointer: coarse`) os botões continuam com 40 px de área de toque. Os estilos valem só para os botões da barra (o popover, que fica dentro do painel, mantém os seus).
+- **Popovers** (`features/filtro/popoverPlacement.ts`): abrem junto da barra, para baixo ou para cima conforme o espaço, com largura e altura limitadas à área do 3D.
+- Legenda e barra "Religar" descem para abaixo da barra (52 px; 68 px no toque). A classe `.float-bar`, sem uso, saiu do CSS.
+- **Viewer falso (e2e):** ganhou uma barra "nativa" (`#guiviewer3d-toolbar`, embaixo e centralizada), como a do Viewer v7.
+- **Testes:**
+  - Vitest `components/FloatingPanel.test.tsx` (9): teclado 10/50 px, posição lembrada e por usuário, duplo clique, sem armazenamento, e o cálculo do popover (para baixo, para cima, na borda, área estreita);
+  - Playwright "Barra do visualizador móvel" (4 × desktop/tablet): padrão no topo e centralizada, sem sobrepor a barra nativa, que recebe o clique, e o 3D continua clicável; arrastar muda a posição, que persiste ao recarregar; duplo clique volta ao padrão; arrastar além da borda mantém dentro do 3D; perto do fundo o popover abre para cima, dentro do 3D; teclado.
+- **Verificação:** lint e typecheck OK; frontend 224/224 (+2 todo); Playwright 74 passaram + 6 pulados (rodada completa) e, depois do último ajuste de CSS, os grupos barra móvel, rolagem, Coloração e Filtros 28/28; detector do impeccable sem achados.
+
+## Bug · rolagem fantasma na tela da obra: corrigido (2026-11-17)
+Diagnóstico e causa em `docs/bugs/rolagem-fantasma.md`.
+- **Causa:** o texto de status só para leitor de tela (`.sr-only`, `position: absolute`), colocado em cada linha da lista de marcas no passo de layout, não tinha ancestral posicionado. O documento crescia até a última linha da lista (2208 px numa janela de 900 px, obra 9480-SE3-IFC com 316 marcas), e o `overflow` do painel não o recortava. Com o Viewer falso não reproduzia: as marcas simuladas não tinham status.
+- **Correção (styles.css):** shell `.app` com `position: relative; height: 100dvh; overflow: hidden`; `.model-page` com linhas fixas `auto auto minmax(0,1fr) auto`; `.model-cols` com `minmax(0,1fr)`; painéis e `.list-item` com `position: relative`; `.model-viewer` com `overflow: hidden` e `container-type: size` (popovers limitados pelo espaço do 3D).
+- **Viewer:** novo `ViewerAdapter.resize()` (Viewer v7: `viewer.resize()`), chamado ao abrir ou fechar um painel; sai o `resize` falso na janela (`usePanels`).
+- **Testes:** Playwright "Tela da obra não rola como página" (1440×900 e 1180×820, 316 marcas com status, painel aberto/fechado: `scrollHeight === innerHeight`, a lista rola por dentro, o Viewer recebe `resize`); Vitest: esconder painel chama `viewer.resize()`. Conferido também com o Viewer real na obra 9480-SE3-IFC: 2208 → 900.
+- **Verificação:** lint e typecheck OK; frontend 215/215 (+2 todo); Playwright 66 passaram + 6 pulados.
+
+## Barra única do 3D, tablet e acabamento (distill + adapt + polish, 2026-11-17)
+- **distill:** uma só barra sobre o 3D, embaixo (perto do polegar): Filtro ▾ (✕) · Colorir ▾ (✕) │ Enquadrar · Isolar · Limpar · Múltipla │ Ampliar tudo (`ViewerToolbar.tsx`, prop `selectionTools`). A barra do topo saiu; "Remover filtros/coloração" viraram um ✕ colado ao botão (mesmo nome acessível); "Editar cores" foi para dentro do popover Colorir. Rótulos curtos com o nome completo no `aria-label` (WCAG 2.5.3).
+- **adapt (tablet):** com `pointer: coarse`, `--tap` 48 px e `--tap-sm` 44 px; × de etiquetas, linhas da legenda, botões de banners, links e botões de painel (28 → 44 px) também crescem; caixas de seleção 24 px. Legenda no canto superior direito (o topo ficou livre) e acima do botão do painel; popovers com altura limitada (não cobrem a barra da versão). Tablet em pé: o painel da peça vem logo abaixo do 3D, antes da lista.
+- **polish:** foco de teclado visível em todo controle (âmbar escuro, 4,6:1); borda de campo 3,4:1 (`--gray-500`); ícones SVG (`components/Icon.tsx`) no lugar de glifos ‹ › ▾ ▸ ×; títulos h1 → h2 (só leitor de tela nos painéis) → h3 → h4 sem pular nível; seleção de texto, cursor e `accent-color` da paleta; `prefers-reduced-motion` no indicador de carregamento; "Sumiu na V2" e "1 arquivo de outro formato oculto" (sobras do clarify); linha do Histórico com fio de 1 px.
+- **Testes:** expectativas da barra (nomes), "Colorir"/"Salvar" sem ▾ e "Editar cores" pelo popover atualizadas no Vitest e no Playwright.
+- **Verificação:** lint e typecheck OK; frontend 215/215 (+2 todo); Playwright 62 passaram + 6 pulados (rodada completa) e grupos Coloração/Filtros/status 16/16 depois do último ajuste de CSS; detector do impeccable sem achados.
+- **Falta:** `harden` (estado salvo/falhou/tentar de novo, indicador de conexão, manifest PWA) — o P2 do critique segue aberto, por isso o snapshot não foi fechado; no tablet deitado o 3D tem ~600 px e "Ampliar tudo" desce para uma 2ª linha da barra; testar o toque num tablet real.
+
+## Textos, rótulos e mensagens (clarify, 2026-11-17)
+- **Versão = V1, V2… em todo lugar** (decisão do usuário: o mesmo nome do Autodesk Docs; não confunde com revisão de desenho R02). Seletor do modelo, modo consulta, banner de nova versão e de diferença ("V2 comparada com a V1"), rodapé, aba Versões, Validação, Identificação, nome do Excel (`export.rev_label`) e alertas do Teams/e-mail (`alerts._rev`). Helper `versionName` em `lib/format.ts`.
+- **Marcas órfãs / Peças órfãs** (antes "Fila de órfãs"): menu Gerenciar e título da janela; a aba Identificação aponta para "Gerenciar › Marcas órfãs".
+- **Plural de verdade** (helper `plural`): saem "parâmetro(s)", "peça(s)", "marca(s)", "obra(s)", "pronta(s)".
+- **Erros:** sem conexão (`TypeError` do fetch) → "Sem conexão com o servidor. Confira o Wi-Fi e tente de novo."; erro sem mensagem do servidor deixa de mostrar o `statusText` em inglês ("Bad Gateway") e ganha texto por situação (`fallbackMessage` em `api/client.ts`: 5xx, 403, 404, 409, 422).
+- **Status na coloração:** a peça sem marca aparece como **"Sem marca"** (antes "Sem valor"), o que explica a diferença entre a legenda e o rodapé (`colors.NO_MARK_LABEL`; nos parâmetros continua "Sem valor").
+- **Painel da peça:** estado vazio diz o próximo passo ("Toque numa peça… ou escolha uma marca na lista…"); dbId e Id do elemento saem do cabeçalho e vão para o fim de "Propriedades do modelo" ("Id no modelo: … · dbId …").
+- **Outros:** dica da legenda "Toque num item para selecionar as peças"; rodapé sem obrigatórios curto e com o caminho ("Gerenciar › Catálogo").
+- **Testes:** `src/lib/messages.test.ts` (4: sem conexão, fallback em português, mensagem do servidor mantida, plural/versão); expectativas de texto atualizadas no Vitest, Playwright e backend (`test_export`, `test_observability`, `test_colors`).
+- **Verificação:** lint e typecheck OK; frontend 215/215 (+2 todo); backend export/observability/colors 43/43, ruff e mypy OK; Playwright 62 passaram + 6 pulados.
+- **Não mudado de propósito:** nomes de categoria do Revit ("Structural Columns") vêm do modelo; traduzir seria alterar o dado.
+
+## Tipografia do app inteiro: IBM Plex + escala por papel (2026-11-17)
+`/impeccable typeset`.
+- **Fonte:** IBM Plex Sans (400 e 600) e IBM Plex Mono (400, só para dado: coordenadas, ids, código), hospedadas no app por `@fontsource` (subconjunto latino, cobre o português; 62 KB em woff2; `font-display: swap`; a CSP já permitia `font-src 'self'`). Antes: `system-ui`, que era Segoe UI no computador e Roboto no tablet.
+- **Escala** (`styles/tokens.css`): 17 tamanhos soltos → 6 papéis em rem: `--fs-2xs` 12px (selos, cabeçalho de tabela), `--fs-xs` 13px (metadados, dicas, legenda, rodapé, título de seção), `--fs-sm` 14px (painéis, listas, barras), `--fs-md` 16px (corpo, campos, botões), `--fs-lg` 18px (título do painel/janela), `--fs-xl` 22px (título de página). "somente leitura" sai de 10,9px para 12px.
+- **Base:** entrelinha 1,45 no corpo e 1,25 nos títulos; títulos em 600 com `text-wrap: balance`; parágrafos com `pretty`; algarismos tabulares em tabelas, contagens, legenda e rodapé; "Copiar" deixa de herdar a fonte mono da tabela de eixos.
+- **Verificação:** lint, typecheck e build OK; frontend 211/211 (+2 todo); Playwright 62 passaram + 6 pulados (sem violação de CSP; fonte carregada no tablet e no desktop); detector de tipografia sem achados.
+
+## Layout da tela da obra: produção primeiro (2026-11-17)
+`/impeccable layout` (decisão: mesma tela para todos os papéis).
+- **Coluna esquerda:** a lista de marcas vem primeiro. Novo parâmetro, Catálogo, Fila de órfãs e Peças órfãs ficam no menu **"Gerenciar ▾"** (`features/modelo/ManageMenu.tsx`: recolhido; Esc fecha e devolve o foco; escolher uma ação fecha).
+- **Status de produção da marca** (já existia `GET /versions/{id}/marks/status`, sem uso): bolinha em cada linha da lista e selo no cabeçalho do painel da peça (`StatusBadge.tsx`, `statusLabel.ts`). Cor da legenda + forma (anel = Pendente, losango = Revisar) + texto; na lista o texto vai no fim do nome acessível ("PP001 … 2 peças, Completa"), para a linha continuar começando pelo código.
+- **Painel da peça:** cabeçalho com status → Parâmetros da fábrica (Editar / Editar em lote viraram a ação cheia) → Coordenadas do eixo → Propriedades do modelo.
+- **Tabela por peça:** Peça → colunas de parâmetro → Nível e Id no fim, em tom secundário (o valor a preencher aparece sem rolar para o lado).
+- **Testes:** 2 novos em `ModelPage.test.tsx` (status na lista e no painel + ordem; menu Gerenciar com Esc e foco); testes e E2E que abriam Catálogo/órfãs/Novo parâmetro pela coluna esquerda agora abrem "Gerenciar" antes; E2E de remover filtros aceita o status no fim da linha.
+- **Verificação:** lint e typecheck OK; frontend 211/211 (+2 todo); Playwright 62 passaram + 6 pulados; detector de layout sem achados.
+- **Falta:** contagem nas filas de órfãs dentro do "Gerenciar"; selo de status também na seleção de várias marcas; restante do plano (`distill`, `adapt`, `harden`, `clarify`, `typeset`, `polish`).
+
+## Paleta do logo, sem azul (2026-11-17)
+- **Interface** (`styles/tokens.css`): ação (botões, links) em **grafite #3C3C3C**; **âmbar** é o único destaque (fio do cabeçalho, aba ativa, item selecionado `--amber-100`, foco `--amber-700` com 4,6:1). Neutros sem matiz (antes puxavam para o azul). Avisos de nova versão e tempo real em cinza neutro; link do aviso escuro em âmbar.
+- **3D:** seleção em grafite (`lib/palette.ts` → `SELECTION_COLOR`; o adapter também ajusta a cor de seleção nativa do Viewer). O âmbar não serve para a seleção: confunde com Parcial/Revisar.
+- **"Cor por gama"** (`backend/app/services/colors.py` → `RANGE_COLORS`): âmbar claro → âmbar escuro (`#FBE3B0` … `#A86500`), longe do grafite da seleção.
+- **Mantidos de propósito:** a paleta de "colorir por categoria" (20 cores bem distintas, inclui azuis: são cores de dado, não da interface) e as cores de status.
+- **Testes:** `ApsViewerAdapter.test.ts` e o E2E "cor por gama" atualizados; viewer falso pinta a seleção com `SELECTION_HEX` grafite.
+- **Verificação:** lint, typecheck OK; frontend 209/209 (+2 todo); backend `test_colors.py` 13/13, ruff e mypy OK; Playwright 62 passaram + 6 pulados (os 2 de "cor por gama" corrigidos e repassados: Coloração 6/6).
+
+## Tela do modelo mais discreta: quieter + critique + audit (2026-11-17)
+- **Critique** (`/impeccable critique`, antes do quieter): **24/40** (Aceitável), 3 problemas P1. Relatório em `.impeccable/critique/`.
+- **Audit** (`/impeccable audit`, frontend inteiro, depois do quieter): **13/20** (Aceitável). Relatório em `.impeccable/audit/`.
+- **Quieter** (`styles.css`, `styles/tokens.css`, `ModelPage.tsx`), sem mudar paleta nem textos:
+  - fundo do 3D liso (sai o gradiente); raios 10–12 px → 6–8 px; sombras curtas;
+  - barra "Ferramentas do modelo" e barra inferior com `width: max-content` (não quebram mais linha à toa);
+  - Catálogo, Fila de órfãs e Peças órfãs viram `button.ghost` (sem contorno); "+ Novo parâmetro" é a única ação cheia;
+  - links com sublinhado fino e translúcido, cheio no hover;
+  - títulos de seção em semibold, sem caixa alta;
+  - "Status" ativo no Colorir usa o selecionado comum (sai o azul saturado);
+  - avisos sem borda lateral grossa (`.notice`, `.alert--review`, `.live-notice`); barra "Religar" tingida com texto escuro (contraste 3,0 → 7,9:1).
+- **Verificação:** lint e typecheck OK; frontend 209/209 (+2 todo); Playwright 62 passaram + 6 pulados.
+- **Falta (do critique/audit):** `adapt` (alvos 44–48 px no tablet, sobreposições da legenda/popovers), `harden` (salvo/falhou/tentar de novo, indicador de conexão, manifest PWA), `layout` (tabela por peça, ordem do painel direito), `clarify` (Rev.01 × v1, dbId, legenda 7 × rodapé 6), `polish` (foco visível, borda de campo, títulos h1→h4).
+
 ## Design system do frontend: tokens e padrões (2026-11-17)
 Feito com a skill impeccable (`/impeccable init` e `/impeccable extract`). Contexto do produto em `PRODUCT.md` (raiz). A extração manteve o visual igual; trocar cores é um passo separado.
 - **`frontend/src/styles/tokens.css`** (novo): primitivas (marca, status, neutros) e tokens semânticos (superfície, borda, texto, ação, seleção, perigo, sucesso, atenção, revisar, raios, sombras, fontes, alvo de toque). `styles.css` importa e usa só tokens: **nenhum hex** sobrou nele.

@@ -58,7 +58,7 @@ describe('AccPicker', () => {
     await openPath(user, ['Cassol', 'OBRA 001', 'Project Files', 'Modelos']);
 
     expect(screen.queryByRole('button', { name: /Memorial\.pdf/ })).not.toBeInTheDocument();
-    expect(screen.getByText(/1 arquivo\(s\) de outros formatos oculto/)).toBeInTheDocument();
+    expect(screen.getByText(/1 arquivo de outro formato oculto/)).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /OBRA-001\.rvt/ }));
     expect(onSelect).toHaveBeenCalledWith({

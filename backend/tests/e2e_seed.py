@@ -154,7 +154,7 @@ async def _revisions(session: AsyncSession, config: ProcessingConfig) -> dict[st
     await session.flush()
     marks = select(Mark.id).where(Mark.obra_id == obra.id)
     await session.execute(delete(Orphan).where(Orphan.mark_id.in_(marks)))
-    # Versões extras (Rev.03… do teste de "nova versão", 8.2) saem: v2 volta a ser a ativa.
+    # Versões extras (V3… do teste de "nova versão", 8.2) saem: v2 volta a ser a ativa.
     await session.execute(
         delete(ModelVersion).where(
             ModelVersion.obra_id == obra.id, ModelVersion.version_number > max(REV_URNS)

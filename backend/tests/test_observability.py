@@ -373,7 +373,7 @@ async def test_alerts_failed_and_no_translation_once(
     fake, broken = _FakeNotifier(), _FakeNotifier(fail=True)
     sent = await alerts.run_checks(session, metrics_store, settings, [broken, fake])
     titles = [a.title for a in sent]
-    assert titles == ["Versão com falha: OB-AL Rev.01", "Sem conversão há 3 h: OB-AL Rev.03"]
+    assert titles == ["Versão com falha: OB-AL V1", "Sem conversão há 3 h: OB-AL V3"]
     assert "Erro inesperado" in sent[0].text and "https://bim.cassol.local/obras/" in sent[0].text
     assert [a.key for a in fake.sent] == [a.key for a in sent]  # um canal fora não impede o outro
     # deduplicação: nada de novo na próxima rodada
@@ -445,12 +445,12 @@ async def test_alert_backup_late_and_failed(
 @respx.mock
 async def test_teams_notifier_posts_adaptive_card() -> None:
     route = respx.post("https://prod.westus.logic.azure.com/workflows/x").respond(202)
-    alert = alerts.Alert("k", "Versão com falha: OB Rev.02", "detalhe", 60)
+    alert = alerts.Alert("k", "Versão com falha: OB V2", "detalhe", 60)
     await alerts.TeamsNotifier("https://prod.westus.logic.azure.com/workflows/x").send(alert)
     body = json.loads(route.calls.last.request.content)
     card = body["attachments"][0]
     assert card["contentType"] == "application/vnd.microsoft.card.adaptive"
-    assert "Versão com falha: OB Rev.02" in card["content"]["body"][0]["text"]
+    assert "Versão com falha: OB V2" in card["content"]["body"][0]["text"]
     assert card["content"]["body"][1]["text"] == "detalhe"
 
 

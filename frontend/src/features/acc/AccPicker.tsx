@@ -145,7 +145,7 @@ export function AccPicker({ onSelect, selectedItemId }: Props) {
       )}
       {hiddenFiles > 0 && visible.length > 0 && (
         <p className="muted small">
-          {hiddenFiles} arquivo(s) de outros formatos oculto(s). Só .rvt, .nwd e .ifc podem ser
+          {hiddenFiles === 1 ? '1 arquivo de outro formato oculto.' : `${String(hiddenFiles)} arquivos de outros formatos ocultos.`} Só .rvt, .nwd e .ifc podem ser
           vinculados.
         </p>
       )}

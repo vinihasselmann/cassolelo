@@ -23,5 +23,5 @@ export const STATUS_TOKENS: Record<ProductionStatus, string> = {
   Revisar: '--status-review',
 };
 
-/** Cor da seleção no 3D (token --selection). */
-export const SELECTION_COLOR = '#2F6FEB';
+/** Cor da seleção no 3D (token --selection): grafite do logo, distinta de todos os status. */
+export const SELECTION_COLOR = '#3C3C3C';

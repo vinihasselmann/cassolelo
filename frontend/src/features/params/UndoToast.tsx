@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { undoBatch } from '../../api/markBatch';
 import { errorMessage } from '../../lib/errors';
 import { invalidateValueQueries } from './invalidate';
+import { Icon } from '../../components/Icon';
 
 export const UNDO_SECONDS = 10;
 
@@ -44,7 +45,7 @@ export function UndoToast({ batchId, text, onClose }: Props) {
         </>
       )}
       <button type="button" className="link toast__close" aria-label="Fechar aviso" onClick={onClose}>
-        ×
+        <Icon name="close" />
       </button>
     </div>
   );

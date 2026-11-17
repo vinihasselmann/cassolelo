@@ -9,15 +9,15 @@ const item = (label: string, color: string, dbids: number[], value: string | nul
 });
 
 describe('coloringModel', () => {
-  it('status: ordem fixa, os quatro sempre presentes e "Sem valor" no fim; marcas contadas pelas peças', () => {
+  it('status: ordem fixa, os quatro sempre presentes e "Sem marca" no fim; marcas contadas pelas peças', () => {
     const result: ColorizeResult = {
       mode: 'distinct', field_name: 'Status de produção', field_type: 'text', total_pieces: 5,
       colors: { '10': '#33A06F', '30': '#9AA0A6' },
-      legend: [item('Completa', '#33A06F', [10, 11, 12]), item('Pendente', '#B9BEC6', [20]), item('Sem valor', '#9AA0A6', [30], null)],
+      legend: [item('Completa', '#33A06F', [10, 11, 12]), item('Pendente', '#B9BEC6', [20]), item('Sem marca', '#9AA0A6', [30], null)],
     };
     const c = fromColorize(result, STATUS_FIELD, markOf);
     expect(c.legend.map((i) => [i.label, i.pieces, i.marks])).toEqual([
-      ['Pendente', 1, 1], ['Parcial', 0, 0], ['Completa', 3, 2], ['Revisar', 0, 0], ['Sem valor', 1, 0],
+      ['Pendente', 1, 1], ['Parcial', 0, 0], ['Completa', 3, 2], ['Revisar', 0, 0], ['Sem marca', 1, 0],
     ]);
     expect(c.colors.get(10)).toBe('#33A06F');
     expect(c.title).toBe('Status de produção');
@@ -44,6 +44,6 @@ describe('coloringModel', () => {
     const c = fromScheme(result, 'Meu esquema', markOf);
     expect(c.title).toBe('Meu esquema');
     expect(c.legend.map((i) => [i.label, i.pieces, i.marks])).toEqual([['Expedidas', 2, 1], ['Antigo', 0, 0]]);
-    expect(c.note).toBe('Regra 2: ignorada. 4 peça(s) sem regra ficam com a cor original.');
+    expect(c.note).toBe('Regra 2: ignorada. 4 peças sem regra ficam com a cor original.');
   });
 });

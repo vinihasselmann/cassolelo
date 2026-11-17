@@ -28,7 +28,7 @@ bim logs --since 30m api worker | grep -E '"level": "(ERROR|WARNING)"'
 
 ## 1. Uma versão falhou (`failed`) ou ficou sem conversão (`no_translation`)
 
-**Alertas:** "Versão com falha: <obra> Rev.NN" ou "Sem conversão há N h". Na tela da
+**Alertas:** "Versão com falha: <obra> VN" ou "Sem conversão há N h". Na tela da
 obra › **Versões**, a linha aparece em vermelho com a mensagem.
 
 **Confirmar:**

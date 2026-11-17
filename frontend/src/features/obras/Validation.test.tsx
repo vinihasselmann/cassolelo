@@ -101,7 +101,7 @@ describe('Painel Validação', () => {
     renderApp('/obras/7/versoes');
 
     // padrão: a versão pronta mais recente (v2); a v3 ainda está processando
-    expect(await screen.findByRole('heading', { name: 'Validação — v2' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Validação — V2' })).toBeInTheDocument();
     const counter = await screen.findByText(/2 alertas/);
     expect(counter).toHaveClass('counter--warn');
     expect(counter).toHaveTextContent('1 peça sem Marca, 1 marca inconsistente');
@@ -143,8 +143,8 @@ describe('Painel Validação', () => {
     renderApp('/obras/7/versoes');
 
     expect(await screen.findByText(/2 alertas/)).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Validação da v1' }));
-    expect(await screen.findByRole('heading', { name: 'Validação — v1' })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Validação da V1' }));
+    expect(await screen.findByRole('heading', { name: 'Validação — V1' })).toBeInTheDocument();
     expect(await screen.findByText('Nenhum alerta')).toHaveClass('counter--ok');
     expect(screen.getByText('Todas as peças têm Marca.')).toBeInTheDocument();
   });
@@ -159,7 +159,7 @@ describe('Painel Validação', () => {
     });
     setDevUser('2');
     renderApp('/obras/7/versoes');
-    expect(await screen.findByText('v1')).toBeInTheDocument();
+    expect(await screen.findByText('V1')).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: /Validação/ })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Validação da/ })).not.toBeInTheDocument();
   });

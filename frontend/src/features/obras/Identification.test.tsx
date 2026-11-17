@@ -128,7 +128,7 @@ describe('Aba Identificação das peças', () => {
 
     // candidatos da v2 (a v3 ainda processa)
     expect(
-      await screen.findByRole('heading', { name: 'Qual parâmetro identifica as peças? — v2' }),
+      await screen.findByRole('heading', { name: 'Qual parâmetro identifica as peças? — V2' }),
     ).toBeInTheDocument();
     const table = await screen.findByRole('table', { name: 'Parâmetros candidatos' });
     const rows = within(table).getAllByRole('row');
@@ -149,7 +149,7 @@ describe('Aba Identificação das peças', () => {
     await user.click(salvar);
 
     expect(await screen.findByRole('status')).toHaveTextContent(
-      'Regra salva. A v2 está sendo reprocessada com a regra nova.',
+      'Regra salva. A V2 está sendo reprocessada com a regra nova.',
     );
     expect(saved[0]?.body).toEqual({
       mark_property_names: ['Nome da montagem', 'Marca', 'Mark'],
@@ -183,7 +183,7 @@ describe('Aba Identificação das peças', () => {
     await user.type(screen.getByLabelText('Adicionar a Parâmetros da marca'), 'PILAR_ID{Enter}');
     await user.click(screen.getByRole('button', { name: 'Salvar regra' }));
     expect(await screen.findByRole('status')).toHaveTextContent(
-      'não foi possível iniciar o reprocessamento da v2',
+      'não foi possível iniciar o reprocessamento da V2',
     );
     expect(saved[0]?.body).toMatchObject({ mark_property_names: ['PILAR_ID'] });
   });

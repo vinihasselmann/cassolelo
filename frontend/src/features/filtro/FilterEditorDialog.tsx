@@ -14,6 +14,7 @@ import {
   type ActiveRule,
 } from './filterModel';
 import { OpSelect, ValueInput } from './RuleInputs';
+import { Icon } from '../../components/Icon';
 
 const fieldId = (f: { source: string; key: string }) => `${f.source}:${f.key}`;
 const MODES: FilterMode[] = ['isolate', 'hide', 'highlight'];
@@ -98,7 +99,7 @@ export function FilterEditorDialog({ versionId, fields, filter, onApply, onClose
                 <span className="error small">Parâmetro não existe nesta versão (a regra é ignorada).</span>
               )}
               <button type="button" className="link rule-row__remove" aria-label={`Remover regra ${n}`} onClick={() => { setRules((prev) => prev.filter((_, j) => j !== i)); }}>
-                ×
+                <Icon name="close" />
               </button>
             </li>
           );

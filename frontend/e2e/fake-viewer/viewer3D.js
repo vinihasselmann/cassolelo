@@ -14,7 +14,7 @@
 (function () {
   'use strict';
   var SELECTION = 'selection';
-  var SELECTION_HEX = '#2F6FEB'; // SELECTION_COLOR do app
+  var SELECTION_HEX = '#3C3C3C'; // SELECTION_COLOR do app
 
   var GLOBAL_OFFSET = { x: 100, y: 200, z: 5 };
   // cubo unitário (malha normalizada do SVF2): 8 vértices, 12 triângulos
@@ -104,10 +104,26 @@
     // peças à esquerda, longe da legenda (à direita) e da barra inferior
     this.root.style.cssText = 'position:absolute;inset:140px 260px 12px 12px;display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start';
     this.container.appendChild(this.root);
+    // imita a barra de ferramentas nativa do Viewer v7: embaixo, centralizada, sobre o desenho
+    this.nativeBar = document.createElement('div');
+    this.nativeBar.id = 'guiviewer3d-toolbar';
+    this.nativeBar.setAttribute('role', 'toolbar');
+    this.nativeBar.setAttribute('aria-label', 'Barra nativa do Viewer');
+    this.nativeBar.style.cssText = 'position:absolute;bottom:12px;left:50%;transform:translateX(-50%);z-index:1;display:flex;gap:4px;padding:4px;background:#222;border-radius:4px';
+    ['Órbita', 'Seção', 'Propriedades'].forEach(function (name) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = name;
+      b.style.cssText = 'min-height:36px;padding:0 10px;background:#333;color:#fff;border:0;border-radius:3px';
+      b.addEventListener('click', function () { window.__E2E_NATIVE_CLICKS = (window.__E2E_NATIVE_CLICKS || 0) + 1; });
+      this.nativeBar.appendChild(b);
+    }, this);
+    this.container.appendChild(this.nativeBar);
     return 0;
   };
   GuiViewer3D.prototype.finish = function () {
     if (this.root) this.root.remove();
+    if (this.nativeBar) this.nativeBar.remove();
   };
   GuiViewer3D.prototype.addEventListener = function (type, cb) {
     if (type === SELECTION) this.listeners.push(cb);
@@ -120,7 +136,7 @@
     var self = this;
     this.buttons.forEach(function (btn, dbid) {
       btn.setAttribute('aria-pressed', String(self.selected.indexOf(dbid) >= 0));
-      btn.style.background = self.selected.indexOf(dbid) >= 0 ? '#2F6FEB' : '#fff';
+      btn.style.background = self.selected.indexOf(dbid) >= 0 ? SELECTION_HEX : '#fff';
       btn.style.color = self.selected.indexOf(dbid) >= 0 ? '#fff' : '#1B2430';
       var out = self.shown !== null && self.shown.indexOf(dbid) < 0;
       var gone = self.hiddenIds.indexOf(dbid) >= 0 || (out && !self.ghosting);
@@ -181,6 +197,7 @@
   GuiViewer3D.prototype.hide = function (ids) { this.hiddenIds = this.hiddenIds.concat(ids); this._paint(); };
   GuiViewer3D.prototype.showAll = function () { this.shown = null; this.hiddenIds = []; this._paint(); };
   GuiViewer3D.prototype.fitToView = function () {};
+  GuiViewer3D.prototype.resize = function () { window.__E2E_RESIZES = (window.__E2E_RESIZES || 0) + 1; };
   function hex(v) {
     return '#' + [v.x, v.y, v.z].map(function (c) {
       return ('0' + Math.round(c * 255).toString(16)).slice(-2);
@@ -189,7 +206,7 @@
   GuiViewer3D.prototype.setThemingColor = function (dbid, v) {
     var h = hex(v);
     if (v.w === 0) { this.colors.delete(dbid); this.selTheme.delete(dbid); } // alfa 0: sem cor
-    else if (h === SELECTION_HEX) this.selTheme.add(dbid); // azul da seleção por cima da base
+    else if (h === SELECTION_HEX) this.selTheme.add(dbid); // grafite da seleção por cima da base
     else { this.colors.set(dbid, h); this.selTheme.delete(dbid); }
     this._paint();
   };

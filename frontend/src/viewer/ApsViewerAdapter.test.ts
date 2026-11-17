@@ -44,6 +44,7 @@ function fakeAutodesk(opts: { docFails?: boolean } = {}) {
     setGhosting: vi.fn(),
     showAll: vi.fn(),
     fitToView: vi.fn(),
+    resize: vi.fn(),
     setThemingColor: vi.fn<(dbId: number, color: unknown, model?: AvModel, recursive?: boolean) => void>(),
     clearThemingColors: vi.fn(),
   } satisfies AvViewer;
@@ -161,25 +162,25 @@ describe('ApsViewerAdapter', () => {
     expect(fake.viewer.clearThemingColors).toHaveBeenCalledTimes(2);
   });
 
-  it('com coloração ativa, a seleção fica azul por cima e volta à cor ao sair', async () => {
+  it('com coloração ativa, a seleção fica grafite por cima e volta à cor ao sair', async () => {
     vi.stubGlobal('THREE', { Vector4 });
     const fake = fakeAutodesk();
     const { adapter } = makeAdapter(fake);
     await adapter.load('dXJu');
     const theme = () => new Map(fake.viewer.setThemingColor.mock.calls.map(([id, c]) => [id, c]));
-    const blue = new Vector4(47 / 255, 111 / 255, 235 / 255, 1);
+    const graphite = new Vector4(60 / 255, 60 / 255, 60 / 255, 1); // SELECTION_COLOR #3C3C3C
 
     adapter.selectDbIds([1]); // sem coloração: só o destaque normal do Viewer
     expect(fake.viewer.setThemingColor).not.toHaveBeenCalled();
     adapter.setColors(new Map([[1, '#FF0000'], [2, '#00FF00']]));
-    expect(theme().get(1)).toEqual(blue); // selecionada: azul, não vermelha
+    expect(theme().get(1)).toEqual(graphite); // selecionada: grafite, não vermelha
     expect(theme().get(2)).toEqual(new Vector4(0, 1, 0, 1));
 
     fake.viewer.setThemingColor.mockClear();
     adapter.selectDbIds([2, 3]);
     expect(theme().get(1)).toEqual(new Vector4(1, 0, 0, 1)); // volta à cor da coloração
-    expect(theme().get(2)).toEqual(blue);
-    expect(theme().get(3)).toEqual(blue); // sem cor própria, mas selecionada
+    expect(theme().get(2)).toEqual(graphite);
+    expect(theme().get(3)).toEqual(graphite); // sem cor própria, mas selecionada
 
     fake.viewer.setThemingColor.mockClear();
     adapter.selectDbIds([]);

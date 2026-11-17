@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { fetchVersionReport, type DimensionDifference } from '../../api/versions';
 import { errorMessage } from '../../lib/errors';
-import { formatDateTime } from '../../lib/format';
+import { formatDateTime, versionName } from '../../lib/format';
 
 const num = (n: number) => n.toLocaleString('pt-BR');
 
@@ -32,7 +32,7 @@ export function ValidationPanel({ versionId, versionNumber }: Props) {
   return (
     <section className="card" aria-labelledby="validation-title">
       <div className="page-head">
-        <h3 id="validation-title">Validação — v{versionNumber}</h3>
+        <h3 id="validation-title">Validação — {versionName(versionNumber)}</h3>
         {query.data && <Counter report={query.data.report} />}
       </div>
 

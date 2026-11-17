@@ -11,6 +11,7 @@ import {
 } from '../../api/markRule';
 import { fetchVersions } from '../../api/obras';
 import { errorMessage } from '../../lib/errors';
+import { versionName } from '../../lib/format';
 import { useObraId } from './useObraId';
 
 const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
@@ -104,9 +105,9 @@ function savedMessage(r: MarkRuleUpdate): string {
     return 'Regra salva. Ela vale para as próximas versões processadas.';
   }
   if (!r.enqueued) {
-    return `Regra salva, mas não foi possível iniciar o reprocessamento da v${r.reprocess_version_number}. Tente salvar de novo em alguns minutos.`;
+    return `Regra salva, mas não foi possível iniciar o reprocessamento da ${versionName(r.reprocess_version_number)}. Tente salvar de novo em alguns minutos.`;
   }
-  return `Regra salva. A v${r.reprocess_version_number} está sendo reprocessada com a regra nova.`;
+  return `Regra salva. A ${versionName(r.reprocess_version_number)} está sendo reprocessada com a regra nova.`;
 }
 
 function signals(c: MarkCandidate): string {
@@ -200,7 +201,7 @@ function RuleEditor({ obraId, rule }: { obraId: number; rule: MarkRule }) {
         Ao salvar, a versão ativa é processada de novo com a regra nova. Uma marca com
         valores cujas peças vão todas para <strong>uma</strong> marca nova leva os valores
         junto. As outras (peças divididas entre marcas, ou destino com outro valor) viram{' '}
-        <strong>órfãs</strong> para decidir na tela de órfãs. Nenhum valor é apagado.
+        <strong>órfãs</strong>: decida em Gerenciar › Marcas órfãs, na tela do modelo. Nenhum valor é apagado.
       </p>
       <div className="actions">
         <button
@@ -250,7 +251,7 @@ function RuleEditor({ obraId, rule }: { obraId: number; rule: MarkRule }) {
         </p>
       )}
 
-      <h4>Qual parâmetro identifica as peças?{active && ` — v${active.version_number}`}</h4>
+      <h4>Qual parâmetro identifica as peças?{active && ` — ${versionName(active.version_number)}`}</h4>
       {versions.isSuccess && !active && (
         <p className="muted">Ainda não há versão pronta para analisar.</p>
       )}
