@@ -1682,3 +1682,174 @@ Caso de teste: o `60_EST_PE_BLCA_MAK_R03.ifc` (obra 16, código 9121) foi exclu�
 - Rodapé sem obrigatórios: "o status das peças conta todos os parâmetros…".
 - **Testes:** `StatusRuleCopy.test.tsx` (3). O teste do rodapé em `ModelPage.test.tsx` foi atualizado.
 - **Verificação:** tsc ok, ESLint ok, Vitest 249/249 (+2 todo). Backend sem mudança.
+
+## Excel: coordenadas e sequência de montagem (2026-11-18)
+
+**Pedido:** a aba "Peças" do Excel deve trazer X, Y e Z de cada peça e ficar na ordem de uma sequência de montagem, não por marca.
+
+**Decisões (2026-11-18):**
+- O ponto é o **centro de gravidade**, igual para todas as peças.
+- A ordem é **Z → X → Y**, crescente, de baixo para cima. O pedido original era X → Y → Z, mas assim peças do alto sairiam antes das do térreo, montadas flutuando.
+- Peças a até **0,10 m** do início da faixa contam como a mesma posição em cada eixo.
+- A numeração das unidades (LA002-1…) **não muda**. Só a documentação foi corrigida: a ordem estável sempre foi pelo nome do nível em ordem alfabética, e não "de baixo para cima" (`docs/pecas/verificacao.md`). A numeração pela sequência de montagem é o **passo 2**, ainda por fazer.
+
+**Por que o cálculo é no navegador:** o servidor não tem a geometria. O CLAUDE.md só permite ler manifest, metadata e propriedades do derivativo. O "Exportar Excel", na tela do modelo, calcula as coordenadas com o 3D carregado e as manda no `POST /export.xlsx`.
+
+**Frontend:**
+- `viewer/coordinates.ts`:
+  - `CentroidAccumulator` / `meshCentroid`: soma de tetraedros a partir do 1º vértice. Malha aberta usa o centro das áreas.
+  - `pieceCentroid`: toda a geometria abaixo do nó da peça, ponderada pelo volume de cada parte. Ficam de fora aço, alça, inserto, neoprene e abertura, **pelo nome**; a categoria não conta, porque a Cassol modela escadas e consolos de concreto como "Conexões estruturais".
+  - `piecesCentroids`: em lotes, com pausa para a tela a cada ~150 ms, e com cancelamento.
+- `ViewerAdapter` ganhou três métodos opcionais:
+  - `whenGeometryLoaded`: o SVF2 carrega aos poucos;
+  - `getGeometryParts`: subárvore sem limite de profundidade, sem ler propriedades;
+  - `forEachTriangle`: percorre os triângulos sem montar listas.
+- Botão "Exportar Excel":
+  - mostra "Aguardando o modelo terminar de carregar…", depois "Calculando coordenadas N/M…" com Cancelar;
+  - guarda o resultado enquanto a versão estiver aberta;
+  - arredonda os valores a 0,1 mm.
+
+**Backend:**
+- `services/assembly_order.py`: ordem Z → X → Y com faixas de 0,10 m.
+- `api/export.py`: `coordinates` no corpo do POST, com números finitos de ±1e6 m e no máximo 100 mil peças. dbIds de outra versão são ignorados.
+- `services/export.py`:
+  - colunas **X (m), Y (m), Z (m)** depois de "Peça", com formato 0.000;
+  - peças sem coordenada no fim, por marca e número;
+  - aba "Sobre" com as linhas "Coordenadas" (centro de gravidade, relativo à **origem interna** do arquivo, porque o ponto base ainda não foi confirmado) e "Ordem das peças".
+
+**Medido com o Viewer real (obra 9121, NWD de vínculos, 1.433 peças, Chromium headless):**
+
+| Rodada | Peças com coordenada | Cálculo | Observação |
+|---|---|---|---|
+| 1ª versão | 440 | 25 s | geometria do SVF2 ainda chegando |
+| com a espera da geometria | 1.266 | 17 s | profundidade e categoria descartavam pilares em V, escadas e sapata |
+| versão final | **1.433** | **8,2 s** | mais ~12 s de espera da geometria quando se exporta logo depois de abrir o modelo |
+
+Teste `e2e/modelo.spec.ts` "Excel com o Viewer real" (`E2E_REAL_VIEWER=1 E2E_OBRA_ID=17 E2E_EXCEL_OBRA_ID=17`).
+
+**Também corrigido:** os seletores do E2E esperavam o título "Marcas (N)", e desde a origem da marca a lista mostra o parâmetro, por exemplo "Marca (N)". Foi uma falha minha por não ter rodado o E2E naquela tarefa.
+
+**Testes:** `tests/test_export_coordinates.py` (8), ajustes em `test_export.py` e `test_piece_params_engine.py`, centro de gravidade em `coordinates.test.ts` (6), `ExportButton.test.tsx` (2) e o E2E de exportação conferindo X/Y/Z e a ordem.
+
+**Verificação:**
+- backend: ruff ok, mypy ok, pytest 741/741;
+- frontend: tsc ok, ESLint ok, Vitest 257/257 (+2 todo);
+- E2E com o Viewer falso: 80 passaram e 8 foram pulados (só rodam com o Viewer real);
+- E2E com o Viewer real: "Excel com o Viewer real" ok, 1.433/1.433 peças.
+
+### Falta
+- ~~Passo 2~~: feito (seção seguinte).
+- O ponto base do projeto continua por confirmar com medidas do Revit.
+
+## Passo 2: numeração das peças pela sequência de montagem (2026-11-18)
+
+Aprovado pelo usuário: exceção à regra "o número nunca é renumerado" enquanto a obra não tem valor por peça (CLAUDE.md e docs/pecas/verificacao.md atualizados).
+
+**Feito**
+- Migração `0019`: `elements.centroid` e `obras.unit_numbering` (`provisional` | `sequence` | `fixed`). As obras com valores por peça ficam `fixed` (no dev, a 12 e a 17); as outras, `provisional`.
+- `services/unit_sequence.py`, chamado por `PUT /api/versions/{id}/centroids`:
+  - guarda os centros;
+  - numa obra provisória, na versão mais recente e sem nenhum valor por peça, renumera cada marca por Z → X → Y (faixas de 0,10 m), como permutação dos números existentes;
+  - grava auditoria por unidade (`renumber`) e da obra (`unit_numbering`), atualiza os rótulos do aviso da versão e emite o evento `units_renumbered`;
+  - numa obra `sequence`, refaz as ligações pela ordem da versão mais recente.
+- `GET /api/versions/{id}/centroids` informa peças, centros guardados e numeração. `ObraOut.unit_numbering`.
+- O 1º valor por peça (individual ou em lote) trava a numeração (`fixed`).
+- `unit_matching`:
+  - nas obras `sequence`, a ordem dos elementos é a sequência de montagem;
+  - **correção:** os valores só decidem quem fica com peça quando há menos peças que unidades. Antes, no NWD, um reprocessamento passava o valor de uma unidade para outra peça.
+- O reprocessamento da mesma versão leva os centros guardados junto (`processing._store`).
+- O Excel, sem coordenadas do navegador, usa os centros guardados.
+- Frontend:
+  - `useCentroidSync`: com o 3D carregado e centros faltando, calcula em segundo plano e envia, uma vez por versão;
+  - `centroidSync.ts`: cálculo compartilhado com o "Exportar Excel", que não recalcula se o servidor já tem tudo;
+  - `NumberingNotice`: "Numeração provisória das peças", com o progresso do cálculo, e depois "Peças numeradas pela sequência de montagem".
+- Testes:
+  - `test_unit_sequence.py` (12): renumeração, permutação, trava pelo valor, valor legado, versão antiga, NWD estável no reprocessamento e na versão nova, centros no reprocessamento, função pura, API e rótulos do aviso;
+  - Excel com os centros guardados;
+  - Vitest: `useCentroidSync.test.tsx` (5) e ExportButton (+1);
+  - E2E: "1ª abertura do 3D".
+
+**Bug encontrado e corrigido durante o trabalho:** a coluna `centroid` gravava o JSON `null` nas peças sem centro, e a contagem as tratava como guardadas. Agora a coluna usa `none_as_null` e a contagem só aceita arrays.
+
+**Verificação**
+- backend: ruff ok, mypy ok (app + tests), pytest 756/756;
+- frontend: tsc ok, ESLint ok, Vitest 263/263 (+2 todo);
+- E2E com o Viewer falso: 80 passaram e 8 foram pulados; depois, o teste novo passou nos dois perfis. No banco do E2E, a E2E-01 ficou `sequence` e a E2E-PEC ficou `fixed`, com os centros guardados.
+
+**Falta**
+- Reiniciar a API e o worker do dev (migração `0019` já aplicada no banco do dev).
+- Obra 9121: excluir e cadastrar de novo para ser numerada pela sequência (hoje ela está `fixed`, porque já tem 69 unidades com valor). Na 1ª abertura do 3D, esperar o aviso "Peças numeradas pela sequência de montagem" antes de preencher valores.
+- Não testado com o Viewer real neste passo: o cálculo é o mesmo do Excel (1.433/1.433), e o envio e a renumeração estão cobertos pelos testes do backend.
+
+## Ordem X → Y → Z e Excel por marca (2026-11-18)
+
+O usuário confirmou que o Dynamo da equipe ordena por **X → Y → Z**. A ordem Z → X → Y, que tinha sido proposta por mim, foi trocada. Mantidas a tolerância de 0,10 m e o centro de gravidade. As coordenadas relativas à origem interna do arquivo estão corretas (confirmado pelo usuário).
+
+**Feito**
+- `assembly_order`: eixos X → Y → Z. A numeração das obras novas usa a mesma função.
+- Excel, aba "Peças":
+  - linhas sempre por marca e número da peça (LA002-1, LA002-2… seguidas);
+  - coluna nova "Ordem de montagem" (1, 2, 3…), depois de Z, com a posição na sequência da obra; vazia nas peças sem coordenada;
+  - a aba "Sobre" explica a ordem das linhas e a coluna, e não fala mais em ponto base "não confirmado".
+- Testes: função pura (X decide antes do Z), Excel (linhas por marca, coluna, texto do "Sobre"), numeração (X decide com o Z invertido) e E2E do Excel.
+- CLAUDE.md, docs/pecas/verificacao.md e os textos da tela atualizados.
+
+**Verificação**
+- backend: ruff ok, mypy ok;
+- pytest: 755 passaram e 1 falhou, `test_filters_perf` (1,1 a 1,3 s contra o limite de 1 s com a máquina carregada). Ele passa sozinho, e a mudança não mexe nos filtros;
+- frontend: tsc ok, ESLint ok, Vitest 263/263 (+2 todo);
+- E2E com o Viewer falso: 82 passaram e 8 foram pulados.
+
+**Falta**
+- O usuário vai excluir e recadastrar a obra 9121 (id 18, já numerada pela ordem antiga e com 68 valores) para ela sair numerada em X → Y → Z.
+- Reiniciar a API e o worker do dev antes disso.
+
+## Filtro "Tipo" na lista de marcas (2026-11-18)
+
+Pedido: no cabeçalho da lista, entre o nome do parâmetro e "Selecionar todas", caixas de seleção por tipo de peça. Marcar um tipo filtra a lista **e** seleciona todas as marcas dele no 3D, para preencher parâmetros em todas de uma vez.
+
+**Regras (decididas pelo usuário)**
+- **Laje:** "Laje" no nome ou no tipo, ou as siglas LA, LAA, LP ou LM soltas e em maiúsculas no nome, no tipo ou na marca.
+- **Escada:** "Escada" no nome ou no tipo.
+- **Pilar:** categoria de pilar.
+- **Quadro estrutural:** o resto da categoria (vigas pré-moldadas e in loco).
+- **Outros:** peças metálicas (MET/GERDAU, fora do escopo), sapatas, complementos.
+- Onde o tipo é lido:
+  - RVT: "Dados de identidade > Nome do tipo";
+  - NWD: "Item/Element > Type/Family";
+  - IFC: "IFC Attributes > ObjectType" e "<parte> · IFC Type Attributes > Name". Na montagem do IFC, só o corpo diz `_LP15`.
+  - Nunca o grupo do nível: um nível "LAJE COBERTURA" não transforma pilares em lajes.
+
+**Feito**
+- `services/piece_type.py` e a migração `0020` (`elements.piece_type`), preenchida no processamento.
+- `python -m app.cli marks type --all` para as versões antigas. Já rodado no dev. Resultado na 9121 (obra 19):
+  - pilar: 98 peças;
+  - quadro: 545 peças;
+  - laje: 753 peças (752 alveolares e 1 maciça);
+  - escada: 5 peças;
+  - outros: 32 peças (30 Gerdau, 1 sapata, 1 complemento).
+- `MarkOut.piece_type`: o tipo mais comum das peças da marca.
+- Frontend:
+  - `PieceTypeFilter` (botão "Tipo ▾" com menu de caixas, contagem de marcas por tipo, só os tipos presentes, "Limpar", Esc fecha);
+  - `FilterResultList`: lista filtrada, título com a contagem filtrada, e cada mudança chama "Selecionar todas" com as marcas dos tipos marcados. Desmarcar tudo limpa a seleção.
+- Testes:
+  - `test_piece_type.py` (6): nomes reais da 9121, 9480 e ORC; metálica; LP só no tipo do IFC; siglas só soltas; nível não conta; API e preenchimento;
+  - `PieceTypeFilter.test.tsx` (3);
+  - E2E "Tipo na lista".
+
+**Verificação**
+- backend: ruff ok, mypy ok, pytest 762/762;
+- frontend: tsc ok, ESLint ok, Vitest 266/266 (+2 todo);
+- E2E com o Viewer falso: 82 passaram e 8 foram pulados. O teste novo falhou na 1ª rodada (o menu era cortado pela coluna; corrigido ancorando o menu no cabeçalho) e depois passou nos dois perfis. A captura de tela confere a lista filtrada e as 4 peças selecionadas.
+
+**Observação:** no IFC 9480, a montagem PP016 está na categoria "Conexões estruturais" e ficou em Outros.
+
+**Falta**
+- Rodar `python -m app.cli marks type --all` em produção depois de migrar.
+- Reiniciar a API e o worker do dev.
+
+### "Marcar tudo" no lugar de "Selecionar todas" (2026-11-18)
+- O botão "Selecionar todas" saiu do cabeçalho da lista (pedido do usuário: redundante).
+- No menu Tipo, a 1ª caixa é **"Marcar tudo"**: marca todos os tipos e seleciona no 3D todas as marcas da lista, respeitando o filtro principal. Com só alguns tipos marcados, ela fica no estado parcial; desmarcar limpa a seleção. O botão mostra "Tipo: todos".
+- Testes: PieceTypeFilter (+1), ModelPage (agora por Tipo > Marcar tudo), E2E "Tipo na lista".
+- Verificação: tsc ok, ESLint ok, Vitest 267/267 (+2 todo); E2E 84 passaram e 8 foram pulados (suíte inteira, depois da correção do menu cortado).

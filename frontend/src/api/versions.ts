@@ -86,7 +86,19 @@ export interface MarkPieces {
   sources?: SourceCount[];
   /** outros parâmetros da regra preenchidos nas peças; mais de um valor = divergem */
   secondary?: SecondaryValues[];
+  /** tipo das peças da marca (filtro "Tipo" da lista) */
+  piece_type?: PieceType;
 }
+
+export type PieceType = 'pilar' | 'quadro' | 'laje' | 'escada' | 'outros';
+export const PIECE_TYPES: readonly PieceType[] = ['pilar', 'quadro', 'laje', 'escada', 'outros'];
+export const PIECE_TYPE_LABELS: Record<PieceType, string> = {
+  pilar: 'Pilar',
+  quadro: 'Quadro estrutural',
+  laje: 'Laje',
+  escada: 'Escada',
+  outros: 'Outros',
+};
 
 export interface SourceCount {
   name: string;

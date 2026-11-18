@@ -26,6 +26,7 @@ const OBRA: Obra = {
   active: true,
   acc_file_state: 'ok',
   acc_file_state_at: null,
+  unit_numbering: 'sequence',
   created_at: '2026-11-10T12:00:00Z',
   updated_at: '2026-11-10T12:00:00Z',
 };

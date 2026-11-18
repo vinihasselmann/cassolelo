@@ -300,16 +300,20 @@ async def test_excel_pieces_sheet_has_unit_and_piece_params(
         "Nível",
         "dbId",
         "Peça",
+        "X (m)",  # centro de gravidade (vazio sem coordenadas no pedido)
+        "Y (m)",
+        "Z (m)",
+        "Ordem de montagem",  # sequência X → Y → Z (vazia sem coordenadas)
         "Data de fabricação",
         "Obs. da viga",
     ]
     by_unit = {row[5]: row for row in rows[1:]}
     assert set(by_unit) == {"PP001-1", "PP001-2", "PP001-3", "V01-1", "V01-2"}
-    assert by_unit["PP001-1"][6] == datetime(2026, 11, 10)
-    assert by_unit["PP001-3"][6] is None
+    assert by_unit["PP001-1"][10] == datetime(2026, 11, 10)
+    assert by_unit["PP001-3"][10] is None
     # célula do parâmetro que não vale para a categoria: cinza
     pilar_row = next(i for i, row in enumerate(rows) if row[5] == "PP001-1") + 1
-    assert ws.cell(row=pilar_row, column=8).fill.fgColor.rgb == NA_FILL.fgColor.rgb
+    assert ws.cell(row=pilar_row, column=12).fill.fgColor.rgb == NA_FILL.fgColor.rgb
     viga_row = next(i for i, row in enumerate(rows) if row[5] == "V01-1") + 1
-    assert ws.cell(row=viga_row, column=8).fill.fgColor.rgb != NA_FILL.fgColor.rgb
-    assert ws.cell(row=pilar_row, column=7).number_format == "dd/mm/yyyy"
+    assert ws.cell(row=viga_row, column=12).fill.fgColor.rgb != NA_FILL.fgColor.rgb
+    assert ws.cell(row=pilar_row, column=11).number_format == "dd/mm/yyyy"

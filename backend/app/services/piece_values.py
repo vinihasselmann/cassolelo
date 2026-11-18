@@ -35,7 +35,7 @@ from app.models import (
     User,
 )
 from app.models.enums import ParamLevel, Role, VersionStatus
-from app.services import audit, events, piece_props
+from app.services import audit, events, piece_props, unit_sequence
 from app.services.errors import ConflictError, ForbiddenError, NotFoundError, ValidationError
 from app.services.mark_batch import BatchMode
 from app.services.mark_values import StaleValuesError, _filled, normalize
@@ -330,6 +330,7 @@ async def save_values(
             conflict_def_ids=[],
         ) from None
 
+    await unit_sequence.lock_numbering(session, obra_id, actor)  # 1º valor: números fixos
     batch = uuid.uuid4()
     for param, old, new in entries:
         base = _base(unit, mark, param)
@@ -583,6 +584,7 @@ async def apply(
     if not changed:
         return BatchResult(None, 0, 0)
     await _flush_or_conflict(session)
+    await unit_sequence.lock_numbering(session, obra_id, actor)  # 1º valor: números fixos
     for action, rows in audits.items():
         await audit.record_many(session, AUDIT_ENTITY, action, list(rows), actor, batch)
     touched = [u for u in ctx.units if u.id in changed]

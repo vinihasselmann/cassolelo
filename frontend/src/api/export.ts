@@ -1,3 +1,4 @@
+import { roundedCoordinates } from './centroids';
 import { DEV_USER_HEADER, getDevUser, toApiError } from './client';
 import type { FilterDefinition } from './filters';
 
@@ -13,11 +14,14 @@ export function filenameFrom(disposition: string | null, fallback: string): stri
 /**
  * Baixa o Excel da obra (POST /api/obras/{id}/export.xlsx) com o filtro da tela: as
  * marcas do resultado, como a lista à esquerda. Sem filtro, todas as marcas da versão.
+ * Com `coordinates`, a aba "Peças" ganha X/Y/Z e fica na sequência de montagem.
  */
 export async function downloadObraExcel(
   obraId: number,
   versionId: number,
   filter: FilterDefinition | null,
+  /** centro de gravidade de cada peça (dbId → [x, y, z] em metros): colunas X/Y/Z e ordem */
+  coordinates: ReadonlyMap<number, readonly [number, number, number]> | null = null,
 ): Promise<string> {
   const headers = new Headers({ 'Content-Type': 'application/json' });
   const user = getDevUser();
@@ -25,7 +29,12 @@ export async function downloadObraExcel(
   const res = await fetch(`/api/obras/${String(obraId)}/export.xlsx`, {
     method: 'POST',
     headers,
-    body: JSON.stringify({ version_id: versionId, filter }),
+    body: JSON.stringify({
+      version_id: versionId,
+      filter,
+      // sem coordenadas, o servidor usa os centros já guardados (se houver)
+      ...(coordinates && coordinates.size > 0 ? { coordinates: roundedCoordinates(coordinates) } : {}),
+    }),
   });
   if (!res.ok) throw await toApiError(res);
   const filename = filenameFrom(res.headers.get('Content-Disposition'), `obra-${String(obraId)}.xlsx`);

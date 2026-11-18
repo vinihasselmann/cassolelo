@@ -13,6 +13,7 @@ from fastapi.responses import Response
 from pydantic import BaseModel, ConfigDict
 
 from app.api.obra_guard import require_file_available
+from app.api.schemas import Coordinates
 from app.api.versions import parse_prop
 from app.auth import CurrentUser
 from app.db import SessionDep
@@ -57,6 +58,10 @@ class ExportInput(BaseModel):
     version_id: int | None = None
     filter: filters.FilterDef | None = None  # regras e texto ("q") do filtro da tela
     order: Literal["asc", "desc"] = "asc"
+    # Centro de gravidade de cada peça (dbId -> [x, y, z] em metros), calculado no navegador
+    # com o 3D carregado: colunas X/Y/Z e sequência de montagem na aba "Peças".
+    # Sem coordenadas: usa os centros já guardados pelo servidor (unit_sequence.py).
+    coordinates: Coordinates = {}
 
 
 @router.post("/{obra_id}/export.xlsx", response_class=Response)
@@ -68,7 +73,9 @@ async def export_xlsx_filtered(
     params = search.SearchParams(
         order=body.order, definition=body.filter, today=filters.today(timezone)
     )
-    return await _respond(request, session, obra_id, body.version_id, params, user)
+    return await _respond(
+        request, session, obra_id, body.version_id, params, user, body.coordinates or None
+    )
 
 
 async def _respond(
@@ -78,6 +85,7 @@ async def _respond(
     version_id: int | None,
     params: search.SearchParams,
     user: User,
+    coordinates: dict[int, tuple[float, float, float]] | None = None,
 ) -> Response:
     file = await export.build_workbook(
         session,
@@ -86,6 +94,7 @@ async def _respond(
         params,
         user,
         timezone=request.app.state.settings.display_timezone,
+        coordinates=coordinates,
     )
     disposition = (
         f"attachment; filename=\"{file.filename}\"; filename*=UTF-8''{quote(file.filename)}"

@@ -96,6 +96,10 @@ MATRIX: dict[str, frozenset[Role] | str] = {
     "POST /api/versions/{version_id}/filter/evaluate": ALL,
     "POST /api/versions/{version_id}/color-scheme/evaluate": ALL,
     "POST /api/versions/{version_id}/colorize": ALL,
+    # centros de gravidade: dado calculado pelo 3D de quem abrir o modelo (qualquer papel);
+    # a renumeração é automática e só vale enquanto a obra não tem valores (2026-11-18)
+    "GET /api/versions/{version_id}/centroids": ALL,
+    "PUT /api/versions/{version_id}/centroids": ALL,
     # filtros salvos e esquemas de cores: pessoais para todos; os compartilhados exigem
     # SHARED_FILTER_ROLES (padrão fábrica e admin), checado no serviço (test_saved_filters)
     "GET /api/saved-filters": ALL,

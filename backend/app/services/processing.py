@@ -38,6 +38,7 @@ from app.services import (
     mark_rule,
     mark_validation,
     piece_props,
+    piece_type,
     piece_units,
     version_reconcile,
 )
@@ -294,6 +295,17 @@ async def _store(
 ) -> tuple[list[ExtractedElement], dict[str, int]]:
     """Grava e devolve os elementos como ficaram no banco (sem dbid repetido; marca
     longa demais conta como sem marca) e as contagens."""
+    # Reprocessamento da mesma versão: o derivativo é o mesmo (mesmos dbIds), então os
+    # centros de gravidade já mandados pelo 3D continuam valendo (unit_sequence.py).
+    centroids: dict[int, Any] = dict(
+        (
+            await session.execute(
+                select(Element.dbid, Element.centroid).where(
+                    Element.version_id == version.id, Element.centroid.is_not(None)
+                )
+            )
+        ).all()
+    )
     deleted = await session.execute(delete(Element).where(Element.version_id == version.id))
 
     # Um dbid por versão (a árvore não deveria repetir, mas a unicidade exige).
@@ -329,6 +341,8 @@ async def _store(
                 e, levels[e.dbid], [*config.search_names, *config.mark_names]
             ),
             "mark_id": mark_ids.get((e.mark_code, e.category[:255])) if e.mark_code else None,
+            "centroid": centroids.get(e.dbid),
+            "piece_type": piece_type.classify(e.category, e.name, e.mark_code, e.props),
         }
         for e in elements
     ]

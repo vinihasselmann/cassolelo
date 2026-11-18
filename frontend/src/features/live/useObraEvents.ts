@@ -45,6 +45,11 @@ export function useObraEvents(obraId: number | null) {
       if (ev.type === 'obra_file_state') {
         // arquivo excluído/restaurado no Docs: a obra (e a lista) mudam de situação
         void queryClient.invalidateQueries({ queryKey: ['obras'] });
+      } else if (ev.type === 'units_renumbered') {
+        // numeração das peças (PP001-1…) e a situação dos centros mudaram
+        void queryClient.invalidateQueries({ queryKey: ['obras', obraId] });
+        void queryClient.invalidateQueries({ predicate: (q) => q.queryKey[0] === 'versions' && q.queryKey[2] === 'centroids' });
+        void invalidateValueQueries(queryClient);
       } else if (ev.type === 'version_ready' || ev.type === 'version_failed') {
         void queryClient.invalidateQueries({ queryKey: ['obras', obraId, 'versions'] });
         if (ev.type === 'version_ready' && typeof ev.data.version_id === 'number') {

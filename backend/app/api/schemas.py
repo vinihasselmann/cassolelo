@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.models.enums import AccFileState, Role, VersionStatus
+from app.models.enums import AccFileState, Role, UnitNumbering, VersionStatus
 
 
 class UserOut(BaseModel):
@@ -76,11 +76,17 @@ class ObraOut(BaseModel):
     # "deleted"/"missing": arquivo excluído no Docs; a obra fica bloqueada (só editar/excluir)
     acc_file_state: AccFileState
     acc_file_state_at: datetime | None
+    # provisional | sequence | fixed (numeração das unidades de peça)
+    unit_numbering: UnitNumbering
     created_at: datetime
     updated_at: datetime
 
 
 # --------------------------------------------------------------------------- Versões
+
+Coord = Annotated[float, Field(allow_inf_nan=False, ge=-1e6, le=1e6)]  # metros
+# Centro de gravidade de cada peça (dbId -> [x, y, z] em metros), calculado no navegador.
+Coordinates = Annotated[dict[int, tuple[Coord, Coord, Coord]], Field(max_length=100_000)]
 
 
 class ModelVersionOut(BaseModel):

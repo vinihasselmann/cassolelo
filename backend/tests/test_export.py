@@ -267,6 +267,11 @@ async def test_types_formats_section_and_layout(
         "Nível": "TÉRREO",
         "dbId": 10,
         "Peça": "PP001-1",  # unidade de peça (P3)
+        # sem coordenadas no pedido (GET): colunas vazias
+        "X (m)": None,
+        "Y (m)": None,
+        "Z (m)": None,
+        "Ordem de montagem": None,
     }
     assert 30 not in pieces  # sem Marca
     about = dict((r[0].value, r[1].value) for r in wb["Sobre"].iter_rows())

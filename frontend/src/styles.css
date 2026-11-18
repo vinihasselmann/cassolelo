@@ -305,6 +305,22 @@ button.link.danger:disabled { color: var(--text-muted); }
 .mark-item__via { color: var(--text-muted); font-style: italic; }
 .mark-item__warn { color: var(--warn-ink); }
 .origin-line { margin: 2px 0 0; font-size: var(--fs-list-meta); color: var(--text-muted); }
+/* filtro "Tipo" da lista de marcas (2026-11-18) */
+.reshead h3 { flex: 1; min-width: 0; }
+/* o menu se ancora no cabeçalho da lista (a coluna corta o que sai dela) */
+.model-sec > .reshead { position: relative; }
+.type-filter { flex: none; }
+.type-filter__btn { font-size: var(--fs-list-meta); white-space: nowrap; }
+.type-filter__btn--on { font-weight: 600; }
+.type-filter__menu {
+  position: absolute; left: 0; top: calc(100% + 4px); z-index: 20;
+  width: max-content; max-width: 100%;
+  display: flex; flex-direction: column; gap: 4px; padding: 8px 10px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+  box-shadow: 0 4px 14px rgb(0 0 0 / 14%); font-size: var(--fs-list);
+}
+.type-filter__menu .link { align-self: flex-start; font-size: var(--fs-list-meta); }
+.type-filter__all { padding-bottom: 4px; border-bottom: 1px solid var(--border-subtle); font-weight: 600; }
 .mark-item--loose .mark-item__code { font-style: italic; font-weight: 500; }
 .pager { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; }
 /* O campo de busca fica sempre à vista ao rolar a lista (tablet). */

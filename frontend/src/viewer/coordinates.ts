@@ -17,7 +17,7 @@
  *    (refPointTransformation); × unidade → metros.
  */
 
-import type { DbId, ModelFrame, ModelNode, Triangle, Vec3 } from './ViewerAdapter';
+import type { DbId, GeometryPart, ModelFrame, ModelNode, Triangle, TriangleVisitor, Vec3 } from './ViewerAdapter';
 
 // ------------------------------------------------------------------ vetores
 
@@ -397,6 +397,10 @@ export interface GeometrySource {
   getModelFrame(): ModelFrame | null;
   getNodes(dbIds: DbId[]): Promise<ModelNode[]>;
   getTriangles(dbId: DbId): Triangle[];
+  /** nó + descendentes com geometria (rápido, sem propriedades); sem ele, percorre getNodes */
+  getGeometryParts?(dbId: DbId): GeometryPart[];
+  /** triângulos sem montar lista (rápido); sem ele, usa getTriangles */
+  forEachTriangle?(dbId: DbId, fn: TriangleVisitor): void;
 }
 
 const NOT_CONCRETE =
@@ -418,8 +422,16 @@ async function node(source: GeometrySource, dbId: DbId): Promise<ModelNode | nul
   return (await source.getNodes([dbId]))[0] ?? null;
 }
 
-/** Peça clicada → membro principal de concreto e a geometria dele. */
-export async function mainMember(source: GeometrySource, clicked: DbId): Promise<MainMember> {
+interface Candidate {
+  node: ModelNode;
+  triangles: Triangle[];
+  volume: number;
+  concrete: boolean;
+  ignored: boolean;
+}
+
+/** Peça → membros de concreto com geometria (corpo, consolos…; sem aço, insertos, neoprene). */
+async function concreteMembers(source: GeometrySource, clicked: DbId): Promise<{ piece: DbId; pool: Candidate[] }> {
   let element = await node(source, clicked);
   if (!element) throw new Error('Peça não encontrada no modelo.');
   for (let i = 0; i < 4 && isGeometryItem(element) && element.parent !== null; i++) {
@@ -436,7 +448,7 @@ export async function mainMember(source: GeometrySource, clicked: DbId): Promise
   }
   const members = top.dbId !== element.dbId || ASSEMBLY.test(text(top)) ? await source.getNodes(top.children) : [element];
 
-  const candidates: { node: ModelNode; triangles: Triangle[]; volume: number; concrete: boolean; ignored: boolean }[] = [];
+  const candidates: Candidate[] = [];
   for (const m of members) {
     const parts: ModelNode[] = [];
     let level = [m];
@@ -457,10 +469,201 @@ export async function mainMember(source: GeometrySource, clicked: DbId): Promise
   }
   const usable = candidates.filter((c) => !c.ignored && c.triangles.length > 0);
   const concrete = usable.filter((c) => c.concrete);
-  const pool = concrete.length ? concrete : usable;
+  return { piece: top.dbId, pool: concrete.length ? concrete : usable };
+}
+
+/** Peça clicada → membro principal de concreto e a geometria dele. */
+export async function mainMember(source: GeometrySource, clicked: DbId): Promise<MainMember> {
+  const { piece, pool } = await concreteMembers(source, clicked);
   const best = [...pool].sort((a, b) => b.volume - a.volume)[0];
   if (!best) throw new Error('A peça não tem geometria de concreto.');
-  return { piece: top.dbId, member: best.node, triangles: best.triangles };
+  return { piece, member: best.node, triangles: best.triangles };
+}
+
+// ------------------------------------------------------------------ centro de gravidade
+
+/**
+ * Centro de gravidade de uma malha fechada (sólido homogêneo), acumulado triângulo a
+ * triângulo: soma dos tetraedros com vértice no 1º ponto da malha (evita perder precisão
+ * com coordenadas grandes). Malha aberta ou degenerada (volume ~0): centro das áreas.
+ */
+export class CentroidAccumulator {
+  private ox = 0;
+  private oy = 0;
+  private oz = 0;
+  private started = false;
+  private vol = 0;
+  private vx = 0;
+  private vy = 0;
+  private vz = 0;
+  private area = 0;
+  private sx = 0;
+  private sy = 0;
+  private sz = 0;
+  private size = 1e-9; // maior distância ao 1º ponto (escala do "volume ~0")
+
+  readonly add = (ax0: number, ay0: number, az0: number, bx0: number, by0: number, bz0: number, cx0: number, cy0: number, cz0: number): void => {
+    if (!this.started) {
+      [this.ox, this.oy, this.oz, this.started] = [ax0, ay0, az0, true];
+    }
+    const ax = ax0 - this.ox, ay = ay0 - this.oy, az = az0 - this.oz;
+    const bx = bx0 - this.ox, by = by0 - this.oy, bz = bz0 - this.oz;
+    const cx = cx0 - this.ox, cy = cy0 - this.oy, cz = cz0 - this.oz;
+    this.size = Math.max(this.size, Math.abs(ax), Math.abs(ay), Math.abs(az), Math.abs(bx), Math.abs(by), Math.abs(bz), Math.abs(cx), Math.abs(cy), Math.abs(cz));
+    const v = (ax * (by * cz - bz * cy) + ay * (bz * cx - bx * cz) + az * (bx * cy - by * cx)) / 6;
+    this.vol += v;
+    this.vx += ((ax + bx + cx) * v) / 4;
+    this.vy += ((ay + by + cy) * v) / 4;
+    this.vz += ((az + bz + cz) * v) / 4;
+    const ux = bx - ax, uy = by - ay, uz = bz - az;
+    const wx = cx - ax, wy = cy - ay, wz = cz - az;
+    const ar = Math.hypot(uy * wz - uz * wy, uz * wx - ux * wz, ux * wy - uy * wx) / 2;
+    this.area += ar;
+    this.sx += ((ax + bx + cx) * ar) / 3;
+    this.sy += ((ay + by + cy) * ar) / 3;
+    this.sz += ((az + bz + cz) * ar) / 3;
+  };
+
+  result(): { center: Vec3; volume: number } | null {
+    if (!this.started) return null;
+    const o: Vec3 = [this.ox, this.oy, this.oz];
+    if (Math.abs(this.vol) > 1e-9 * this.size ** 3) {
+      return { center: add(o, mul([this.vx, this.vy, this.vz], 1 / this.vol)), volume: Math.abs(this.vol) };
+    }
+    if (this.area > 0) return { center: add(o, mul([this.sx, this.sy, this.sz], 1 / this.area)), volume: 0 };
+    return null;
+  }
+}
+
+/** Centro de gravidade de uma lista de triângulos (ver CentroidAccumulator). */
+export function meshCentroid(triangles: Triangle[]): { center: Vec3; volume: number } | null {
+  const acc = new CentroidAccumulator();
+  for (const [a, b, c] of triangles) acc.add(a[0], a[1], a[2], b[0], b[1], b[2], c[0], c[1], c[2]);
+  return acc.result();
+}
+
+/**
+ * Partes que NÃO entram no centro de gravidade, pelo nome (ou material): aço, alças,
+ * insertos, neoprene, aberturas. A categoria não conta: a Cassol modela escadas e consolos
+ * de concreto como "Conexões estruturais".
+ */
+const NOT_IN_CENTROID =
+  /vergalh|armadur|rebar|reinforc|estribo|insert|chumbador|fastener|ferragem|alça|içamento|neoprene|elastômero|ifcopening|opening|abertura|ifcreinforcing|ifcmechanicalfastener|ifcdiscreteaccessory|ifcfastener/i;
+
+function partCentroid(source: GeometrySource, dbId: DbId): { center: Vec3; volume: number } | null {
+  if (!source.forEachTriangle) return meshCentroid(source.getTriangles(dbId));
+  const acc = new CentroidAccumulator();
+  source.forEachTriangle(dbId, acc.add);
+  return acc.result();
+}
+
+/** Nó da peça + descendentes com geometria, sem limite de profundidade. */
+async function geometryParts(source: GeometrySource, dbId: DbId): Promise<GeometryPart[]> {
+  if (source.getGeometryParts) return source.getGeometryParts(dbId);
+  const out: GeometryPart[] = [];
+  let level = await source.getNodes([dbId]);
+  for (let depth = 0; depth < 20 && level.length; depth++) {
+    out.push(...level.filter((n) => n.hasGeometry).map((n) => ({ dbId: n.dbId, name: `${text(n)} ${n.material}` })));
+    const next = level.flatMap((n) => n.children);
+    level = next.length ? await source.getNodes(next) : [];
+  }
+  return out;
+}
+
+/**
+ * Centro de gravidade da PEÇA (instância), em metros relativos ao ponto base do projeto:
+ * toda a geometria abaixo do nó da peça (corpo, consolos, dentes…), ponderada pelo volume
+ * de cada parte; sem aço, alças, insertos, neoprene e aberturas (pelo nome).
+ */
+export async function pieceCentroid(source: GeometrySource, dbId: DbId): Promise<Vec3> {
+  const frame = source.getModelFrame();
+  if (!frame) throw new Error('O modelo ainda não terminou de carregar.');
+  const all = await geometryParts(source, dbId);
+  const kept = all.filter((p) => !NOT_IN_CENTROID.test(p.name));
+  const parts = (kept.length ? kept : all)
+    .map((p) => partCentroid(source, p.dbId))
+    .filter((c): c is { center: Vec3; volume: number } => c !== null);
+  if (parts.length === 0) throw new Error('A peça não tem geometria de concreto.');
+  const total = parts.reduce((t, p) => t + p.volume, 0);
+  const world =
+    total > 0
+      ? parts.reduce<Vec3>((acc, p) => add(acc, mul(p.center, p.volume / total)), [0, 0, 0])
+      : mul(parts.reduce<Vec3>((acc, p) => add(acc, p.center), [0, 0, 0]), 1 / parts.length);
+  return toProjectBase(world, frame);
+}
+
+/** Guarda os nós já lidos: pais, montagens e a raiz se repetem entre as peças. */
+function cachedSource(source: GeometrySource): GeometrySource {
+  const nodes = new Map<DbId, Promise<ModelNode | undefined>>();
+  return {
+    getModelFrame: () => source.getModelFrame(),
+    getTriangles: (id) => source.getTriangles(id),
+    ...(source.getGeometryParts ? { getGeometryParts: (id: DbId) => source.getGeometryParts?.(id) ?? [] } : {}),
+    ...(source.forEachTriangle ? { forEachTriangle: (id: DbId, fn: TriangleVisitor) => { source.forEachTriangle?.(id, fn); } } : {}),
+    getNodes: async (ids) => {
+      const missing = ids.filter((id) => !nodes.has(id));
+      if (missing.length) {
+        const fetched = source.getNodes(missing);
+        missing.forEach((id) => nodes.set(id, fetched.then((list) => list.find((n) => n.dbId === id))));
+      }
+      const got = await Promise.all(ids.map((id) => nodes.get(id) ?? Promise.resolve(undefined)));
+      return got.filter((n): n is ModelNode => n !== undefined);
+    },
+  };
+}
+
+export interface CentroidProgress {
+  done: number;
+  total: number;
+}
+
+/**
+ * Centro de gravidade de muitas peças (exportação). Cede a vez ao navegador a cada lote
+ * para a tela não travar; peças sem geometria de concreto ficam de fora (o Excel as põe
+ * no fim). `signal` cancela.
+ */
+export async function piecesCentroids(
+  source: GeometrySource,
+  dbIds: readonly DbId[],
+  {
+    onProgress,
+    onSkip,
+    signal,
+    batch = 25,
+    yieldMs = 150,
+  }: {
+    onProgress?: (p: CentroidProgress) => void;
+    /** peça que ficou sem coordenada e o motivo */
+    onSkip?: (dbId: DbId, reason: string) => void;
+    signal?: AbortSignal;
+    batch?: number;
+    /** trabalho máximo (ms) entre duas pausas para a tela */
+    yieldMs?: number;
+  } = {},
+): Promise<Map<DbId, Vec3>> {
+  const out = new Map<DbId, Vec3>();
+  const cached = cachedSource(source);
+  // Cede a vez ao navegador por TEMPO (não a cada N peças): cada pausa deixa o Viewer
+  // redesenhar a cena, que custa caro em modelos grandes.
+  let last = performance.now();
+  for (let i = 0; i < dbIds.length; i += batch) {
+    if (signal?.aborted) throw new DOMException('Cancelado', 'AbortError');
+    const slice = dbIds.slice(i, i + batch);
+    const results = await Promise.allSettled(slice.map((id) => pieceCentroid(cached, id)));
+    results.forEach((r, k) => {
+      const id = slice[k] as DbId;
+      if (r.status === 'fulfilled') out.set(id, r.value);
+      // sem geometria de concreto: fica sem coordenada
+      else onSkip?.(id, r.reason instanceof Error ? r.reason.message : String(r.reason));
+    });
+    const done = Math.min(i + batch, dbIds.length);
+    if (performance.now() - last >= yieldMs || done === dbIds.length) {
+      onProgress?.({ done, total: dbIds.length });
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      last = performance.now();
+    }
+  }
+  return out;
 }
 
 export interface AxisRow {

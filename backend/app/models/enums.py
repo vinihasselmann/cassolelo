@@ -53,6 +53,15 @@ class OrphanStatus(StrEnum):
     RETURNED = "returned"  # a marca voltou numa versão seguinte
 
 
+class UnitNumbering(StrEnum):
+    """Como as unidades de peça da obra foram numeradas (decisão de 2026-11-18)."""
+
+    # ordem estável (nível, nome, id), à espera dos centros de gravidade do 3D
+    PROVISIONAL = "provisional"
+    SEQUENCE = "sequence"  # renumeradas pela sequência de montagem (X → Y → Z)
+    FIXED = "fixed"  # travada na ordem estável (valores por peça antes dos centros)
+
+
 def check_in(column: str, enum: type[StrEnum]) -> str:
     values = ", ".join(f"'{m.value}'" for m in enum)
     return f"{column} IN ({values})"

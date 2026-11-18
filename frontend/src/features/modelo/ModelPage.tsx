@@ -17,6 +17,8 @@ import { CatalogDialog } from '../params/CatalogDialog';
 import { ParamDefDialog } from '../params/ParamDefDialog';
 import { UndoToast } from '../params/UndoToast';
 import { ExportButton } from './ExportButton';
+import { NumberingNotice } from './NumberingNotice';
+import { useCentroidSync } from './useCentroidSync';
 import { ManageMenu } from './ManageMenu';
 import { LiveNotices } from '../live/LiveNotices';
 import { useObraEvents } from '../live/useObraEvents';
@@ -133,6 +135,8 @@ export function ModelPage() {
   });
   const index = useMemo(() => buildMarkIndex(marks.data ?? []), [marks.data]);
   const marksById = useMemo(() => new Map((marks.data ?? []).map((m) => [m.mark_id, m])), [marks.data]);
+  // Peças da versão (todas as marcas): o Excel calcula o centro de gravidade de cada uma.
+  const pieceDbIds = useMemo(() => (marks.data ?? []).flatMap((m) => m.dbids), [marks.data]);
   // Status de produção de cada marca (agregado das peças): lista e painel da peça.
   const markStatus = useQuery({
     queryKey: markStatusKey(active?.id ?? 0),
@@ -271,6 +275,15 @@ export function ModelPage() {
   const modelReady = load.kind === 'ready';
   // Coordenadas do eixo da peça CLICADA (selection.focus), não da marca inteira.
   const axis = useAxisCoordinates(viewer, selection.focus, modelReady);
+  // Centros de gravidade para o servidor (1ª abertura da versão): numeração das peças pela
+  // sequência de montagem e X/Y/Z do Excel.
+  const centroids = useCentroidSync({
+    obraId,
+    versionId: active?.id ?? null,
+    viewer,
+    modelReady,
+    pieceDbIds,
+  });
 
   // O que o 3D mostra. Filtro: o backend diz o modo ("isolate": só o resultado;
   // "highlight": resultado normal, o resto esmaecido e as peças fora das visíveis ocultas).
@@ -392,8 +405,21 @@ export function ModelPage() {
         </label>
         <span className="model-bar__spacer" />
         {active && (
-          <ExportButton obraId={obraId} versionId={active.id} filter={filterState.active ? filterState.definition : null} />
+          <ExportButton
+            obraId={obraId}
+            versionId={active.id}
+            filter={filterState.active ? filterState.definition : null}
+            viewer={viewer}
+            modelReady={modelReady}
+            pieceDbIds={pieceDbIds}
+            centroidsStored={
+              centroids.status !== undefined &&
+              centroids.status.pieces > 0 &&
+              centroids.status.stored >= centroids.status.pieces
+            }
+          />
         )}
+        <NumberingNotice numbering={obra.data?.unit_numbering} state={centroids.state} />
         <Link to={`/obras/${obraId}/versoes`} className="small">Versões e validação</Link>
       </div>
 

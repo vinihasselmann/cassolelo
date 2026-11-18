@@ -13,11 +13,16 @@ export interface Obra {
   /** "deleted"/"missing": arquivo excluído no Docs; a obra fica bloqueada (só editar/excluir). */
   acc_file_state: AccFileState;
   acc_file_state_at: string | null;
+  /** Numeração das unidades (PP001-1…): provisória até o 3D mandar os centros de gravidade. */
+  unit_numbering: UnitNumbering;
   created_at: string;
   updated_at: string;
 }
 
 export type AccFileState = 'ok' | 'deleted' | 'missing';
+
+/** provisional: à espera do 3D · sequence: pela sequência de montagem · fixed: travada antes. */
+export type UnitNumbering = 'provisional' | 'sequence' | 'fixed';
 
 export const isFileBlocked = (o: Pick<Obra, 'acc_file_state'>): boolean => o.acc_file_state !== 'ok';
 

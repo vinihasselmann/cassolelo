@@ -28,7 +28,7 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import AuthorMixin, Base, TimestampMixin
-from app.models.enums import AccFileState, ReviewStatus, VersionStatus, check_in
+from app.models.enums import AccFileState, ReviewStatus, UnitNumbering, VersionStatus, check_in
 
 
 class Obra(TimestampMixin, AuthorMixin, Base):
@@ -36,6 +36,7 @@ class Obra(TimestampMixin, AuthorMixin, Base):
     __table_args__ = (
         UniqueConstraint("code", name="uq_obras_code"),
         CheckConstraint(check_in("acc_file_state", AccFileState), name="ck_obras_acc_file_state"),
+        CheckConstraint(check_in("unit_numbering", UnitNumbering), name="ck_obras_unit_numbering"),
     )
 
     id: Mapped[int] = mapped_column(BigInteger, Identity(), primary_key=True)
@@ -54,6 +55,11 @@ class Obra(TimestampMixin, AuthorMixin, Base):
         String(20), default=AccFileState.OK, server_default=text("'ok'")
     )
     acc_file_state_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # Numeração das unidades: provisória até o 3D mandar os centros de gravidade; então
+    # renumerada pela sequência de montagem, se a obra ainda não tem valores por peça.
+    unit_numbering: Mapped[str] = mapped_column(
+        String(12), default=UnitNumbering.PROVISIONAL, server_default=text("'provisional'")
+    )
     # Regra de identificação das peças (nulo = padrão do servidor): parâmetros do modelo
     # que dão a marca e a categoria, em ordem de prioridade.
     mark_property_names: Mapped[list[str] | None] = mapped_column(JSONB)
@@ -168,6 +174,11 @@ class Element(Base):
     # parâmetros da regra preenchidos na peça: [["Marca", "P01"], ...] na ordem da regra.
     mark_source: Mapped[str | None] = mapped_column(String(255))
     mark_alt: Mapped[list[Any]] = mapped_column(default=list, server_default=text("'[]'::jsonb"))
+    # centro de gravidade [x, y, z] (m), mandado pelo navegador (unit_sequence.py)
+    # (None vira NULL do SQL, não o JSON null: "sem centro" é contado pelo status)
+    centroid: Mapped[list[float] | None] = mapped_column(JSONB(none_as_null=True))
+    # pilar | quadro | laje | escada | outros (piece_type.py; filtro da lista)
+    piece_type: Mapped[str | None] = mapped_column(String(12))
     category: Mapped[str | None] = mapped_column(String(255))
     level: Mapped[str | None] = mapped_column(String(255))  # nível/pavimento (busca)
     # nome, categoria, marca, nível e valores de SEARCH_PROPERTY_NAMES (texto livre)

@@ -12,6 +12,8 @@ import {
   parseHexColor,
   SELECTION_COLOR,
   type DbId,
+  type GeometryPart,
+  type TriangleVisitor,
   type HexColor,
   type ModelFrame,
   type ModelNode,
@@ -61,6 +63,8 @@ export interface AvModel {
   getUnitScale?(): number;
   getInstanceTree?(): AvInstanceTree | null;
   getFragmentList?(): AvFragmentList;
+  /** toda a geometria já chegou (o SVF2 carrega aos poucos) */
+  isLoadDone?(): boolean;
   getProperties?(
     dbId: number,
     onSuccess: (result: { name: string; properties: AvProperty[] }) => void,
@@ -88,6 +92,7 @@ export interface AvViewer {
   start(): number;
   finish(): void;
   addEventListener(type: string, cb: (event: AvSelectionEvent) => void): void;
+  removeEventListener?(type: string, cb: (event: AvSelectionEvent) => void): void;
   loadDocumentNode(doc: AvDocument, node: AvBubbleNode): Promise<AvModel>;
   select(dbIds: number[]): void;
   clearSelection(): void;
@@ -122,6 +127,7 @@ export interface AutodeskNamespace {
       getAecModelData?(node: AvBubbleNode): unknown;
     };
     SELECTION_CHANGED_EVENT: string;
+    GEOMETRY_LOADED_EVENT?: string;
     SelectionType?: { MIXED: number };
   };
 }
@@ -312,6 +318,30 @@ export class ApsViewerAdapter implements ViewerAdapter {
 
   // ---------------------------------------------------------------- coordenadas do eixo
 
+  /**
+   * Espera TODA a geometria do modelo chegar: o SVF2 vai carregando aos poucos e, antes
+   * disso, peças ainda sem fragmento não têm triângulos (o Excel ficaria sem as coordenadas
+   * delas). Limite de `timeoutMs`; depois segue com o que houver.
+   */
+  async whenGeometryLoaded(timeoutMs = 120_000): Promise<void> {
+    const model = this.model;
+    if (!model || !this.started || model.isLoadDone?.() !== false) return;
+    const { av, viewer } = await this.started;
+    const type = av.Viewing.GEOMETRY_LOADED_EVENT;
+    if (!type) return;
+    await new Promise<void>((resolve) => {
+      const done = () => {
+        clearInterval(poll);
+        clearTimeout(limit);
+        viewer.removeEventListener?.(type, done);
+        resolve();
+      };
+      viewer.addEventListener(type, done);
+      const poll = setInterval(() => { if (model.isLoadDone?.() !== false) done(); }, 500);
+      const limit = setTimeout(done, timeoutMs);
+    });
+  }
+
   getModelFrame(): ModelFrame | null {
     const model = this.model;
     if (!model?.getData) return null;
@@ -357,14 +387,42 @@ export class ApsViewerAdapter implements ViewerAdapter {
     return Promise.all(dbIds.map(one));
   }
 
+  getGeometryParts(dbId: DbId): GeometryPart[] {
+    const tree = this.model?.getInstanceTree?.();
+    if (!tree) return [];
+    // sem limite de profundidade: no NWD de vínculos a geometria fica 6+ níveis abaixo.
+    // (com `recursive`, o Viewer também chama para o próprio nó; o Set evita repetir)
+    const ids = new Set<DbId>([dbId]);
+    tree.enumNodeChildren(dbId, (id) => { ids.add(id); }, true);
+    const out: GeometryPart[] = [];
+    for (const id of ids) {
+      let own = 0;
+      tree.enumNodeFragments(id, () => { own += 1; }, false);
+      if (own > 0) out.push({ dbId: id, name: tree.getNodeName?.(id) ?? '' });
+    }
+    return out;
+  }
+
   getTriangles(dbId: DbId): Triangle[] {
+    const out: Triangle[] = [];
+    this.forEachTriangle(dbId, (ax, ay, az, bx, by, bz, cx, cy, cz) => {
+      out.push([
+        [ax, ay, az],
+        [bx, by, bz],
+        [cx, cy, cz],
+      ]);
+    });
+    return out;
+  }
+
+  /** Percorre os triângulos da geometria PRÓPRIA do nó (mundo do Viewer) sem criar listas. */
+  forEachTriangle(dbId: DbId, fn: TriangleVisitor): void {
     const model = this.model;
     const tree = model?.getInstanceTree?.();
     const frags = model?.getFragmentList?.();
     const impl = this.viewer?.impl;
     const Matrix4 = window.THREE?.Matrix4;
-    if (!model || !tree || !frags || !impl || !Matrix4) return [];
-    const out: Triangle[] = [];
+    if (!model || !tree || !frags || !impl || !Matrix4) return;
     tree.enumNodeFragments(
       dbId,
       (fragId) => {
@@ -380,29 +438,31 @@ export class ApsViewerAdapter implements ViewerAdapter {
         const stride = g.vb ? (g.vbstride ?? 3) : (pos?.itemSize ?? 3);
         const off = g.vb ? (pos?.offset ?? pos?.itemOffset ?? 0) : 0;
         const e = (k: number) => m[k] ?? 0;
-        const vert = (i: number): Vec3 => {
+        const [m0, m1, m2, m4, m5, m6, m8, m9, m10, m12, m13, m14] = [e(0), e(1), e(2), e(4), e(5), e(6), e(8), e(9), e(10), e(12), e(13), e(14)];
+        // cada vértice é transformado UMA vez (ele se repete em vários triângulos)
+        const nv = Math.floor((vb.length - off) / stride);
+        const w = new Float64Array(nv * 3);
+        for (let i = 0; i < nv; i++) {
           const x = vb[i * stride + off] ?? 0;
           const y = vb[i * stride + off + 1] ?? 0;
           const z = vb[i * stride + off + 2] ?? 0;
-          return [
-            e(0) * x + e(4) * y + e(8) * z + e(12),
-            e(1) * x + e(5) * y + e(9) * z + e(13),
-            e(2) * x + e(6) * y + e(10) * z + e(14),
-          ];
-        };
+          w[i * 3] = m0 * x + m4 * y + m8 * z + m12;
+          w[i * 3 + 1] = m1 * x + m5 * y + m9 * z + m13;
+          w[i * 3 + 2] = m2 * x + m6 * y + m10 * z + m14;
+        }
         const ib = g.ib ?? g.index?.array;
-        const count = ib ? ib.length : vb.length / stride;
+        const count = ib ? ib.length : nv;
         for (let i = 0; i + 2 < count; i += 3) {
-          const a = ib ? (ib[i] ?? 0) : i;
-          const b = ib ? (ib[i + 1] ?? 0) : i + 1;
-          const c = ib ? (ib[i + 2] ?? 0) : i + 2;
-          out.push([vert(a), vert(b), vert(c)]);
+          const a = (ib ? (ib[i] ?? 0) : i) * 3;
+          const b = (ib ? (ib[i + 1] ?? 0) : i + 1) * 3;
+          const c = (ib ? (ib[i + 2] ?? 0) : i + 2) * 3;
+          fn(w[a] ?? 0, w[a + 1] ?? 0, w[a + 2] ?? 0, w[b] ?? 0, w[b + 1] ?? 0, w[b + 2] ?? 0, w[c] ?? 0, w[c + 1] ?? 0, w[c + 2] ?? 0);
         }
       },
       false,
     );
-    return out;
   }
+
 
   /** Marcador laranja no eixo (overlay do Viewer, por cima do modelo). */
   showAxisMarker(points: Vec3[] | null): void {

@@ -6,7 +6,10 @@ O arquivo é a MESMA lista da tela: usa `search.find_marks` com os filtros da bu
 Aba "Marcas" (uma linha por marca): Marca, Categoria, Peças, Seção, Comprimento (cm),
 Status, uma coluna por parâmetro ativo da obra ("Nome (unidade)"), Última alteração e
 Autor (só os parâmetros POR MARCA). Aba "Peças": Marca, Categoria, externalId, Nível,
-dbId, Peça (unidade de peça, ex.: PP001-3) e uma coluna por parâmetro POR PEÇA (P3).
+dbId, Peça (unidade de peça, ex.: PP001-3), X, Y, Z (m; centro de gravidade, quando o
+navegador as manda ou o servidor já as tem), "Ordem de montagem" (posição na sequência
+X -> Y -> Z da obra, faixas de 0,10 m; assembly_order.py) e uma coluna por parâmetro POR
+PEÇA (P3). As linhas ficam sempre por marca e número da peça.
 Aba "Sobre": obra, versão, filtros, quando e quem gerou.
 
 Cabeçalho congelado e filtro automático; números como número, datas como data do Excel
@@ -43,8 +46,8 @@ from app.models import (
     User,
 )
 from app.models.enums import ParamLevel, ParamType, VersionStatus
+from app.services import assembly_order, mark_status, search
 from app.services import filters as filters_engine
-from app.services import mark_status, search
 from app.services.errors import NotFoundError
 from app.services.extraction import find_prop
 from app.services.mark_status import MarkStatus
@@ -68,6 +71,10 @@ STATUS_LABELS = {
     MarkStatus.REVIEW: "Revisar",
 }
 BASE_HEADERS = ["Marca", "Categoria", "Peças", "Seção", "Comprimento (cm)", "Status"]
+COORD_HEADERS = ["X (m)", "Y (m)", "Z (m)"]
+SEQ_HEADER = "Ordem de montagem"  # posição na sequência X → Y → Z da obra (1, 2, 3…)
+COORD_FMT = "0.000"
+NO_UNIT = 1 << 30  # peça sem unidade: depois das numeradas
 DATE_FMT = "dd/mm/yyyy"
 DATETIME_FMT = "dd/mm/yyyy hh:mm"
 HEADER_FILL = PatternFill("solid", fgColor="DCE6F2")
@@ -168,6 +175,7 @@ async def build_workbook(
     params: search.SearchParams,
     actor: User,
     timezone: str = "America/Sao_Paulo",
+    coordinates: dict[int, tuple[float, float, float]] | None = None,
 ) -> ExportFile:
     obra = await session.get(Obra, obra_id)
     if obra is None:
@@ -310,36 +318,66 @@ async def build_workbook(
             unit_values[(unit_id, def_id)] = value
 
     ps = wb.create_sheet("Peças")
-    pheaders = ["Marca", "Categoria", "externalId", "Nível", "dbId", "Peça"] + [
-        f"{p.name} ({p.unit})" if p.unit else p.name for p in piece_defs
-    ]
+    pheaders = [
+        "Marca",
+        "Categoria",
+        "externalId",
+        "Nível",
+        "dbId",
+        "Peça",
+        *COORD_HEADERS,
+        SEQ_HEADER,
+    ] + [f"{p.name} ({p.unit})" if p.unit else p.name for p in piece_defs]
     ps.append(pheaders)
     ptable: list[list[Any]] = [pheaders]
-    first_param_col = 7
-    for m in marks:
+    first_param_col = 7 + len(COORD_HEADERS) + 1
+    # As do navegador (calculadas agora) ou, sem elas, os centros já guardados (unit_sequence)
+    coords = coordinates or {
+        el.dbid: (float(el.centroid[0]), float(el.centroid[1]), float(el.centroid[2]))
+        for els in pieces.values()
+        for el in els
+        if el.centroid
+    }
+    # Linhas por marca e, na marca, pelo número da peça (PP001-1, PP001-2… seguidas). A
+    # sequência de montagem da obra (X → Y → Z) vai na coluna "Ordem de montagem".
+    listed = [
+        (m, el, units.get(el.id))
+        for m in marks
+        for el in sorted(
+            pieces.get(m.mark_id, []),
+            key=lambda e: (units[e.id][1] if e.id in units else NO_UNIT, e.dbid),
+        )
+    ]
+    with_xyz = [(el.dbid, coords[el.dbid]) for _m, el, _u in listed if el.dbid in coords]
+    order = {dbid: i + 1 for i, dbid in enumerate(assembly_order.sequence(with_xyz))}
+    without = len(listed) - len(order)
+    for m, el, unit in listed:
         applicable = [p for p in piece_defs if not p.categories or m.category in p.categories]
-        for el in pieces.get(m.mark_id, []):
-            unit = units.get(el.id)
-            prow: list[Any] = [
-                m.code,
-                m.category,
-                el.external_id,
-                el.level,
-                el.dbid,
-                f"{m.code}-{unit[1]}" if unit else None,
-            ]
-            for p in piece_defs:
-                raw = unit_values.get((unit[0], p.id)) if unit and p in applicable else None
-                prow.append(cell_value(p.type, raw) if raw is not None else None)
-            ps.append(prow)
-            ptable.append(prow)
-            r = ps.max_row
-            for i, p in enumerate(piece_defs):
-                cell = ps.cell(row=r, column=first_param_col + i)
-                if p not in applicable:
-                    cell.fill = NA_FILL
-                elif isinstance(cell.value, date):
-                    cell.number_format = DATE_FMT
+        xyz = coords.get(el.dbid)
+        prow: list[Any] = [
+            m.code,
+            m.category,
+            el.external_id,
+            el.level,
+            el.dbid,
+            f"{m.code}-{unit[1]}" if unit else None,
+            *([round(v, 3) for v in xyz] if xyz else [None, None, None]),
+            order.get(el.dbid),
+        ]
+        for p in piece_defs:
+            raw = unit_values.get((unit[0], p.id)) if unit and p in applicable else None
+            prow.append(cell_value(p.type, raw) if raw is not None else None)
+        ps.append(prow)
+        ptable.append(prow)
+        r = ps.max_row
+        for i in range(len(COORD_HEADERS)):
+            ps.cell(row=r, column=7 + i).number_format = COORD_FMT
+        for i, p in enumerate(piece_defs):
+            cell = ps.cell(row=r, column=first_param_col + i)
+            if p not in applicable:
+                cell.fill = NA_FILL
+            elif isinstance(cell.value, date):
+                cell.number_format = DATE_FMT
     _style_sheet(ps, _widths(ptable))
 
     now = datetime.now(UTC).astimezone(tz)
@@ -357,6 +395,8 @@ async def build_workbook(
         ("Peças", sum(m.count for m in marks)),
         ("Gerado em", now.replace(tzinfo=None)),
         ("Gerado por", actor.name),
+        ("Coordenadas", _describe_coords(coords)),
+        ("Ordem das peças", _describe_order(coords, without)),
     ):
         about.append([key, value])
     about.cell(row=6, column=2).number_format = DATETIME_FMT
@@ -372,6 +412,28 @@ async def build_workbook(
     safe = re.sub(r"[^A-Za-z0-9._-]+", "-", obra.code).strip("-") or "obra"
     filename = f"{safe}_{rev_label(version.version_number)}_{now:%Y-%m-%d}.xlsx"
     return ExportFile(buffer.getvalue(), filename, len(marks), sum(m.count for m in marks))
+
+
+def _describe_coords(coords: dict[int, tuple[float, float, float]]) -> str:
+    if not coords:
+        return "não calculadas (exporte com o modelo 3D aberto para ter X, Y e Z)"
+    return (
+        "X, Y e Z do centro de gravidade de cada peça (concreto: corpo, consolos e dentes), "
+        "em metros, relativos à origem interna do arquivo"
+    )
+
+
+def _describe_order(coords: dict[int, tuple[float, float, float]], rest: int) -> str:
+    if not coords:
+        return "por marca e número da peça"
+    tol = f"{assembly_order.TOLERANCE_M:.2f}".replace(".", ",")
+    text = (
+        f'por marca e número da peça; coluna "{SEQ_HEADER}": sequência de montagem '
+        f"{assembly_order.AXIS_NAMES}, crescente, em faixas de {tol} m (ordene por ela)"
+    )
+    if rest:
+        text += f"; {rest} peça(s) sem coordenada, sem ordem de montagem"
+    return text
 
 
 MODE_WORDS = {"isolate": "", "hide": "ocultar ", "highlight": "destacar "}

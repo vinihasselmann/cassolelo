@@ -9,10 +9,13 @@ import {
   dot,
   formatMeters,
   mainMember,
+  meshCentroid,
   meshVolume,
   mul,
   norm,
   pieceAxis,
+  pieceCentroid,
+  piecesCentroids,
   pieceCoordinates,
   sub,
   toProjectBase,
@@ -211,5 +214,82 @@ describe('membro principal de concreto', () => {
     expect(r.kind).toBe('viga');
     near((r.rows.at(1)?.xyz ?? NO), [8, 0, 4.8], 1e-9);
     expect(r.noReference).toBe(true);
+  });
+});
+
+describe('centro de gravidade (Excel: sequência de montagem, 2026-11-18)', () => {
+  const n = (dbId: number, parent: number | null, extra: Partial<ModelNode>): ModelNode => ({
+    dbId, parent, children: [], name: `n${String(dbId)}`, category: '', ifcClass: '', material: '', hasGeometry: false, ...extra,
+  });
+  function source(nodes: ModelNode[], geometry: Record<number, Triangle[]>, frame?: ModelFrame): GeometrySource {
+    const byId = new Map(nodes.map((x) => [x.dbId, x]));
+    return {
+      getModelFrame: () => frame ?? { globalOffset: [0, 0, 0], unitScaleToM: 1, refPointTransformation: null },
+      getNodes: (ids) => Promise.resolve(ids.map((id) => byId.get(id)).filter((x): x is ModelNode => x !== undefined)),
+      getTriangles: (id) => geometry[id] ?? [],
+    };
+  }
+
+  it('caixa longe da origem: centro exato, volume certo', () => {
+    const r = meshCentroid(box([1000, -2000, 50], [2, 0, 0], [0, 4, 0], [0, 0, 6]));
+    near(r?.center ?? NO, [1001, -1998, 53], 1e-9);
+    expect(r?.volume).toBeCloseTo(48, 9);
+  });
+
+  it('malha aberta (só uma face): centro da área', () => {
+    const r = meshCentroid([[[0, 0, 0], [2, 0, 0], [2, 2, 0]], [[0, 0, 0], [2, 2, 0], [0, 2, 0]]]);
+    near(r?.center ?? NO, [1, 1, 0], 1e-9);
+    expect(r?.volume).toBe(0);
+  });
+
+  it('pilar com consolo: média pelos volumes; aço e alça ficam de fora', async () => {
+    const nodes = [
+      n(1, null, { children: [100] }),
+      n(100, 1, { name: 'Montagem PP312', ifcClass: 'IfcElementAssembly', children: [101, 103, 104] }),
+      n(101, 100, { name: 'IfcColumn::CASSOL-ACS-Alça', ifcClass: 'IfcColumn', material: 'CP190RB', hasGeometry: true }),
+      n(103, 100, { name: 'IfcColumn::Consolo', ifcClass: 'IfcColumn', material: 'Concreto, Pré-moldado - 50MPa', hasGeometry: true }),
+      n(104, 100, { name: 'IfcColumn::Pilar', ifcClass: 'IfcColumn', material: 'Concreto, Pré-moldado - 50MPa', hasGeometry: true }),
+    ];
+    const geometry = {
+      101: prism([0, 0, 0], [0, 0, 8], 0.02, 0.02),
+      103: box([0.2, -0.2, 4], [0.3, 0, 0], [0, 0.4, 0], [0, 0, 0.3]), // 0,036 m³ em (0,35; 0; 4,15)
+      104: box([-0.2, -0.2, -1.4], [0.4, 0, 0], [0, 0.4, 0], [0, 0, 7.4]), // 1,184 m³ em (0; 0; 2,3)
+    };
+    const total = 0.036 + 1.184;
+    const got = await pieceCentroid(source(nodes, geometry), 100);
+    near(got, [(0.35 * 0.036) / total, 0, (4.15 * 0.036 + 2.3 * 1.184) / total], 1e-9);
+  });
+
+  it('converte para metros com o globalOffset do modelo', async () => {
+    const nodes = [n(1, null, { children: [10] }), n(10, 1, { category: 'Pilares', material: 'Concreto', hasGeometry: true })];
+    const frame: ModelFrame = { globalOffset: [100, 0, 0], unitScaleToM: 0.01, refPointTransformation: null };
+    const got = await pieceCentroid(source(nodes, { 10: box([0, 0, 0], [2, 0, 0], [0, 2, 0], [0, 0, 2]) }, frame), 10);
+    near(got, [1.01, 0.01, 0.01], 1e-12);
+  });
+
+  it('pilar real do ORC: centro de gravidade no meio do pilar (entre a base e o topo)', async () => {
+    const got = await pieceCentroid(fixtureSource(pilarReal), pilarReal.dbId);
+    near([got[0], got[1], 0], [-73.1754, 141.5944, 0], 0.02); // no eixo, em planta
+    expect(got[2]).toBeGreaterThan(-1.4);
+    expect(got[2]).toBeLessThan(5.2);
+  });
+
+  it('lote: progresso, peças sem geometria de fora e cancelamento', async () => {
+    const nodes = [
+      n(1, null, { children: [10, 11, 12] }),
+      n(10, 1, { category: 'Pilares', material: 'Concreto', hasGeometry: true }),
+      n(11, 1, { category: 'Pilares', material: 'Concreto', hasGeometry: true }),
+      n(12, 1, { category: 'Pilares', material: 'Concreto', hasGeometry: true }),
+    ];
+    const geometry = { 10: box([0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]), 12: box([5, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]) };
+    const progress: number[] = [];
+    const out = await piecesCentroids(source(nodes, geometry), [10, 11, 12], { batch: 2, yieldMs: 0, onProgress: (p) => progress.push(p.done) });
+    expect([...out.keys()]).toEqual([10, 12]); // 11 sem geometria
+    near(out.get(12) ?? NO, [5.5, 0.5, 0.5], 1e-12);
+    expect(progress).toEqual([2, 3]);
+
+    const ctrl = new AbortController();
+    ctrl.abort();
+    await expect(piecesCentroids(source(nodes, geometry), [10], { signal: ctrl.signal })).rejects.toThrow('Cancelado');
   });
 });

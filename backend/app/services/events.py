@@ -54,6 +54,7 @@ EVENT_TYPES = frozenset(
         "unit_batch_undone",
         "unit_orphan_changed",  # P5: unidade órfã religada ou arquivada
         "obra_file_state",  # arquivo da obra excluído / restaurado / sumiu do Docs
+        "units_renumbered",  # numeração pela sequência de montagem / ligações refeitas
     }
 )
 EVENT_ID = re.compile(r"^\d{1,20}-\d{1,20}$")

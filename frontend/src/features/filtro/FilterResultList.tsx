@@ -2,11 +2,12 @@ import { useEffect, useMemo, useState } from 'react';
 
 import type { Evaluation } from '../../api/filters';
 import type { MarkStatus } from '../../api/status';
-import type { MarkPieces } from '../../api/versions';
+import type { MarkPieces, PieceType } from '../../api/versions';
 import { errorMessage } from '../../lib/errors';
 import { StatusDot } from '../modelo/StatusBadge';
 import { STATUS_LABEL } from '../modelo/statusLabel';
 import { markAlt, versionOrigin } from './markOrigin';
+import { PieceTypeFilter } from './PieceTypeFilter';
 
 const num = (n: number) => n.toLocaleString('pt-BR');
 export const LIST_PAGE_SIZE = 50;
@@ -82,7 +83,10 @@ export function FilterResultList({
   const origin = useMemo(() => versionOrigin(marks), [marks]);
   const byId = useMemo(() => new Map(marks.map((m) => [m.mark_id, m])), [marks]);
   const hasSecondary = useMemo(() => marks.some((m) => (m.secondary ?? []).length > 0), [marks]);
-  const rows = useMemo((): Row[] => {
+  const [types, setTypes] = useState<ReadonlySet<PieceType>>(() => new Set());
+  const typeOf = (markId: number | null): PieceType | undefined =>
+    markId === null ? undefined : (byId.get(markId)?.piece_type ?? 'outros');
+  const allRows = useMemo((): Row[] => {
     if (!filtered) {
       return [...marks]
         .sort((a, b) => a.code.localeCompare(b.code) || a.category.localeCompare(b.category))
@@ -101,9 +105,34 @@ export function FilterResultList({
         : [],
     }));
   }, [marks, evaluation, filtered]);
+  // Filtro "Tipo": só as marcas dos tipos marcados (as peças sem marca saem)
+  const rows = useMemo(
+    () => (types.size === 0 ? allRows : allRows.filter((r) => r.markId !== null && types.has(byId.get(r.markId)?.piece_type ?? 'outros'))),
+    [allRows, types, byId],
+  );
+  const typeCounts = useMemo(() => {
+    const out = new Map<PieceType, number>();
+    for (const r of allRows) {
+      if (r.markId === null || r.matched === 0) continue;
+      const t = byId.get(r.markId)?.piece_type ?? 'outros';
+      out.set(t, (out.get(t) ?? 0) + 1);
+    }
+    return out;
+  }, [allRows, byId]);
+  // Marcar/desmarcar um tipo seleciona no 3D todas as marcas dos tipos marcados
+  const changeTypes = (next: Set<PieceType>) => {
+    setTypes(next);
+    onSelectAll(
+      next.size === 0
+        ? []
+        : allRows.flatMap((r) => {
+            const t = typeOf(r.markId);
+            return r.markId !== null && r.matched > 0 && t && next.has(t) ? [r.markId] : [];
+          }),
+    );
+  };
   useEffect(() => { setPage(1); }, [rows]);
 
-  const markIds = rows.flatMap((r) => (r.markId !== null && r.matched > 0 ? [r.markId] : []));
   const pages = Math.max(1, Math.ceil(rows.length / LIST_PAGE_SIZE));
   const shown = rows.slice((page - 1) * LIST_PAGE_SIZE, page * LIST_PAGE_SIZE);
 
@@ -113,12 +142,10 @@ export function FilterResultList({
         <h3 id="result-title" className="section-title">
           {/* o nome do parâmetro de onde vêm os nomes das peças (regra da obra) */}
           {origin.split.length === 1 && origin.main ? origin.main : 'Marcas'} (
-          {num(filtered ? (evaluation?.matched_marks ?? 0) : marks.length)})
+          {num(types.size > 0 ? rows.length : filtered ? (evaluation?.matched_marks ?? 0) : marks.length)})
           {loading && <span className="muted small"> filtrando…</span>}
         </h3>
-        <button type="button" className="link" disabled={markIds.length === 0} onClick={() => { onSelectAll(markIds); }}>
-          Selecionar todas
-        </button>
+        <PieceTypeFilter counts={typeCounts} selected={types} onChange={changeTypes} />
       </div>
       {origin.split.length > 1 && (
         <p className="origin-line">

@@ -24,7 +24,7 @@ from app.models import (
     User,
     VersionDiff,
 )
-from app.models.enums import UnitStatus, VersionStatus
+from app.models.enums import UnitNumbering, UnitStatus, VersionStatus
 from app.services import audit
 from app.services.param_defs import has_value
 from app.services.unit_matching import KEY, NEW, ORDER, ElementIn, UnitIn, match
@@ -107,16 +107,23 @@ async def link_version(
         raise ValueError(f"obra {version.obra_id} não existe")
     latest = await _is_latest(session, version)
     use_key = uses_key(obra)
+    by_sequence = obra.unit_numbering == UnitNumbering.SEQUENCE.value
     await session.execute(delete(PieceUnitLink).where(PieceUnitLink.version_id == version.id))
 
     elements: dict[int, list[ElementIn]] = defaultdict(list)
-    for eid, mark_id, ext, level, name in await session.execute(
-        select(Element.id, Element.mark_id, Element.external_id, Element.level, Element.name).where(
-            Element.version_id == version.id, Element.mark_id.is_not(None)
-        )
+    for eid, mark_id, ext, level, name, centroid in await session.execute(
+        select(
+            Element.id,
+            Element.mark_id,
+            Element.external_id,
+            Element.level,
+            Element.name,
+            Element.centroid,
+        ).where(Element.version_id == version.id, Element.mark_id.is_not(None))
     ):
         if mark_id is not None:  # filtrado na consulta; o tipo da coluna admite nulo
-            elements[mark_id].append(ElementIn(eid, ext, level, name))
+            xyz = (float(centroid[0]), float(centroid[1]), float(centroid[2])) if centroid else None
+            elements[mark_id].append(ElementIn(eid, ext, level, name, xyz))
 
     # Versão mais recente: todas as unidades da obra (as de marcas que sumiram ficam sem
     # peça). Versão anterior: só as das marcas presentes, e nada muda de situação.
@@ -158,6 +165,7 @@ async def link_version(
             elements.get(mark_id, []),
             use_key=use_key,
             create=latest,
+            by_sequence=by_sequence,
         )
         for link in result.links:
             if link.method == NEW:

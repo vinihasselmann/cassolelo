@@ -8,6 +8,7 @@
     uv run python -m app.cli alerts test               # manda um alerta de teste (Teams/e-mail)
     uv run python -m app.cli versions retry --version 7   # reconsulta o Docs e reprocessa
     uv run python -m app.cli marks origin --all        # origem da marca (versões antigas)
+    uv run python -m app.cli marks type --all          # tipo da peça (versões antigas)
     uv run python -m app.cli sync --obra 1 | --all     # "Sincronizar agora" pela linha de comando
     uv run python -m app.cli dates list [--obra 12]    # datas fora de 1900–2100 (por marca e peça)
     uv run python -m app.cli dates fix p:34 --clear | --set 2026-05-05 [--user email]
@@ -35,7 +36,7 @@ from app.db import create_engine, create_sessionmaker
 from app.models import ModelVersion, Obra, User
 from app.models.enums import Role, VersionStatus
 from app.observability import alerts
-from app.services import invalid_dates, mark_origin, piece_props
+from app.services import invalid_dates, mark_origin, piece_props, piece_type
 from app.services import versions as versions_service
 from app.services import webhooks as hooks_service
 from app.services.errors import DomainError
@@ -90,6 +91,12 @@ def _parser() -> argparse.ArgumentParser:
     origin_target = origin.add_mutually_exclusive_group(required=True)
     origin_target.add_argument("--version", type=int, help="id da versão")
     origin_target.add_argument("--all", action="store_true", help="todas as versões prontas")
+    ptype = marks_cmds.add_parser(
+        "type", help="preenche o tipo da peça (pilar, quadro, laje, escada) sem chamar o APS"
+    )
+    ptype_target = ptype.add_mutually_exclusive_group(required=True)
+    ptype_target.add_argument("--version", type=int, help="id da versão")
+    ptype_target.add_argument("--all", action="store_true", help="todas as versões prontas")
     sync_cmd = sub.add_parser("sync", help='"Sincronizar agora" (uma obra ou todas as ativas)')
     target = sync_cmd.add_mutually_exclusive_group(required=True)
     target.add_argument("--obra", type=int, help="id da obra")
@@ -182,6 +189,22 @@ async def _mark_origin(session: AsyncSession, settings: Settings, version_id: in
     return 0
 
 
+async def _piece_type(session: AsyncSession, version_id: int | None) -> int:
+    """Versões processadas antes da 0020: tipo da peça (filtro da lista)."""
+    stmt = select(ModelVersion).where(ModelVersion.status == VersionStatus.READY.value)
+    if version_id is not None:
+        stmt = select(ModelVersion).where(ModelVersion.id == version_id)
+    versions = list(await session.scalars(stmt.order_by(ModelVersion.id)))
+    if not versions:
+        print("Nenhuma versão encontrada.", file=sys.stderr)
+        return 2
+    for v in versions:
+        n = await piece_type.rebuild_version(session, v)
+        await session.commit()
+        print(f"versão {v.id} (obra {v.obra_id}, v{v.version_number}): {n} peças")
+    return 0
+
+
 async def _backfill_piece_props(session: AsyncSession, version_id: int | None) -> int:
     """Versões já processadas antes do motor de filtros: monta piece_props a partir do
     que está no banco (elements.props, marcas, valores). Um commit por versão."""
@@ -235,6 +258,8 @@ async def run(
     queue: JobQueue | None = None,
 ) -> int:
     args = _parser().parse_args(argv)
+    if args.group == "marks" and args.cmd == "type":
+        return await _piece_type(session, args.version)
     if args.group == "marks":
         return await _mark_origin(session, settings, args.version)
     if args.group == "piece-props":

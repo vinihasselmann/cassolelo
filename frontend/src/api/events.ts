@@ -22,7 +22,8 @@ export type ObraEventType =
   | 'unit_batch_applied'
   | 'unit_batch_undone'
   | 'unit_orphan_changed'
-  | 'obra_file_state'; // arquivo da obra excluído / restaurado no Docs
+  | 'obra_file_state' // arquivo da obra excluído / restaurado no Docs
+  | 'units_renumbered'; // peças numeradas pela sequência de montagem / ligações refeitas
 
 export interface EventActor {
   id: number;

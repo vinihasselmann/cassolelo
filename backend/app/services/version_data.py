@@ -48,6 +48,8 @@ class MarkPieces:
     member_dbids: list[int] = field(default_factory=list)
     sources: list[SourceCount] = field(default_factory=list)
     secondary: list[SecondaryValues] = field(default_factory=list)
+    # tipo das peças (o mais comum): pilar | quadro | laje | escada | outros
+    piece_type: str = "outros"
 
 
 @dataclass(frozen=True)
@@ -95,6 +97,7 @@ async def list_marks(session: AsyncSession, version_id: int) -> list[MarkPieces]
     ):
         members.setdefault(mark_id, []).extend(member_dbids)
     origins = await _origins(session, version_id)
+    types = await _piece_types(session, version_id)
     return [
         MarkPieces(
             mark_id=r[0],
@@ -105,9 +108,23 @@ async def list_marks(session: AsyncSession, version_id: int) -> list[MarkPieces]
             member_dbids=sorted(members.get(r[0], [])),
             sources=origins[r[0]].sources() if r[0] in origins else [],
             secondary=origins[r[0]].secondary() if r[0] in origins else [],
+            piece_type=types.get(r[0], "outros"),
         )
         for r in rows
     ]
+
+
+async def _piece_types(session: AsyncSession, version_id: int) -> dict[int, str]:
+    """Tipo de cada marca: o das suas peças (o mais comum; empate, o primeiro na ordem)."""
+    counts: dict[int, dict[str, int]] = {}
+    for mark_id, kind, n in await session.execute(
+        select(Element.mark_id, Element.piece_type, func.count())
+        .where(Element.version_id == version_id, Element.mark_id.is_not(None))
+        .group_by(Element.mark_id, Element.piece_type)
+    ):
+        if mark_id is not None:  # filtrado na consulta; o tipo da coluna admite nulo
+            counts.setdefault(mark_id, {})[kind or "outros"] = n
+    return {m: max(sorted(c), key=lambda k: c[k]) for m, c in counts.items()}
 
 
 class _Origin:

@@ -46,6 +46,7 @@ const OBRA: Obra = {
   active: true,
   acc_file_state: 'ok',
   acc_file_state_at: null,
+  unit_numbering: 'sequence',
   created_at: '2026-11-10T12:00:00Z',
   updated_at: '2026-11-10T12:00:00Z',
 };
@@ -751,7 +752,7 @@ describe('Filtro (F3)', () => {
     expect(bar().getByRole('button', { name: 'Remover filtros' })).toBeInTheDocument();
   });
 
-  it('clicar numa marca da lista seleciona e enquadra; Selecionar todas seleciona o resultado', async () => {
+  it('clicar numa marca da lista seleciona e enquadra; Tipo > Marcar tudo seleciona o resultado', async () => {
     const { viewer, user } = await ready();
     await user.click(screen.getByRole('button', { name: /^V-01/ }));
     expect(await screen.findByRole('heading', { name: 'V-01 · Structural Framing · 2 peças' })).toBeInTheDocument();
@@ -762,7 +763,8 @@ describe('Filtro (F3)', () => {
     const pop = await openFilter(user);
     await user.type(pop.getByRole('searchbox', { name: 'Pesquisar por objetos' }), 'PP');
     await vi.waitFor(() => { expect(rows()).toHaveLength(2); });
-    await user.click(screen.getByRole('button', { name: 'Selecionar todas' }));
+    await user.click(screen.getByRole('button', { name: /^Tipo/ }));
+    await user.click(screen.getByRole('checkbox', { name: /Marcar tudo/ }));
     expect(await screen.findByRole('heading', { name: '2 marcas · 4 peças' })).toBeInTheDocument();
     expect(viewer.selectDbIds).toHaveBeenLastCalledWith([10, 11, 12, 13]);
   });

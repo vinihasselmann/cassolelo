@@ -182,7 +182,7 @@ test('clicar numa peça destaca a marca inteira e mostra marca, quantidade e pro
     if (testInfo.project.use.hasTouch) {
       // O toque emulado do Chromium não chega ao reconhecedor de gestos do Viewer: aqui a
       // seleção é pela lista (o Viewer seleciona os dbIds do banco). Toque: tablet real.
-      const first = page.getByRole('list', { name: /^Marcas/ }).getByRole('button').first();
+      const first = page.getByRole('list', { name: /^Marcas?/ }).getByRole('button').first();
       await first.click();
       await expect(header(page)).toHaveText(/^.+ · .+ · \d+ peças?$/);
       console.log(`[${testInfo.project.name}] selecionada pela lista: ${(await header(page).textContent()) ?? ''}`);
@@ -312,7 +312,7 @@ test('pesquisar PP001 destaca a marca e Isolar mostra todas as peças dela e só
   const state = (dbid: number) => fake3d.getByRole('button', { name: `Peça ${dbid}` });
 
   await searchObjects(page, 'PP001');
-  const list = page.getByRole('list', { name: /^Marcas \(1\)/ });
+  const list = page.getByRole('list', { name: /^Marcas? \(1\)/ });
   await expect(list.getByRole('button')).toHaveText([/PP001.*2 de 2 peças/]);
   await closePopovers(page);
 
@@ -338,7 +338,7 @@ test('pesquisa por seção e menu rápido de nível refletem no 3D', async ({ pa
   const state = (dbid: number) => fake3d.getByRole('button', { name: `Peça ${dbid}` });
 
   await searchObjects(page, '40x50'); // seção, vinda do Tipo
-  await expect(page.getByRole('list', { name: /^Marcas \(1\)/ }).getByRole('button')).toHaveText([/PP001.*1 de 2 peças/]);
+  await expect(page.getByRole('list', { name: /^Marcas? \(1\)/ }).getByRole('button')).toHaveText([/PP001.*1 de 2 peças/]);
   await expect(state(11)).toHaveAttribute('data-state', 'normal');
   await expect(state(10)).toHaveAttribute('data-state', 'esmaecida');
 
@@ -346,7 +346,7 @@ test('pesquisa por seção e menu rápido de nível refletem no 3D', async ({ pa
   await pop.getByRole('searchbox', { name: 'Pesquisar por objetos' }).fill('');
   await pop.getByRole('button', { name: /^Nível/ }).click();
   await pop.getByRole('group', { name: 'Nível' }).getByRole('checkbox', { name: /TÉRREO/ }).check();
-  await expect(page.getByRole('list', { name: /^Marcas \(2\)/ })).toBeVisible();
+  await expect(page.getByRole('list', { name: /^Marcas? \(2\)/ })).toBeVisible();
   await expect(pop.getByRole('list', { name: 'Filtros ativos' })).toContainText('Nível: TÉRREO');
   // Isolar (modo padrão das regras): o resto some
   for (const dbid of [10, 11, 20]) await expect(state(dbid)).toHaveAttribute('data-state', 'normal');
@@ -522,7 +522,7 @@ test('aceite da Fase 6: cores, legenda, progresso e atalhos acompanham marca, lo
 
   // filtro de sistema Pendentes (antigo atalho)
   await applySaved(page, 'Pendentes');
-  await expect(page.getByRole('heading', { name: 'Marcas (2)' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /^Marcas? \(2\)$/ })).toBeVisible();
   await removeFilters(page);
 
   // 2. lote (legenda seleciona as pendentes) e 3. desfazer
@@ -615,8 +615,8 @@ test('aceite da Fase 7: versão nova com revisar (40x60 → 40x80), órfãs reli
 
   // Atalho A revisar (pelo banner)
   await banner.getByRole('button', { name: '1 a revisar' }).click();
-  await expect(page.getByRole('heading', { name: 'Marcas (1)' })).toBeVisible();
-  await expect(page.getByRole('list', { name: 'Marcas (1)' })).toContainText('PP001');
+  await expect(page.getByRole('heading', { name: /^Marcas? \(1\)$/ })).toBeVisible();
+  await expect(page.getByRole('list', { name: /^Marcas? \(1\)$/ })).toContainText('PP001');
 
   // Manter valores: sai de revisão, fica verde (Tipo de forma preenchido)
   await alert.getByRole('button', { name: 'Manter valores' }).click();
@@ -626,11 +626,11 @@ test('aceite da Fase 7: versão nova com revisar (40x60 → 40x80), órfãs reli
 
   // Filtro de sistema "Novas na versão"
   await applySaved(page, 'Novas na versão');
-  await expect(page.getByRole('list', { name: 'Marcas (2)' })).toContainText('PP004A');
-  await expect(page.getByRole('list', { name: 'Marcas (2)' })).toContainText('PP007');
+  await expect(page.getByRole('list', { name: /^Marcas? \(2\)$/ })).toContainText('PP004A');
+  await expect(page.getByRole('list', { name: /^Marcas? \(2\)$/ })).toContainText('PP007');
   // Filtro de sistema "Órfãs"
   await applySaved(page, 'Órfãs');
-  await expect(page.getByRole('list', { name: 'Marcas (2)' })).toContainText('PP005');
+  await expect(page.getByRole('list', { name: /^Marcas? \(2\)$/ })).toContainText('PP005');
   await removeFilters(page);
 
   // Órfãs: religar PP004 → PP004A clicando no 3D (peça 17)
@@ -673,7 +673,7 @@ test('Fase 7 com o Viewer real: R02 chega e o PP005 (60x60 → 80x80) fica a rev
   await expect(banner).toContainText(/1 a revisar/);
   await expect(page.getByRole('region', { name: 'Legenda' }).getByRole('button', { name: 'Revisar: 1 marca' })).toBeVisible();
   await banner.getByRole('button', { name: '1 a revisar' }).click();
-  await page.getByRole('list', { name: 'Marcas (1)' }).getByRole('button', { name: /^PP005/ }).click();
+  await page.getByRole('list', { name: /^Marcas? \(1\)$/ }).getByRole('button', { name: /^PP005/ }).click();
   const alert = page.getByRole('complementary', { name: 'Peça selecionada' }).getByRole('region', { name: 'Revisar' });
   await expect(alert).toContainText('SEÇÃO-Largura: 60.000 cm → 80.000 cm');
   await expect(alert).toContainText('PEÇA-Comprimento: 660.000 cm → 690.000 cm');
@@ -875,6 +875,41 @@ test('aceite da Fase 8: dois navegadores recebem a versão nova e as edições s
 
 // ------------------------------------------------------------------ Fase 9.1
 
+test('Tipo na lista: marcar Pilar deixa só os pilares e seleciona todos no 3D', async ({ page }, testInfo) => {
+  test.skip(REAL, 'usa a obra de teste semeada');
+  await openModel(page, testInfo);
+  await page.getByRole('button', { name: /^Tipo/ }).click();
+  const menu = page.getByRole('group', { name: 'Tipo de peça' });
+  await expect(menu.getByRole('checkbox')).toHaveCount(3); // marcar tudo, pilar e quadro estrutural
+  await menu.getByRole('checkbox', { name: /Pilar/ }).check();
+  await expect(page.getByRole('list', { name: /\(2\)$/ })).toBeVisible();
+  await expect(header(page)).toHaveText('2 marcas · 4 peças');
+  await menu.getByRole('button', { name: 'Limpar' }).click();
+  await expect(page.getByRole('list', { name: /\(3\)$/ })).toBeVisible();
+  // "Marcar tudo" substitui o antigo "Selecionar todas"
+  await expect(page.getByRole('button', { name: 'Selecionar todas' })).toHaveCount(0);
+  await menu.getByRole('checkbox', { name: /Marcar tudo/ }).check();
+  await expect(header(page)).toHaveText('3 marcas · 6 peças');
+});
+
+test('1ª abertura do 3D: os centros de gravidade vão para o servidor e a numeração sai da provisória', async ({ page }, testInfo) => {
+  test.skip(REAL, 'usa a obra de teste semeada');
+  await openModel(page, testInfo);
+  const users = (await (await page.request.get('/api/dev/users')).json()) as { id: number; role: string }[];
+  const headers = { 'X-Dev-User': String(users[0]?.id ?? '') };
+  const status = async () =>
+    (await (await page.request.get(`/api/versions/${process.env.E2E_VERSION_ID ?? ''}/centroids`, { headers })).json()) as {
+      pieces: number;
+      stored: number;
+      numbering: string;
+    };
+  await expect.poll(async () => { const s = await status(); return s.pieces > 0 && s.stored === s.pieces; }, { timeout: 15_000 }).toBe(true);
+  // sem valores por peça: pela sequência de montagem; com valores gravados antes: travada
+  expect(['sequence', 'fixed']).toContain((await status()).numbering);
+  const obra = (await (await page.request.get(`/api/obras/${obraId()}`, { headers })).json()) as { unit_numbering: string };
+  expect(obra.unit_numbering).toBe((await status()).numbering);
+});
+
 test('Exportar Excel: o arquivo tem as mesmas marcas, quantidades e valores da tela (com filtro)', async ({ page }, testInfo) => {
   test.skip(REAL, 'usa a obra de teste semeada');
   // Estado: PP001 = F-12, demais sem valor
@@ -894,7 +929,7 @@ test('Exportar Excel: o arquivo tem as mesmas marcas, quantidades e valores da t
 
   await openModel(page, testInfo);
   await searchObjects(page, 'PP');
-  const list = page.getByRole('list', { name: 'Marcas (2)' });
+  const list = page.getByRole('list', { name: /^Marcas? \(2\)$/ });
   await expect(list).toBeVisible();
   await closePopovers(page);
   const onScreen = await list.locator('.mark-item').evaluateAll((items) =>
@@ -930,6 +965,17 @@ test('Exportar Excel: o arquivo tem as mesmas marcas, quantidades e valores da t
   expect(rows.find((r) => r.Marca === 'PP002')?.['Tipo de forma']).toBeNull();
   expect(rows.find((r) => r.Marca === 'PP001')?.Status).toBe('Completa');
   expect((book.Peças as unknown[]).length).toBe(4);
+  // X/Y/Z do centro de gravidade (Viewer falso: caixas); linhas por marca e número; a
+  // sequência de montagem X → Y → Z vai na coluna "Ordem de montagem"
+  const pieces = book.Peças as Record<string, unknown>[];
+  expect(pieces.every((p) => typeof p['X (m)'] === 'number' && typeof p['Z (m)'] === 'number')).toBe(true);
+  const labels = pieces.map((p) => String(p['Peça']));
+  expect(labels).toEqual([...labels].sort((a, b) => a.localeCompare(b, 'pt-BR', { numeric: true })));
+  const bySeq = [...pieces].sort((a, b) => Number(a['Ordem de montagem']) - Number(b['Ordem de montagem']));
+  expect(bySeq.map((p) => Number(p['Ordem de montagem']))).toEqual([1, 2, 3, 4]);
+  const xs = bySeq.map((p) => Number(p['X (m)']));
+  expect(xs).toEqual([...xs].sort((a, b) => a - b));
+  expect(String((book.Sobre as Record<string, unknown>)['Ordem das peças'])).toMatch(/^por marca e número da peça; coluna "Ordem de montagem": sequência de montagem X → Y → Z/);
   expect(book['Marcas:layout']).toEqual({ freeze: 'A2', filter: 'A1:J3' }); // + coluna Data de expedição (F3)
   expect((book.Sobre as Record<string, unknown>).Filtros).toBe('texto "PP"');
 });
@@ -939,7 +985,7 @@ test('Exportar Excel: o arquivo tem as mesmas marcas, quantidades e valores da t
 test.describe('Filtros (F3)', () => {
   test.skip(REAL, 'usa a obra de teste semeada (filtros salvos e Data de expedição)');
   const piece = (page: Page, dbid: number) => page.getByTestId('fake-3d').getByRole('button', { name: `Peça ${dbid}` });
-  const rows = (page: Page) => page.getByRole('list', { name: /^Marcas/ }).getByRole('button');
+  const rows = (page: Page) => page.getByRole('list', { name: /^Marcas?/ }).getByRole('button');
 
   test('aplicar um filtro salvo', async ({ page }, testInfo) => {
     // Estado conhecido: PP001 com Tipo de forma (completa), PP002 e V-01 vazias (pendentes)
@@ -1008,7 +1054,7 @@ test.describe('Filtros (F3)', () => {
     await openModel(page, testInfo); // de novo, pela lista de obras (o usuário simulado fica só em memória)
     await applySaved(page, name);
     await expect(filterPop(page).getByRole('list', { name: 'Filtros ativos' })).toContainText('Nível: TÉRREO');
-    await expect(page.getByRole('list', { name: /^Marcas \(2\)/ })).toBeVisible();
+    await expect(page.getByRole('list', { name: /^Marcas? \(2\)/ })).toBeVisible();
   });
 
   test('remover filtros volta tudo ao normal', async ({ page }, testInfo) => {
@@ -1336,7 +1382,7 @@ test.describe('Parâmetros por peça (P4)', () => {
     await expect(step.getByRole('combobox', { name: 'Operador' })).toHaveValue('this_month');
     await step.getByRole('button', { name: 'Adicionar' }).click();
     await expect(pop.getByRole('list', { name: 'Filtros ativos' })).toContainText('Data de fabricação: no mês atual');
-    await expect(page.getByRole('list', { name: /^Marcas/ }).getByRole('button')).toHaveText([/P-06.*2 de 6 peças/]);
+    await expect(page.getByRole('list', { name: /^Marcas?/ }).getByRole('button')).toHaveText([/P-06.*2 de 6 peças/]);
     await closePopovers(page);
     for (const n of [2, 5]) await expect(piece(page, dbid(n))).toHaveAttribute('data-state', 'normal');
     for (const n of [1, 3, 4, 6]) await expect(piece(page, dbid(n))).toBeHidden();
@@ -1604,7 +1650,7 @@ test.describe('Tela da obra não rola como página', () => {
       await page.route(/\/api\/versions\/\d+\/marks$/, (route) => route.fulfill({ json: MARKS }));
       await page.route(/\/api\/versions\/\d+\/marks\/status$/, (route) => route.fulfill({ json: STATUS }));
       await openModel(page, testInfo);
-      await expect(page.getByRole('heading', { name: 'Marcas (316)' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: /^Marcas? \(316\)$/ })).toBeVisible();
 
       // painel esquerdo aberto
       expect(await pageHeights(page)).toEqual({ doc: h, win: h, scrollY: 0 });
@@ -1621,7 +1667,7 @@ test.describe('Tela da obra não rola como página', () => {
       await expect.poll(() => page.evaluate(() => (window as unknown as { __E2E_RESIZES?: number }).__E2E_RESIZES ?? 0)).toBeGreaterThan(before);
       expect(await pageHeights(page)).toEqual({ doc: h, win: h, scrollY: 0 });
       await page.getByRole('button', { name: 'Mostrar painel esquerdo' }).click();
-      await expect(page.getByRole('heading', { name: 'Marcas (316)' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: /^Marcas? \(316\)$/ })).toBeVisible();
       expect(await pageHeights(page)).toEqual({ doc: h, win: h, scrollY: 0 });
     });
   }
@@ -1799,4 +1845,32 @@ test.describe('Legenda móvel e retrátil', () => {
     expect(p.left).toBeGreaterThanOrEqual(area.left - 0.5);
     expect(p.top).toBeGreaterThanOrEqual(area.top - 0.5);
   });
+});
+
+test('Excel com o Viewer real: centro de gravidade de todas as peças e tempo do cálculo', async ({ page }, testInfo) => {
+  const obra = process.env.E2E_EXCEL_OBRA_ID;
+  test.skip(!REAL || !obra || testInfo.project.name !== 'desktop', 'modo real com E2E_EXCEL_OBRA_ID (desktop)');
+  test.setTimeout(240_000);
+  await page.goto('/obras');
+  const userSelect = page.getByLabel('Usuário (simulado)');
+  const fabrica = await userSelect.locator('option', { hasText: '(Fábrica)' }).first().getAttribute('value');
+  await userSelect.selectOption(fabrica ?? '');
+  await page.locator(`a[href="/obras/${obra ?? ''}"]`).first().click();
+  await page.getByRole('link', { name: 'Abrir modelo 3D' }).click();
+  await expect(page.locator('[data-load="ready"]')).toBeVisible({ timeout: MAX_LOAD_MS + 30_000 });
+
+  const exported = page.waitForRequest((r) => r.url().includes('/export.xlsx') && r.method() === 'POST', { timeout: 200_000 });
+  const download = page.waitForEvent('download', { timeout: 200_000 });
+  const started = Date.now();
+  await page.getByRole('button', { name: 'Exportar Excel' }).click();
+  const body = (await exported).postDataJSON() as { coordinates?: Record<string, number[]> };
+  const computed = Date.now() - started;
+  const file = await download;
+  const total = Date.now() - started;
+  const n = Object.keys(body.coordinates ?? {}).length;
+  const msg = `${n} peças com coordenada; cálculo ${computed} ms; até o download ${total} ms`;
+  console.log(`[Excel] ${msg}`);
+  testInfo.annotations.push({ type: 'Excel com coordenadas', description: msg });
+  await file.saveAs(testInfo.outputPath(file.suggestedFilename()));
+  expect(n).toBeGreaterThan(0);
 });

@@ -8,10 +8,11 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from app.api.obra_guard import require_file_available
+from app.api.schemas import Coordinates
 from app.auth import CurrentUser
 from app.db import SessionDep
 from app.models import ModelVersion, Obra
-from app.models.enums import ParamType, VersionStatus
+from app.models.enums import ParamType, UnitNumbering, VersionStatus
 from app.services import (
     colors,
     filters,
@@ -21,6 +22,7 @@ from app.services import (
     mark_validation,
     review,
     search,
+    unit_sequence,
     version_data,
 )
 from app.services.errors import NotFoundError, ValidationError
@@ -83,6 +85,7 @@ class MarkOut(BaseModel):
     member_dbids: list[int] = []  # membros: o clique neles acha a marca
     sources: list[SourceCountOut] = []
     secondary: list[SecondaryOut] = []
+    piece_type: Literal["pilar", "quadro", "laje", "escada", "outros"] = "outros"
 
 
 class SecondaryValueOut(BaseModel):
@@ -618,4 +621,48 @@ async def colorize_by_field(
             "legend": [x.__dict__ for x in r.legend],
             "total_pieces": r.total_pieces,
         }
+    )
+
+
+# --------------------------------------------------------------------------- centros (2026-11-18)
+
+
+class CentroidsIn(BaseModel):
+    coordinates: Coordinates
+
+
+class CentroidStatusOut(BaseModel):
+    pieces: int
+    stored: int
+    numbering: UnitNumbering  # provisional | sequence | fixed
+
+
+class CentroidsOut(CentroidStatusOut):
+    renumbered: int  # unidades que mudaram de número (sequência de montagem)
+    relinked: bool  # ligações pela ordem refeitas pela sequência
+
+
+@router.get("/{version_id}/centroids", response_model=CentroidStatusOut)
+async def get_centroids(
+    version_id: int, session: SessionDep, _user: CurrentUser
+) -> CentroidStatusOut:
+    """Quantas peças da versão já têm centro de gravidade e a numeração da obra."""
+    s = await unit_sequence.status(session, version_id)
+    return CentroidStatusOut(pieces=s.pieces, stored=s.stored, numbering=UnitNumbering(s.numbering))
+
+
+@router.put("/{version_id}/centroids", response_model=CentroidsOut)
+async def put_centroids(
+    version_id: int, body: CentroidsIn, session: SessionDep, user: CurrentUser
+) -> CentroidsOut:
+    """Centros de gravidade calculados pelo 3D. Numa obra com numeração provisória e sem
+    valores por peça, renumera as unidades pela sequência de montagem (uma única vez)."""
+    r = await unit_sequence.store(session, version_id, body.coordinates, user)
+    await session.commit()
+    return CentroidsOut(
+        pieces=r.status.pieces,
+        stored=r.status.stored,
+        numbering=UnitNumbering(r.status.numbering),
+        renumbered=r.renumbered,
+        relinked=r.relinked,
     )

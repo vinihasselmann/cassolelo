@@ -30,6 +30,10 @@ export function describeEvent(ev: ObraEvent): string | null {
       return `A versão ${str(d.version_number)} não pôde ser processada`;
     case 'obra_file_state':
       return d.state === 'ok' ? 'O arquivo da obra foi restaurado no Docs' : 'O arquivo da obra foi excluído do Docs';
+    case 'units_renumbered':
+      return Number(d.renumbered) > 0
+        ? 'As peças foram numeradas pela sequência de montagem'
+        : 'As peças da versão foram religadas pela sequência de montagem';
     case 'version_ready':
       return null; // vira o banner "Nova versão disponível"
     case 'unit_values_changed':

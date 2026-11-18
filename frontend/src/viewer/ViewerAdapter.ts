@@ -46,6 +46,14 @@ export interface ModelNode {
   hasGeometry: boolean;
 }
 
+/** Visita um triângulo: vértices a, b, c (x, y, z cada), sem criar arrays. */
+export type TriangleVisitor = (ax: number, ay: number, az: number, bx: number, by: number, bz: number, cx: number, cy: number, cz: number) => void;
+
+export interface GeometryPart {
+  dbId: DbId;
+  name: string;
+}
+
 export interface ViewerAdapter {
   /** Carrega o modelo (URN do derivativo em base64, sem o prefixo "urn:"). Substitui o anterior. */
   load(urn: string): Promise<void>;
@@ -75,10 +83,19 @@ export interface ViewerAdapter {
   // ---- Coordenadas do eixo da peça (opcionais: um adapter sem geometria não mostra) ----
   /** Dados de conversão do modelo carregado (null antes de carregar). */
   getModelFrame?(): ModelFrame | null;
+  /** Resolve quando toda a geometria do modelo carregou (o SVF2 chega aos poucos). */
+  whenGeometryLoaded?(): Promise<void>;
   /** Nós da árvore (nome, categoria, material, pai, filhos). */
   getNodes?(dbIds: DbId[]): Promise<ModelNode[]>;
   /** Triângulos da geometria PRÓPRIA do nó, em coordenadas de mundo do Viewer. */
   getTriangles?(dbId: DbId): Triangle[];
+  /**
+   * O nó e os descendentes que têm geometria própria, com o nome da árvore (síncrono, sem
+   * ler propriedades): base do centro de gravidade de muitas peças (Excel).
+   */
+  getGeometryParts?(dbId: DbId): GeometryPart[];
+  /** Como getTriangles, mas sem montar a lista (centro de gravidade de muitas peças). */
+  forEachTriangle?(dbId: DbId, fn: TriangleVisitor): void;
   /** Marcador no 3D: 1 ponto = marcador; 2 pontos = linha (eixo da viga); null apaga. */
   showAxisMarker?(points: Vec3[] | null): void;
 }
