@@ -200,11 +200,8 @@ button.link.danger:disabled { color: var(--text-muted); }
 
 /* ---- Gerenciar (coluna esquerda): gestão recolhida acima da lista de marcas ---- */
 .manage { padding-top: 8px; padding-bottom: 8px; }
-.manage__head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.manage__head .params-count { margin: 0; }
-.manage__head button { flex: none; }
+.manage .params-count { margin: 0; }
 .manage__list { display: grid; gap: 2px; margin-top: 6px; }
-.manage__list[hidden] { display: none; } /* o display: grid acima venceria o atributo hidden */
 .manage__list .list-item { min-height: var(--tap); color: var(--action); }
 
 /* ---- Validação de marcas ---- */

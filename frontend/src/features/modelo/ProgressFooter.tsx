@@ -20,7 +20,7 @@ export function ProgressFooter({ versionId, label }: { versionId: number; label:
       {data && data.required.length === 0 && (
         <span className="muted">
           Nenhum parâmetro obrigatório: o status das peças conta todos os parâmetros. Marque os que definem a peça
-          como Completa como obrigatórios (Gerenciar › Catálogo) para ver o progresso aqui.
+          como Completa como obrigatórios (Catálogo, na coluna esquerda) para ver o progresso aqui.
         </span>
       )}
       {data?.required.map((p) => {

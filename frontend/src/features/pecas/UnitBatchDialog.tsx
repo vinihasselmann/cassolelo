@@ -28,12 +28,14 @@ interface Props {
   unitIds: number[];
   /** Rótulos das peças marcadas (PP001-2, PP001-3…), para o título. */
   labels: string[];
+  /** Resumo no lugar da lista de rótulos (muitas peças, várias marcas). */
+  summary?: string;
   onClose: () => void;
   onApplied: (result: UnitBatchResult) => void;
 }
 
 /** "Preencher selecionadas": um valor para várias peças da marca, com "Só nas vazias" e Desfazer. */
-export function UnitBatchDialog({ obraId, unitIds, labels, onClose, onApplied }: Props) {
+export function UnitBatchDialog({ obraId, unitIds, labels, summary: caption, onClose, onApplied }: Props) {
   const queryClient = useQueryClient();
   const summary = useQuery({
     queryKey: ['unit-batch', obraId, [...unitIds].sort((a, b) => a - b).join(',')],
@@ -85,7 +87,7 @@ export function UnitBatchDialog({ obraId, unitIds, labels, onClose, onApplied }:
 
   return (
     <Modal title={title} onClose={onClose}>
-      <p className="muted small">{labels.join(', ')}</p>
+      <p className="muted small">{caption ?? labels.join(', ')}</p>
       {summary.isPending && <p className="muted small">Carregando…</p>}
       {summary.isError && <p role="alert" className="error small">{errorMessage(summary.error)}</p>}
 

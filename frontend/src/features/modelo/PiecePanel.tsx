@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { fetchElement, type ElementDetail, type MarkPieces, type PropertyGroup } from '../../api/versions';
 import type { BatchApplyResult } from '../../api/markBatch';
 import type { UnitBatchResult } from '../../api/units';
+import { MarksPieceBatchSection } from '../pecas/MarksPieceBatchSection';
 import { PieceUnitsSection } from '../pecas/PieceUnitsSection';
 import { BatchValuesSection } from '../params/BatchValuesSection';
 import { MarkValuesSection } from '../params/MarkValuesSection';
@@ -281,6 +282,16 @@ export function PiecePanel({
           <h5 id="mark-params">Parâmetros por marca</h5>
           <FactoryValues obraId={obraId} selection={selection} canEdit={canEditParams} onBatchApplied={onBatchApplied} />
         </section>
+        {selection.marks.length >= 2 && (
+          <MarksPieceBatchSection
+            obraId={obraId}
+            versionId={versionId}
+            markIds={selection.marks.map((m) => m.mark_id)}
+            unmarked={selection.unmarked.length}
+            canEdit={canEditParams}
+            onApplied={onUnitBatchApplied}
+          />
+        )}
         {onlyMark && (
           <PieceUnitsSection
             obraId={obraId}

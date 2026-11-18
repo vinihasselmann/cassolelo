@@ -103,6 +103,40 @@ async def _version(
     return v
 
 
+@dataclass(frozen=True)
+class MarkUnit:
+    unit_id: int
+    label: str  # PP001-3
+    mark_id: int
+
+
+async def units_of_marks(
+    session: AsyncSession, obra_id: int, version_id: int | None, mark_ids: list[int]
+) -> list[MarkUnit]:
+    """Peças (unidades) das marcas ligadas a um elemento da versão aberta, para o lote por
+    peça com várias marcas selecionadas (2026-11-18). Órfãs e sem peça ficam de fora."""
+    if len(set(mark_ids)) > MAX_UNITS:
+        raise ValidationError(f"No máximo {MAX_UNITS} marcas.")
+    version = await _version(session, obra_id, version_id)
+    if version is None or not mark_ids:
+        return []
+    found = set(
+        await session.scalars(
+            select(Mark.id).where(Mark.id.in_(set(mark_ids)), Mark.obra_id == obra_id)
+        )
+    )
+    if found != set(mark_ids):
+        raise NotFoundError("Marca não encontrada nesta obra.")
+    rows = await session.execute(
+        select(PieceUnit.id, PieceUnit.number, Mark.id, Mark.code)
+        .join(Mark, Mark.id == PieceUnit.mark_id)
+        .join(PieceUnitLink, PieceUnitLink.unit_id == PieceUnit.id)
+        .where(PieceUnitLink.version_id == version.id, Mark.id.in_(found))
+        .order_by(Mark.code, Mark.category, PieceUnit.number)
+    )
+    return [MarkUnit(uid, f"{code}-{number}", mid) for uid, number, mid, code in rows]
+
+
 async def _user_names(session: AsyncSession, ids: set[int]) -> dict[int, str]:
     if not ids:
         return {}

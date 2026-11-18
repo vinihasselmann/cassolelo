@@ -1,7 +1,11 @@
 import type { QueryClient } from '@tanstack/react-query';
 
-/** Consultas de uma versão que dependem dos valores ou do catálogo da fábrica. */
-const VALUE_DEPENDENT = new Set(['search', 'status', 'progress', 'param-values', 'diff', 'filter', 'colorize', 'color-scheme', 'color-scheme-preview']);
+/**
+ * Consultas de uma versão que dependem dos valores ou do catálogo da fábrica. `fields` =
+ * campos do Filtro e do Colorir (parâmetro novo aparece em "Fábrica" sem recarregar a
+ * página; contagens de valores mudam ao gravar). Correção de 2026-11-18.
+ */
+const VALUE_DEPENDENT = new Set(['search', 'status', 'progress', 'param-values', 'diff', 'filter', 'colorize', 'color-scheme', 'color-scheme-preview', 'fields']);
 
 /**
  * Depois de gravar valores (marca ou lote), desfazer um lote ou mudar o catálogo:

@@ -65,6 +65,7 @@ MATRIX: dict[str, frozenset[Role] | str] = {
     "PUT /api/obras/{obra_id}/units/{unit_id}/values": FACTORY,
     "GET /api/obras/{obra_id}/units/{unit_id}/history": ALL,
     "POST /api/obras/{obra_id}/units/batch-preview": ALL,  # só calcula, não grava
+    "POST /api/obras/{obra_id}/units/of-marks": ALL,  # só lê (lote por peça, várias marcas)
     "POST /api/obras/{obra_id}/units/batch-apply": FACTORY,
     "GET /api/obras/{obra_id}/unit-orphans": ALL,
     "POST /api/obras/{obra_id}/units/{unit_id}/relink": FACTORY,

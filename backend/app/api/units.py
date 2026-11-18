@@ -226,6 +226,27 @@ def _unit(row: piece_values.UnitRow) -> UnitOut:
     )
 
 
+class UnitsOfMarksIn(BaseModel):
+    version_id: int | None = None
+    mark_ids: list[int]
+
+
+class MarkUnitOut(BaseModel):
+    unit_id: int
+    label: str  # PP001-3
+    mark_id: int
+
+
+@router.post("/{obra_id}/units/of-marks", response_model=list[MarkUnitOut])
+async def units_of_marks(
+    obra_id: int, body: UnitsOfMarksIn, session: SessionDep, _user: CurrentUser
+) -> list[MarkUnitOut]:
+    """Peças das marcas ligadas na versão aberta (só leitura): base do lote por peça com
+    várias marcas selecionadas. O lote em si usa batch-preview / batch-apply."""
+    rows = await piece_values.units_of_marks(session, obra_id, body.version_id, body.mark_ids)
+    return [MarkUnitOut(**r.__dict__) for r in rows]
+
+
 @router.get("/{obra_id}/marks/{mark_id}/units", response_model=MarkUnitsOut)
 async def list_mark_units(
     obra_id: int,

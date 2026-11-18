@@ -634,7 +634,6 @@ test('aceite da Fase 7: versão nova com revisar (40x60 → 40x80), órfãs reli
   await removeFilters(page);
 
   // Órfãs: religar PP004 → PP004A clicando no 3D (peça 17)
-  await page.getByRole('button', { name: /^Gerenciar/ }).click(); // gestão recolhida no "Gerenciar"
   await page.getByRole('button', { name: 'Marcas órfãs' }).click();
   const dialog = page.getByRole('dialog', { name: 'Marcas órfãs' });
   await expect(dialog).toContainText('PP004');
@@ -650,7 +649,6 @@ test('aceite da Fase 7: versão nova com revisar (40x60 → 40x80), órfãs reli
   await expect(panel.getByLabel('Valores da marca')).toContainText('Tipo de forma *F-12');
 
   // Arquivar PP005: a fila esvazia
-  await page.getByRole('button', { name: /^Gerenciar/ }).click(); // gestão recolhida no "Gerenciar"
   await page.getByRole('button', { name: 'Marcas órfãs' }).click();
   await dialog.getByRole('button', { name: 'Arquivar PP005' }).click();
   await expect(dialog.getByText('Nenhuma órfã pendente.')).toBeVisible();
@@ -803,7 +801,6 @@ test('troca de versão: a anterior abre em modo consulta (somente leitura) e vol
   await expect(panel.getByRole('note')).toContainText('valem para a versão ativa (V2)');
   await expect(panel.getByLabel('Valores da marca')).toContainText('Tipo de forma *F-13');
   await expect(panel.getByRole('button', { name: 'Editar' })).toHaveCount(0);
-  await page.getByRole('button', { name: /^Gerenciar/ }).click(); // gestão recolhida no "Gerenciar"
   await expect(page.getByRole('button', { name: '+ Novo parâmetro' })).toHaveCount(0);
   // PP001 na V1: em revisão, mas sem ações; propriedades da V1 (40x60)
   await fake3d.getByRole('button', { name: 'Peça 10' }).click();
@@ -1326,7 +1323,6 @@ test.describe('Parâmetros por peça (P4)', () => {
   test('catálogo: o botão Excluir é um link vermelho com texto legível', async ({ page }) => {
     await fakeViewerOn(page, PEC_PIECES);
     await openRev(page, pec(), '(Fábrica)');
-    await page.getByRole('button', { name: /^Gerenciar/ }).click(); // gestão recolhida no "Gerenciar"
     await page.getByRole('button', { name: 'Catálogo', exact: true }).click();
     const dialog = page.getByRole('dialog', { name: 'Catálogo de parâmetros da fábrica' });
     const del = dialog.getByRole('button', { name: 'Excluir Data de fabricação' });
@@ -1364,6 +1360,32 @@ test.describe('Parâmetros por peça (P4)', () => {
     await page.getByRole('button', { name: 'Desfazer' }).click();
     for (const n of [1, 2, 4, 5]) await expect(cell(page, n)).toHaveText('—');
     expect(await filledNumbers(page)).toEqual([]);
+  });
+
+  test('várias marcas (Tipo > Marcar tudo): "Preencher todas as peças" grava o parâmetro por peça nas duas marcas e Desfazer', async ({ page }) => {
+    await setValues(page);
+    await fakeViewerOn(page, PEC_PIECES);
+    await openRev(page, pec(), '(Fábrica)');
+    await page.getByRole('button', { name: /^Tipo/ }).click();
+    await page.getByRole('group', { name: 'Tipo de peça' }).getByRole('checkbox', { name: /Marcar tudo/ }).check();
+    await page.keyboard.press('Escape');
+    const factory = panel(page).getByRole('region', { name: 'Parâmetros da fábrica' });
+    const perPiece = factory.getByRole('region', { name: 'Parâmetros por peça' });
+    await expect(perPiece).toContainText('8 peças de 2 marcas'); // P-06 (6) + V-02 (2)
+    await perPiece.getByRole('button', { name: 'Preencher todas as peças' }).click();
+
+    const dialog = page.getByRole('dialog', { name: 'Preencher 8 peças' });
+    await expect(dialog).toContainText('8 peças de 2 marcas (P-06-1, P-06-2, P-06-3… e mais 5)');
+    await dialog.getByLabel('Data de fabricação').fill(today());
+    await dialog.getByRole('button', { name: 'Aplicar' }).click();
+    await expect(dialog).toContainText('8 peças serão alteradas.');
+    await dialog.getByRole('button', { name: 'Confirmar' }).click();
+    await expect(dialog).toBeHidden();
+    await expect(page.getByText('Valores aplicados a 8 peças.')).toBeVisible();
+    expect(await filledNumbers(page)).toEqual([1, 2, 3, 4, 5, 6]);
+
+    await page.getByRole('button', { name: 'Desfazer' }).click();
+    await expect.poll(() => filledNumbers(page)).toEqual([]);
   });
 
   test('filtrar pelo parâmetro por peça mostra só as peças preenchidas', async ({ page }, testInfo) => {
@@ -1456,7 +1478,6 @@ test.describe('Unidades órfãs (P5)', () => {
     expect(await api<unknown[]>(`/obras/${obra}/unit-orphans`)).toEqual([]);
     const history = await api<{ action: string }[]>(`/obras/${obra}/units/${String(orphan?.id)}/history`);
     expect(history.map((h) => h.action)).toEqual(expect.arrayContaining(['orphan', 'relink']));
-    await page.getByRole('button', { name: /^Gerenciar/ }).click(); // gestão recolhida no "Gerenciar"
     await page.getByRole('button', { name: 'Peças órfãs', exact: true }).click();
     await expect(page.getByRole('dialog', { name: 'Peças órfãs' })).toContainText('Nenhuma peça órfã pendente.');
   });

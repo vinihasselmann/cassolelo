@@ -432,24 +432,24 @@ describe('Tela do modelo', () => {
     expect(factory).toBeLessThan(props);
   });
 
-  it('Gerenciar: gestão recolhida acima da lista; escolher uma ação fecha o menu', async () => {
+  it('gestão sempre à mostra acima da lista (sem "Gerenciar"); a ação abre a janela', async () => {
     renderModel([version(1)]);
     const user = userEvent.setup();
-    const manage = await screen.findByRole('button', { name: /^Gerenciar/ });
-    expect(manage).toHaveAttribute('aria-expanded', 'false');
-    expect(screen.queryByRole('button', { name: 'Catálogo' })).not.toBeInTheDocument();
-    await user.click(manage);
-    expect(manage).toHaveAttribute('aria-expanded', 'true');
+    await screen.findByRole('button', { name: '+ Novo parâmetro' });
+    expect(screen.queryByRole('button', { name: /^Gerenciar/ })).not.toBeInTheDocument();
     for (const name of ['+ Novo parâmetro', 'Catálogo', 'Marcas órfãs', 'Peças órfãs']) {
-      expect(screen.getByRole('button', { name })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name })).toBeVisible();
     }
-    await user.keyboard('{Escape}');
-    expect(manage).toHaveAttribute('aria-expanded', 'false');
-    expect(manage).toHaveFocus();
-    await user.click(manage);
     await user.click(screen.getByRole('button', { name: 'Catálogo' }));
     expect(screen.getByRole('dialog')).toBeInTheDocument();
-    expect(manage).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('quem não edita parâmetros vê as 3 ações de consulta, sem "+ Novo parâmetro"', async () => {
+    renderModel([version(1)], '/obras/7/modelo', new FakeViewer(), { userId: '1' });
+    await screen.findByRole('button', { name: 'Catálogo' });
+    expect(screen.getByRole('button', { name: 'Marcas órfãs' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Peças órfãs' })).toBeVisible();
+    expect(screen.queryByRole('button', { name: '+ Novo parâmetro' })).not.toBeInTheDocument();
   });
 
   it('versão escolhida pela URL', async () => {
@@ -848,7 +848,12 @@ describe('Catálogo de parâmetros da fábrica (6.1)', () => {
 
   it('fábrica cria um parâmetro de lista pela barra lateral', async () => {
     const { calls, user } = await open([]);
-    await user.click(await screen.findByRole('button', { name: /^Gerenciar/ })); // gestão fica recolhida no "Gerenciar"
+    const fieldsCalls = () =>
+      vi.mocked(fetch).mock.calls.filter(
+        ([url, init]) => typeof url === 'string' && url.endsWith('/api/versions/1/fields') && (init?.method ?? 'GET') === 'GET',
+      ).length;
+    await vi.waitFor(() => { expect(fieldsCalls()).toBeGreaterThan(0); });
+    const before = fieldsCalls();
     await user.click(await screen.findByRole('button', { name: '+ Novo parâmetro' }));
     const dialog = screen.getByRole('dialog', { name: 'Novo parâmetro da fábrica' });
 
@@ -874,11 +879,12 @@ describe('Catálogo de parâmetros da fábrica (6.1)', () => {
       include_in_obra_id: 7, // criado da biblioteca aqui: já entra nesta obra
     });
     expect(await screen.findByText('1 parâmetro no catálogo desta obra.')).toBeInTheDocument();
+    // a lista de campos do Filtro/Colorir é pedida de novo: o parâmetro novo já aparece lá
+    await vi.waitFor(() => { expect(fieldsCalls()).toBeGreaterThan(before); });
   });
 
   it('número mostra unidade; escopo da obra envia obra_id; erro do servidor aparece', async () => {
     const { calls, user } = await open([def({ id: 1, name: 'Forma' })]);
-    await user.click(await screen.findByRole('button', { name: /^Gerenciar/ })); // gestão fica recolhida no "Gerenciar"
     await user.click(await screen.findByRole('button', { name: '+ Novo parâmetro' }));
     const dialog = screen.getByRole('dialog');
     await user.selectOptions(within(dialog).getByLabelText('Tipo'), 'number');
@@ -899,7 +905,6 @@ describe('Catálogo de parâmetros da fábrica (6.1)', () => {
     const used = def({ id: 1, values_count: 2, options_in_use: ['F-02'] });
     const free = def({ id: 2, name: 'Ciclo de cura', type: 'number', unit: 'h', options: null, required: false, categories: null });
     const { calls, user } = await open([used, free]);
-    await user.click(await screen.findByRole('button', { name: /^Gerenciar/ })); // gestão fica recolhida no "Gerenciar"
     await user.click(await screen.findByRole('button', { name: 'Catálogo' }));
     const catalog = screen.getByRole('dialog', { name: 'Catálogo de parâmetros da fábrica' });
     const rows = within(catalog).getAllByRole('listitem');
@@ -921,7 +926,6 @@ describe('Catálogo de parâmetros da fábrica (6.1)', () => {
     expect(calls.find((c) => c.method === 'PATCH')?.body).toMatchObject({ name: 'Forma', type: 'list' });
 
     // Excluir: confirmação dentro do app (o window.confirm pode não aparecer no tablet)
-    await user.click(await screen.findByRole('button', { name: /^Gerenciar/ })); // gestão fica recolhida no "Gerenciar"
     await user.click(screen.getByRole('button', { name: 'Catálogo' }));
     await user.click(screen.getByRole('button', { name: 'Excluir Ciclo de cura' }));
     const ask = screen.getByRole('alertdialog', { name: 'Confirmar' });
@@ -943,7 +947,6 @@ describe('Catálogo de parâmetros da fábrica (6.1)', () => {
     api.routes['DELETE /api/obras/7/params/1'] = (req) => { api.calls.push({ method: req.method, path: req.path, body: null }); return { obra_id: 7, def_id: 1, in_obra: false, changed: true }; };
     renderModel([version(1)], undefined, undefined, { userId: '2', routes: api.routes });
     const user = userEvent.setup();
-    await user.click(await screen.findByRole('button', { name: /^Gerenciar/ })); // gestão fica recolhida no "Gerenciar"
     await user.click(await screen.findByRole('button', { name: 'Catálogo' }));
     const catalog = screen.getByRole('dialog', { name: 'Catálogo de parâmetros da fábrica' });
 
@@ -969,7 +972,6 @@ describe('Catálogo de parâmetros da fábrica (6.1)', () => {
   it('projetos vê o catálogo só para leitura', async () => {
     const { user } = await open([def({})], '1');
     await screen.findByText('1 parâmetro no catálogo desta obra.');
-    await user.click(await screen.findByRole('button', { name: /^Gerenciar/ })); // gestão fica recolhida no "Gerenciar"
     expect(screen.queryByRole('button', { name: '+ Novo parâmetro' })).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Catálogo' }));
     const catalog = screen.getByRole('dialog');
@@ -1678,7 +1680,6 @@ describe('Reconciliação: banner, revisar e órfãs (7.2)', () => {
   it('Órfãs: arquivar com confirmação', async () => {
     vi.spyOn(window, 'confirm').mockReturnValue(true);
     const { user, calls } = await open();
-    await user.click(await screen.findByRole('button', { name: /^Gerenciar/ })); // gestão fica recolhida no "Gerenciar"
     await user.click(screen.getByRole('button', { name: 'Marcas órfãs' }));
     const dialog = await screen.findByRole('dialog', { name: 'Marcas órfãs' });
     expect(dialog).toHaveTextContent('Sumiu na V2');
@@ -1690,7 +1691,6 @@ describe('Reconciliação: banner, revisar e órfãs (7.2)', () => {
 
   it('Religar: clicar na marca de destino no 3D, confirmar e copiar', async () => {
     const { viewer, user, calls } = await open();
-    await user.click(await screen.findByRole('button', { name: /^Gerenciar/ })); // gestão fica recolhida no "Gerenciar"
     await user.click(screen.getByRole('button', { name: 'Marcas órfãs' }));
     await user.click(await screen.findByRole('button', { name: 'Religar PP009' }));
     expect(screen.getByRole('status', { name: 'Religar órfã' })).toHaveTextContent('Religar PP009: clique na marca de destino');
@@ -1706,7 +1706,6 @@ describe('Reconciliação: banner, revisar e órfãs (7.2)', () => {
 
   it('Religar pela lista; conflito pede para sobrescrever', async () => {
     const { user, calls } = await open({ relinkConflict: true });
-    await user.click(await screen.findByRole('button', { name: /^Gerenciar/ })); // gestão fica recolhida no "Gerenciar"
     await user.click(screen.getByRole('button', { name: 'Marcas órfãs' }));
     await user.click(await screen.findByRole('button', { name: 'Religar PP009' }));
     await user.click(screen.getByRole('button', { name: /^PP002/ }));

@@ -1853,3 +1853,40 @@ Pedido: no cabeçalho da lista, entre o nome do parâmetro e "Selecionar todas",
 - No menu Tipo, a 1ª caixa é **"Marcar tudo"**: marca todos os tipos e seleciona no 3D todas as marcas da lista, respeitando o filtro principal. Com só alguns tipos marcados, ela fica no estado parcial; desmarcar limpa a seleção. O botão mostra "Tipo: todos".
 - Testes: PieceTypeFilter (+1), ModelPage (agora por Tipo > Marcar tudo), E2E "Tipo na lista".
 - Verificação: tsc ok, ESLint ok, Vitest 267/267 (+2 todo); E2E 84 passaram e 8 foram pulados (suíte inteira, depois da correção do menu cortado).
+
+## Parâmetro por peça em várias marcas de uma vez (2026-11-18)
+
+Pedido: com várias marcas selecionadas (ex.: Tipo > Pilar), preencher um parâmetro POR PEÇA (ex.: Concretagem) em todas as peças delas, sem mudar o que já funciona.
+
+**Feito**
+- Backend: `POST /api/obras/{id}/units/of-marks` (só leitura, todos os papéis). Recebe `{version_id, mark_ids}` e devolve as peças (unidades) das marcas ligadas na versão aberta, sem as órfãs. Marca de outra obra dá 404. O lote em si usa o `batch-preview`/`batch-apply` que já existiam (auditoria, status por peça, evento, Desfazer).
+- Frontend: `MarksPieceBatchSection`, a seção "Parâmetros por peça" do painel quando há 2 ou mais marcas selecionadas:
+  - mostra "N peças de M marcas" e o botão "Preencher todas as peças", que abre o `UnitBatchDialog` de sempre;
+  - o diálogo ganhou o resumo opcional `summary`, usado só por esse caminho: "98 peças de 86 marcas (PP001-1, PP001-2, PP001-3… e mais 95)";
+  - sem parâmetro por peça para as categorias, avisa; papel sem edição não vê o botão;
+  - peças sem marca na seleção ficam de fora, com aviso (decisão do usuário).
+- Nada mudou com uma marca só (tabela por peça e "Preencher selecionadas").
+- Testes:
+  - `test_units_of_marks.py` (2);
+  - `MarksPieceBatchSection.test.tsx` (3);
+  - E2E "várias marcas (Tipo > Marcar tudo)": 8 peças de P-06 e V-02, gravar, conferir e Desfazer.
+
+**Verificação**
+- backend: ruff ok, mypy ok;
+- pytest: 764 passaram e 1 falhou, `test_filters_perf`, só na suíte completa. Sozinho ele passa, mas mesmo sozinho as chamadas levam de 0,2 a 1,15 s contra o limite de 1 s, então a folga é pequena. O motor de filtros não mudou nesta tarefa. **Pendente:** decidir se o limite ou o motor precisam de atenção.
+- frontend: tsc ok, ESLint ok, Vitest 270/270 (+2 todo);
+- E2E: 86 passaram e 8 foram pulados.
+
+## Coluna esquerda sem "Gerenciar" (2026-11-18)
+- O botão "Gerenciar" saiu (pedido do usuário). "+ Novo parâmetro" (só para quem edita), "Catálogo", "Marcas órfãs" e "Peças órfãs" ficam sempre à mostra, uma por linha, abaixo de "N parâmetros no catálogo desta obra". Janelas, permissões e regras não mudaram.
+- `ManageMenu.tsx` ficou sem estado de aberto/fechado. Os textos de ajuda (ProgressFooter, IdentificationTab) não citam mais "Gerenciar ›".
+- Testes:
+  - Vitest: o teste do "Gerenciar" virou "gestão sempre à mostra", e entrou um teste novo para o papel Projetos (3 ações, sem "+ Novo parâmetro");
+  - o clique em "Gerenciar" saiu de 9 testes Vitest e 5 E2E.
+- Verificação: tsc ok, ESLint ok, Vitest 271/271 (+2 todo), E2E 86 passaram e 8 foram pulados. A captura de tela confere a coluna.
+
+## Correção: parâmetro novo não aparecia no Colorir/Filtro (2026-11-18)
+- Causa: a lista de campos do Filtro e do Colorir (`['versions', id, 'fields']`) não era recarregada ao criar, editar ou excluir parâmetro nem ao gravar valores. O parâmetro só aparecia em "Fábrica" depois de recarregar a página. O servidor já o devolvia.
+- Correção: `fields` entrou em `VALUE_DEPENDENT` (`features/params/invalidate.ts`). Vale também para as outras abas, que recebem o evento `param_def_changed`.
+- Teste: "fábrica cria um parâmetro de lista" confere que a lista de campos é pedida de novo. Sem a correção ele falha; com ela, passa.
+- Verificação: tsc ok, ESLint ok, Vitest 271/271 (+2 todo), E2E 86 passaram e 8 foram pulados.

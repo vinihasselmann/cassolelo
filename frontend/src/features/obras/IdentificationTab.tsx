@@ -201,7 +201,7 @@ function RuleEditor({ obraId, rule }: { obraId: number; rule: MarkRule }) {
         Ao salvar, a versão ativa é processada de novo com a regra nova. Uma marca com
         valores cujas peças vão todas para <strong>uma</strong> marca nova leva os valores
         junto. As outras (peças divididas entre marcas, ou destino com outro valor) viram{' '}
-        <strong>órfãs</strong>: decida em Gerenciar › Marcas órfãs, na tela do modelo. Nenhum valor é apagado.
+        <strong>órfãs</strong>: decida em Marcas órfãs, na coluna esquerda da tela do modelo. Nenhum valor é apagado.
       </p>
       <div className="actions">
         <button

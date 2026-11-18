@@ -113,6 +113,20 @@ export const previewUnitBatch = (obraId: number, body: UnitBatchRequest): Promis
 export const applyUnitBatch = (obraId: number, body: UnitBatchRequest): Promise<UnitBatchResult> =>
   apiFetch(`/obras/${obraId}/units/batch-apply`, { method: 'POST', body: JSON.stringify(body) });
 
+/** Peça (unidade) de uma das marcas selecionadas, ligada na versão aberta. */
+export interface MarkUnit {
+  unit_id: number;
+  label: string;
+  mark_id: number;
+}
+
+/** Peças das marcas ligadas na versão (sem órfãs): lote por peça com várias marcas. */
+export const fetchUnitsOfMarks = (obraId: number, versionId: number, markIds: number[]): Promise<MarkUnit[]> =>
+  apiFetch(`/obras/${String(obraId)}/units/of-marks`, {
+    method: 'POST',
+    body: JSON.stringify({ version_id: versionId, mark_ids: markIds }),
+  });
+
 // ------------------------------------------------------------------ unidades órfãs (P5)
 
 export interface UnitOrphan {
