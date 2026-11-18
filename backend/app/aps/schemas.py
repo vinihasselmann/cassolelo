@@ -78,16 +78,24 @@ class Item(ApsModel):
     name: str
     file_type: str | None = None
     extension_type: str | None = None
+    hidden: bool = False  # True = arquivo na lixeira do Docs (excluído)
 
     @classmethod
     def from_api(cls, d: dict[str, Any]) -> Item:
         name = _display_name(d)
         return cls(
-            id=d["id"], name=name, file_type=_file_type(name), extension_type=_extension_type(d)
+            id=d["id"],
+            name=name,
+            file_type=_file_type(name),
+            extension_type=_extension_type(d),
+            hidden=bool(_attrs(d).get("hidden", False)),
         )
 
 
 FolderEntry = Folder | Item
+
+
+DELETED_VERSION_TYPE = "versions:autodesk.core:Deleted"
 
 
 class Version(ApsModel):
@@ -99,13 +107,19 @@ class Version(ApsModel):
     create_time: datetime | None = None
     derivative_id: str | None = None
     comment: str | None = None
+    # Excluir um arquivo no Docs cria uma versão do tipo "Deleted", sem derivativo, cujo
+    # displayName é um GUID; o nome do arquivo fica em extension.data.originalName.
+    is_deleted: bool = False
 
     @classmethod
     def from_api(cls, d: dict[str, Any]) -> Version:
         a = _attrs(d)
         rel = d.get("relationships") or {}
         deriv = ((rel.get("derivatives") or {}).get("data") or {}).get("id")
-        name = str(a.get("displayName") or a.get("name") or "")
+        is_deleted = _extension_type(d) == DELETED_VERSION_TYPE
+        data = (a.get("extension") or {}).get("data") or {}
+        original = data.get("originalName") if is_deleted else None
+        name = str(original or a.get("displayName") or a.get("name") or "")
         return cls(
             id=d["id"],
             number=int(a.get("versionNumber") or 0),
@@ -115,6 +129,7 @@ class Version(ApsModel):
             create_time=a.get("createTime") or a.get("lastModifiedTime"),
             derivative_id=deriv,
             comment=_version_comment(a),
+            is_deleted=is_deleted,
         )
 
 

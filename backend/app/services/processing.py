@@ -270,6 +270,11 @@ async def _set_status(
     await audit.record(session, "model_version", version.id, action, before, after, None)
 
 
+def _origin(e: ExtractedElement, mark_names: list[str]) -> dict[str, Any]:
+    source, alt = mark_validation.mark_origin(e.props, mark_names, e.mark_code)
+    return {"mark_source": _cut(source, 255), "mark_alt": alt}
+
+
 def search_text(e: ExtractedElement, level: str | None, names: list[str]) -> str:
     """Texto da busca livre: nome, categoria, marca, nível e valores de `names`."""
     parts = [e.name, e.category, e.mark_raw, e.mark_code, level]
@@ -315,6 +320,7 @@ async def _store(
             "name": _cut(e.name, 512),
             "category": e.category[:255],
             "mark_raw": _cut(e.mark_raw, 255),
+            **_origin(e, config.mark_names),
             "props": e.props,
             "member_dbids": list(e.member_dbids),
             "level": _cut(levels[e.dbid], 255),

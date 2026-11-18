@@ -1594,3 +1594,91 @@ Custom Integrations liberado; credenciais em `infra/.env` e `spikes/.env` (fora 
 - **Webhooks — correção:** com várias obras na mesma pasta, o hook é um só (o APS não aceita repetido) e o evento chegava com o `obra_id` de quem registrou. Agora **o arquivo do evento (pasta + lineage) decide a obra**; o `hookAttribute` é reserva; arquivo da pasta que não é de nenhuma obra → `no_obra` (guardado, sem sincronizar). Teste novo em `tests/test_webhooks.py`.
 - **Webhooks — túnel:** baixar e executar o `cloudflared` foi bloqueado pela proteção do ambiente. **Decisão (2026-11-11): webhooks ficam para o servidor definitivo** (URL fixa, Fases 8/10). Até lá, versões chegam pela verificação a cada 10 min e pelo "Sincronizar agora" (testados com o Docs real). Ao expor o backend, publicar só a rota do webhook (instância com `APP_ENV` diferente de `dev`, sem usuário simulado).
 - Verificação: backend 290/290, frontend 71/71, `make e2e` 13 + 1 pulado.
+
+## Arquivo excluído no Docs (2026-11-18)
+
+Caso de teste: o `60_EST_PE_BLCA_MAK_R03.ifc` (obra 16, código 9121) foi excluído no Docs e a obra mostrava uma "versão nova" com "Este arquivo não foi convertido pelo Docs…".
+
+**Resposta real do Docs** (GET do item e das versões, só leitura): excluir **não apaga o item**, que fica `hidden: true`. O Docs cria uma versão nova do tipo `versions:autodesk.core:Deleted`, sem derivativo, com `displayName` = GUID e o nome em `extension.data.originalName`. Na tela do Docs a única opção para um arquivo excluído é **restaurar**; não existe exclusão definitiva. Fixture sanitizada em `tests/fixtures/aps/versions_deleted.json`.
+
+**Decisão (2026-11-18):** com o arquivo excluído, a obra fica **bloqueada**: cinza claro na lista, sem link, e só **Editar/Excluir**. Se o arquivo for restaurado no Docs, a obra volta ao normal sozinha. Revisões novas são publicadas com o **mesmo nome**, para usar o versionamento do ACC; por isso não há troca de arquivo da obra.
+
+- **Migração 0017:** `obras.acc_file_state` (`ok` | `deleted` | `missing`) e `acc_file_state_at`; `model_versions.status` aceita `deleted`.
+- **Sync** (`services/versions.py`):
+  - versão "Deleted" é gravada com status `deleted`, não consulta o manifest e usa o nome original;
+  - a versão mais recente decide o estado da obra: "Deleted" → `deleted`, normal (restaurada) → `ok`;
+  - 404 → `missing`, e a obra sai da verificação de 10 em 10 min;
+  - linhas antigas gravadas como `no_translation` são corrigidas;
+  - toda mudança vai para o audit_log (`file_state`) e gera o evento `obra_file_state` para as telas abertas.
+- **API:** dependência `api/obra_guard.py` nos routers de obras, versões, marcas, órfãs, unidades e exportação. Responde **409 `obra_file_deleted`** a tudo, exceto listar/ver/editar/excluir a obra, a prévia da exclusão e "Sincronizar". O `/events` segue livre, para avisar as telas.
+- O seletor de pasta do Docs passou a esconder também os arquivos ocultos (na lixeira).
+- **Exclusão de obra:** passa a apagar também os `webhook_events` da obra. Antes, o `obra_id` só virava nulo. Todo o resto já era apagado. O `audit_log` continua, porque é o registro da exclusão.
+- **Frontend:**
+  - linha cinza (`row-blocked`) com selo "Arquivo excluído no Docs" e o código sem link;
+  - `/obras/:id` mostra o aviso, sem 3D nem abas;
+  - `/obras/:id/modelo` passa por `ObraFileGate`;
+  - o evento em tempo real tira o usuário do 3D;
+  - status de versão "Excluída no Docs";
+  - tokens `--blocked-*`.
+- **Testes:** `tests/test_acc_file_deleted.py` (11) e `ObraFileDeleted.test.tsx` (4).
+- **Dev:** migração aplicada. `sync --obra 16` deixou a obra 16 `deleted` e a v2 `deleted`.
+- **Verificação:** ruff ok, mypy ok, pytest 721/721, tsc ok, ESLint ok, Vitest 238/238 (+2 todo).
+
+### Falta
+- Testar a restauração no Docs com um arquivo real (coberta só por teste automatizado).
+- Reiniciar API e worker do dev para pegarem o código novo.
+
+## Origem da marca e parâmetros secundários (2026-11-18)
+
+**Pedido:** a coluna esquerda dizia sempre "Marcas", mas o nome das peças pode vir de "Nome da montagem", de "Marca" ou de outro parâmetro da regra da obra. A coluna deve mostrar o parâmetro e os outros parâmetros da regra preenchidos em cada marca, com fontes menores.
+
+**Decisões (2026-11-18):**
+- Peças da mesma marca com valores diferentes num parâmetro secundário geram **só um aviso na lista**. Vale o primeiro parâmetro da regra.
+- A linha de secundários vem **ligada** por padrão.
+- O painel "Seleção" também mostra a origem e os secundários.
+
+**Backend:**
+- **Migração 0018:** `elements.mark_source` e `elements.mark_alt`.
+- **Processamento:** `mark_validation.mark_origin` define a origem como o primeiro parâmetro da regra cujo valor dá a marca. Os secundários são os demais preenchidos, na ordem da regra.
+- **Versões antigas:** `python -m app.cli marks origin (--version ID | --all)`, a partir do `props` guardado, sem chamar o APS. Já rodado no dev, 6 versões. A obra 9121 tem 1.433 peças, todas com origem "Nome da montagem" e nenhuma com "Marca".
+- **API:**
+  - `GET /versions/{id}/marks` traz `sources` (parâmetro → peças) e `secondary` (parâmetro, valores distintos, peças com valor);
+  - `GET /versions/{id}/elements/{dbid}` traz `mark_source` e `mark_alt`.
+- A busca já encontrava as peças pelos outros parâmetros da regra (apelidos), então não mudou.
+
+**Frontend:**
+- **Título da coluna:** é o nome do parâmetro quando todas as peças vêm dele, por exemplo "Nome da montagem (550)". Quando a origem é mista, fica "Marcas (550)" com a linha "Origem: Nome da montagem 520 · Marca 30 peças".
+- **2ª linha da marca:**
+  - "via Marca" quando a origem difere da principal;
+  - "Marca: P01" para os secundários;
+  - "(3 de 4)" quando só parte das peças tem o valor;
+  - ⚠ em âmbar quando os valores divergem.
+- A caixa "Parâmetros secundários" liga e desliga a 2ª linha, e a escolha fica no navegador.
+- **Fontes da lista:** código 13 px, demais textos 12 px, via tokens `--fs-list` e `--fs-list-meta`. A linha tem pelo menos 36 px de altura.
+- **Painel "Seleção":** mostra o bloco "Identificação da peça" (ex.: Nome da montagem PP001 "nome da peça" · Marca P01) e o aviso de divergência da marca.
+
+**Testes:** `tests/test_mark_origin.py` (12), `FilterResultList.test.tsx` (5) e `PieceIdentification.test.tsx` (3).
+
+**Verificação:** ruff ok, mypy ok, pytest 733/733, tsc ok, ESLint ok, Vitest 246/246 (+2 todo).
+
+### Falta
+- Em produção, depois da migração, rodar `python -m app.cli marks origin --all`.
+- Conferir na tela com um modelo que tenha "Marca" e "Nome da montagem" preenchidos juntos. O modelo 9121 só tem "Nome da montagem".
+- Reiniciar API e worker do dev.
+
+## Regra do status explicada na tela (2026-11-18)
+
+**Relato:** na obra 9121, "forma" (por peça, opcional) deixava Parcial as peças que tinham "concretagem" preenchida. Ao marcar forma como obrigatória, todas as peças ficavam Pendente.
+
+**Diagnóstico:** não é bug de cálculo. Nenhum parâmetro da obra era obrigatório, e a regra do CLAUDE.md diz que, sem obrigatórios, contam todos os que valem. Com forma obrigatória, só forma conta, e ela está vazia em todas as peças. O que faltava era a tela explicar a regra. O texto da caixa ainda dizia "status ... da marca", mas o status é por peça.
+
+**Decisão (2026-11-18):** a regra continua a mesma e passa a ser explicada na tela. Para o caso da obra 9121: marcar **concretagem como obrigatória** e deixar forma opcional.
+
+- Caixa do parâmetro: "Obrigatório: define o status da peça (Pendente, Parcial ou Completa)", com a dica "Só os obrigatórios contam para o status. Se nenhum parâmetro da obra for obrigatório, todos contam…".
+- Catálogo, em "Nesta obra":
+  - sem obrigatórios, avisa que todos contam e que um vazio deixa a peça Parcial;
+  - com obrigatórios, diz que contam só eles (*).
+  - A introdução passou a dizer "por marca ou por peça".
+- Rodapé sem obrigatórios: "o status das peças conta todos os parâmetros…".
+- **Testes:** `StatusRuleCopy.test.tsx` (3). O teste do rodapé em `ModelPage.test.tsx` foi atualizado.
+- **Verificação:** tsc ok, ESLint ok, Vitest 249/249 (+2 todo). Backend sem mudança.

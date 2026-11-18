@@ -3,10 +3,11 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Annotated, Any, Literal
 
-from fastapi import APIRouter, Query, Request
+from fastapi import APIRouter, Depends, Query, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
+from app.api.obra_guard import require_file_available
 from app.auth import CurrentUser
 from app.db import SessionDep
 from app.models import ModelVersion, Obra
@@ -24,7 +25,10 @@ from app.services import (
 )
 from app.services.errors import NotFoundError, ValidationError
 
-router = APIRouter(prefix="/versions", tags=["versions"])
+# Obra com o arquivo excluído no Docs fica bloqueada (só editar/excluir).
+router = APIRouter(
+    prefix="/versions", tags=["versions"], dependencies=[Depends(require_file_available)]
+)
 
 
 class ReportNotReadyError(NotFoundError):
@@ -59,6 +63,17 @@ async def get_report(version_id: int, session: SessionDep, _user: CurrentUser) -
     )
 
 
+class SourceCountOut(BaseModel):
+    name: str  # parâmetro da regra de onde veio o nome das peças (ex.: "Nome da montagem")
+    pieces: int
+
+
+class SecondaryOut(BaseModel):
+    name: str  # outro parâmetro da regra preenchido (ex.: "Marca")
+    values: list[str]  # valores distintos; mais de um = as peças da marca divergem
+    pieces: int  # peças da marca com valor
+
+
 class MarkOut(BaseModel):
     mark_id: int
     code: str
@@ -66,6 +81,13 @@ class MarkOut(BaseModel):
     count: int
     dbids: list[int]
     member_dbids: list[int] = []  # membros: o clique neles acha a marca
+    sources: list[SourceCountOut] = []
+    secondary: list[SecondaryOut] = []
+
+
+class SecondaryValueOut(BaseModel):
+    name: str
+    value: str
 
 
 class PropertyOut(BaseModel):
@@ -86,6 +108,8 @@ class ElementOut(BaseModel):
     mark_raw: str | None
     mark: MarkOut | None
     groups: list[PropertyGroupOut]
+    mark_source: str | None = None  # parâmetro de onde veio a marca desta peça
+    mark_alt: list[SecondaryValueOut] = []  # outros parâmetros da regra preenchidos
 
 
 @router.get("/{version_id}/marks", response_model=list[MarkOut])
@@ -93,7 +117,7 @@ async def list_marks(version_id: int, session: SessionDep, _user: CurrentUser) -
     """Marcas da versão (código, categoria, quantidade e dbIds das peças).
     O Viewer seleciona a marca inteira com estes dbIds."""
     marks = await version_data.list_marks(session, version_id)
-    return [MarkOut(**m.__dict__) for m in marks]
+    return [MarkOut.model_validate(m, from_attributes=True) for m in marks]
 
 
 @router.get("/{version_id}/elements/{dbid}", response_model=ElementOut)
@@ -108,8 +132,10 @@ async def get_element(
         name=el.name,
         category=el.category,
         mark_raw=el.mark_raw,
-        mark=MarkOut(**el.mark.__dict__) if el.mark else None,
+        mark=MarkOut.model_validate(el.mark, from_attributes=True) if el.mark else None,
         groups=[PropertyGroupOut.model_validate(g) for g in el.groups],
+        mark_source=el.mark_source,
+        mark_alt=[SecondaryValueOut(name=n, value=v) for n, v in el.mark_alt],
     )
 
 
@@ -178,7 +204,7 @@ async def search_marks(
         total_pieces=r.total_pieces,
         page=r.page,
         page_size=r.page_size,
-        items=[MarkOut(**m.__dict__) for m in r.items],
+        items=[MarkOut.model_validate(m, from_attributes=True) for m in r.items],
         mark_ids=r.mark_ids,
         dbids=r.dbids,
         note=r.note,

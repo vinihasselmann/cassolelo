@@ -182,6 +182,8 @@ async def test_sync_and_list_endpoints(
         "failed": 0,
         "enqueued": 1,
         "enqueue_failed": 0,
+        "deleted": 0,
+        "file_state": "ok",
     }
     again = await client.post(f"/api/obras/{obra.id}/sync", headers=as_user(users[Role.ADMIN]))
     assert again.json()["created"] == 0

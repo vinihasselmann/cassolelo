@@ -120,6 +120,12 @@
   --review-border-soft: #f4c2a6;
   --review-ink: #7a3410;
 
+  /* obra bloqueada (arquivo excluído no Docs): linha cinza claro, só editar/excluir */
+  --blocked-bg: var(--gray-100);
+  --blocked-text: var(--text-muted);
+  --blocked-badge-bg: var(--gray-200);
+  --blocked-badge-ink: var(--gray-650);
+
   --required: #c2410c;               /* asterisco de campo obrigatório */
 
   /* superfície invertida (aviso com Desfazer) */
@@ -159,7 +165,9 @@
   --fs-sm: 0.875rem;   /* 14px · texto de painel, listas, botões compactos e de barra */
   --fs-md: 1rem;       /* 16px · corpo, campos e botões (16px evita zoom automático no tablet) */
   --fs-lg: 1.125rem;   /* 18px · título do painel da peça e de janela */
-  --fs-xl: 1.375rem;   /* 22px · título de página */
+  --fs-xl: 1.375rem;
+  --fs-list: var(--fs-xs);       /* 13px · código da marca na coluna esquerda */
+  --fs-list-meta: var(--fs-2xs); /* 12px · categoria, quantidade e parâmetros secundários */   /* 22px · título de página */
   --lh-body: 1.45;
   --lh-tight: 1.25;
 

@@ -28,6 +28,8 @@ export function describeEvent(ev: ObraEvent): string | null {
     }
     case 'version_failed':
       return `A versão ${str(d.version_number)} não pôde ser processada`;
+    case 'obra_file_state':
+      return d.state === 'ok' ? 'O arquivo da obra foi restaurado no Docs' : 'O arquivo da obra foi excluído do Docs';
     case 'version_ready':
       return null; // vira o banner "Nova versão disponível"
     case 'unit_values_changed':

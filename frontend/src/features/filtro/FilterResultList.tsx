@@ -6,6 +6,7 @@ import type { MarkPieces } from '../../api/versions';
 import { errorMessage } from '../../lib/errors';
 import { StatusDot } from '../modelo/StatusBadge';
 import { STATUS_LABEL } from '../modelo/statusLabel';
+import { markAlt, versionOrigin } from './markOrigin';
 
 const num = (n: number) => n.toLocaleString('pt-BR');
 export const LIST_PAGE_SIZE = 50;
@@ -38,6 +39,28 @@ interface Props {
 
 const NO_STATUS: ReadonlyMap<number, MarkStatus> = new Map();
 
+const SECONDARY_KEY = 'marks.showSecondary';
+
+/** Liga/desliga a 2ª linha (parâmetros secundários); fica no navegador. Padrão: ligada. */
+function useShowSecondary(): [boolean, (v: boolean) => void] {
+  const [on, setOn] = useState(() => {
+    try {
+      return localStorage.getItem(SECONDARY_KEY) !== '0';
+    } catch {
+      return true;
+    }
+  });
+  const set = (v: boolean) => {
+    setOn(v);
+    try {
+      localStorage.setItem(SECONDARY_KEY, v ? '1' : '0');
+    } catch {
+      // sem armazenamento (janela privada): vale só nesta tela
+    }
+  };
+  return [on, set];
+}
+
 /**
  * Coluna esquerda: as marcas agrupadas pelo Nome da montagem. Com filtro, cada linha diz
  * quantas peças da marca bateram ("12 de 194 peças"); peças sem marca ficam no fim.
@@ -55,6 +78,10 @@ export function FilterResultList({
   statusById = NO_STATUS,
 }: Props) {
   const [page, setPage] = useState(1);
+  const [showSecondary, setShowSecondary] = useShowSecondary();
+  const origin = useMemo(() => versionOrigin(marks), [marks]);
+  const byId = useMemo(() => new Map(marks.map((m) => [m.mark_id, m])), [marks]);
+  const hasSecondary = useMemo(() => marks.some((m) => (m.secondary ?? []).length > 0), [marks]);
   const rows = useMemo((): Row[] => {
     if (!filtered) {
       return [...marks]
@@ -84,13 +111,30 @@ export function FilterResultList({
     <div className="model-sec">
       <div className="reshead">
         <h3 id="result-title" className="section-title">
-          Marcas ({num(filtered ? (evaluation?.matched_marks ?? 0) : marks.length)})
+          {/* o nome do parâmetro de onde vêm os nomes das peças (regra da obra) */}
+          {origin.split.length === 1 && origin.main ? origin.main : 'Marcas'} (
+          {num(filtered ? (evaluation?.matched_marks ?? 0) : marks.length)})
           {loading && <span className="muted small"> filtrando…</span>}
         </h3>
         <button type="button" className="link" disabled={markIds.length === 0} onClick={() => { onSelectAll(markIds); }}>
           Selecionar todas
         </button>
       </div>
+      {origin.split.length > 1 && (
+        <p className="origin-line">
+          Origem: {origin.split.map((s) => `${s.name} ${num(s.pieces)}`).join(' · ')} peças
+        </p>
+      )}
+      {hasSecondary && (
+        <label className="check origin-line">
+          <input
+            type="checkbox"
+            checked={showSecondary}
+            onChange={(e) => { setShowSecondary(e.target.checked); }}
+          />
+          Parâmetros secundários
+        </label>
+      )}
       {filtered && evaluation && (
         <p className="hint" role="status">
           {num(evaluation.matched_pieces)} de {num(evaluation.total_pieces)} peças no filtro
@@ -114,6 +158,9 @@ export function FilterResultList({
                 ? `${num(r.matched)} de ${num(r.total)} ${r.total === 1 ? 'peça' : 'peças'}`
                 : `${num(r.total)} ${r.total === 1 ? 'peça' : 'peças'}`;
             const status = r.markId !== null && !orphan ? statusById.get(r.markId) : undefined;
+            const mark = r.markId !== null ? byId.get(r.markId) : undefined;
+            const alt = mark ? markAlt(mark, origin.main) : null;
+            const showAlt = alt !== null && (alt.via.length > 0 || (showSecondary && alt.secondary.length > 0));
             return (
               <li key={r.key}>
                 <button
@@ -133,6 +180,32 @@ export function FilterResultList({
                     {qty}
                     {status && <span className="sr-only">, {STATUS_LABEL[status]}</span>}
                   </span>
+                  {showAlt && (
+                    <span className="mark-item__alt">
+                      {alt.via.length > 0 && (
+                        <span className="mark-item__via" title={`O nome destas peças veio de ${alt.via.join(', ')}`}>
+                          via {alt.via.join(', ')}
+                        </span>
+                      )}
+                      {showSecondary &&
+                        alt.secondary.map((s) => (
+                          <span
+                            key={s.name}
+                            className={s.divergent ? 'mark-item__warn' : undefined}
+                            title={
+                              s.divergent
+                                ? `As peças desta marca têm valores diferentes em ${s.name}. Vale ${origin.main ?? 'o primeiro parâmetro da regra'}.`
+                                : undefined
+                            }
+                          >
+                            {s.divergent && <span aria-hidden="true">⚠ </span>}
+                            {s.name}: {s.values.join(', ')}
+                            {s.partial && ` (${num(s.pieces)} de ${num(mark?.count ?? 0)})`}
+                            {s.divergent && <span className="sr-only"> (valores diferentes)</span>}
+                          </span>
+                        ))}
+                    </span>
+                  )}
                 </button>
               </li>
             );

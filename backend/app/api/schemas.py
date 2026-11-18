@@ -5,7 +5,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.models.enums import Role, VersionStatus
+from app.models.enums import AccFileState, Role, VersionStatus
 
 
 class UserOut(BaseModel):
@@ -73,6 +73,9 @@ class ObraOut(BaseModel):
     acc_item_id: str | None
     acc_item_name: str | None
     active: bool
+    # "deleted"/"missing": arquivo excluído no Docs; a obra fica bloqueada (só editar/excluir)
+    acc_file_state: AccFileState
+    acc_file_state_at: datetime | None
     created_at: datetime
     updated_at: datetime
 
@@ -101,3 +104,5 @@ class SyncOut(BaseModel):
     failed: int
     enqueued: int
     enqueue_failed: int
+    deleted: int = 0  # versões "Deleted" novas (arquivo excluído no Docs)
+    file_state: AccFileState = AccFileState.OK

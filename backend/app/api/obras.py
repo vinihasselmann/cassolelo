@@ -10,6 +10,7 @@ from pydantic import BaseModel
 from sqlalchemy import select
 
 from app.api.deps import EDITOR_ROLES, SYNC_ROLES, ApsDep, QueueDep
+from app.api.obra_guard import require_file_available
 from app.api.schemas import ModelVersionOut, ObraCreate, ObraOut, ObraUpdate, SyncOut
 from app.aps.client import ApsClient
 from app.aps.errors import ApsError
@@ -17,7 +18,7 @@ from app.auth import CurrentUser, Role, require_role
 from app.config import Settings
 from app.db import SessionDep
 from app.models import ModelVersion, Obra, User
-from app.models.enums import OrphanStatus, ParamType, VersionStatus
+from app.models.enums import AccFileState, OrphanStatus, ParamType, VersionStatus
 from app.services import mark_batch, mark_rule, mark_values, review
 from app.services import obras as obras_service
 from app.services import param_defs as param_defs_service
@@ -27,7 +28,8 @@ from app.services.obras import AccLink
 
 log = logging.getLogger("app.api.obras")
 
-router = APIRouter(prefix="/obras", tags=["obras"])
+# Obra com o arquivo excluído no Docs fica bloqueada (só editar/excluir).
+router = APIRouter(prefix="/obras", tags=["obras"], dependencies=[Depends(require_file_available)])
 
 Editor = Annotated[User, Depends(require_role(*EDITOR_ROLES))]
 Syncer = Annotated[User, Depends(require_role(*SYNC_ROLES))]
@@ -304,6 +306,8 @@ async def sync(
         failed=result.failed,
         enqueued=result.enqueued,
         enqueue_failed=result.enqueue_failed,
+        deleted=result.deleted,
+        file_state=AccFileState(result.file_state),
     )
 
 

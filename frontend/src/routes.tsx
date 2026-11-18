@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { ModelPage } from './features/modelo/ModelPage';
 import { IdentificationTab } from './features/obras/IdentificationTab';
+import { ObraFileGate } from './features/obras/ObraBlocked';
 import { ObraPage } from './features/obras/ObraPage';
 import { ObrasPage } from './features/obras/ObrasPage';
 import { VersionsTab } from './features/obras/VersionsTab';
@@ -22,7 +23,14 @@ export function AppRoutes() {
           <Route path="versoes" element={<VersionsTab />} />
           <Route path="identificacao" element={<IdentificationTab />} />
         </Route>
-        <Route path="obras/:obraId/modelo" element={<ModelPage />} />
+        <Route
+          path="obras/:obraId/modelo"
+          element={
+            <ObraFileGate>
+              <ModelPage />
+            </ObraFileGate>
+          }
+        />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

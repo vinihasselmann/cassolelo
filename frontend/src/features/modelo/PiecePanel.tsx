@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 
-import { fetchElement, type PropertyGroup } from '../../api/versions';
+import { fetchElement, type ElementDetail, type MarkPieces, type PropertyGroup } from '../../api/versions';
 import type { BatchApplyResult } from '../../api/markBatch';
 import type { UnitBatchResult } from '../../api/units';
 import { PieceUnitsSection } from '../pecas/PieceUnitsSection';
@@ -45,6 +45,42 @@ function SelectionHeader({ selection }: { selection: Selection }) {
         ))}
         {unmarked.length > 0 && <li>{pieces(unmarked.length)} sem Marca</li>}
       </ul>
+    </>
+  );
+}
+
+/**
+ * De onde veio o nome da peça clicada e os outros parâmetros da regra preenchidos nela
+ * (ex.: "Nome da montagem: PP001 · Marca: P01"). Na marca, avisa quando as peças divergem
+ * num parâmetro secundário (vale o primeiro da regra).
+ */
+export function PieceIdentification({ element, mark }: { element: ElementDetail; mark: MarkPieces | undefined }) {
+  const alt = element.mark_alt ?? [];
+  const divergent = (mark?.secondary ?? []).filter((s) => s.values.length > 1);
+  if (!element.mark_source && alt.length === 0 && divergent.length === 0) return null;
+  return (
+    <>
+      <dl className="kv piece-ident" aria-label="Identificação da peça">
+        {element.mark_source && (
+          <div className="kv__row">
+            <dt>{element.mark_source}</dt>
+            <dd>
+              {element.mark_raw ?? '—'} <span className="ro">nome da peça</span>
+            </dd>
+          </div>
+        )}
+        {alt.map((a) => (
+          <div key={a.name} className="kv__row">
+            <dt>{a.name}</dt>
+            <dd>{a.value}</dd>
+          </div>
+        ))}
+      </dl>
+      {divergent.map((s) => (
+        <p key={s.name} className="hint mark-item__warn" role="note">
+          ⚠ As peças desta marca têm valores diferentes em {s.name}: {s.values.join(', ')}.
+        </p>
+      ))}
     </>
   );
 }
@@ -223,6 +259,7 @@ export function PiecePanel({
         {element.data && (
           <p className="muted small">Peça clicada: {element.data.name ?? '—'}</p>
         )}
+        {element.data && <PieceIdentification element={element.data} mark={onlyMark} />}
       </div>
 
       {/* Ordem do painel = caminho da produção: quem é → status → preencher → conferir no modelo. */}

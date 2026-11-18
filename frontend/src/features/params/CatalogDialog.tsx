@@ -134,7 +134,7 @@ export function CatalogDialog({ obraId, canEdit, onClose, onNew, onEdit }: Props
   return (
     <Modal title="Catálogo de parâmetros da fábrica" onClose={onClose} wide>
       <p className="muted small">
-        Parâmetros que a fábrica preenche por marca. Os da biblioteca só valem nas obras em que forem incluídos;
+        Parâmetros que a fábrica preenche por marca ou por peça. Os da biblioteca só valem nas obras em que forem incluídos;
         os &quot;só desta obra&quot; valem apenas aqui.
         {!canEdit && ' Somente a fábrica cria, inclui, retira e exclui parâmetros.'}
       </p>
@@ -167,7 +167,14 @@ export function CatalogDialog({ obraId, canEdit, onClose, onNew, onEdit }: Props
           {inObra.length === 0 ? (
             <p className="muted">Nenhum parâmetro nesta obra. Crie um ou inclua da biblioteca abaixo.</p>
           ) : (
-            <ul className="catalog" aria-label="Parâmetros desta obra">{inObra.map(row)}</ul>
+            <>
+              <p className="hint" role="note">
+                {inObra.some((p) => p.required)
+                  ? 'Status das peças: contam só os obrigatórios (*). Os demais podem ficar vazios sem afetar o status.'
+                  : 'Nenhum parâmetro obrigatório: todos contam para o status, e qualquer um vazio deixa a peça Parcial. Marque como obrigatórios (Editar) só os que definem a peça como Completa.'}
+              </p>
+              <ul className="catalog" aria-label="Parâmetros desta obra">{inObra.map(row)}</ul>
+            </>
           )}
           <h4>Biblioteca: não usados nesta obra ({library.length})</h4>
           {library.length === 0 ? (

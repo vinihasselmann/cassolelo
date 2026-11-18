@@ -82,6 +82,21 @@ export interface MarkPieces {
   dbids: number[];
   /** membros das peças (consolos, geometria): um clique neles acha a marca */
   member_dbids?: number[];
+  /** de qual parâmetro da regra veio o nome das peças (normalmente um só) */
+  sources?: SourceCount[];
+  /** outros parâmetros da regra preenchidos nas peças; mais de um valor = divergem */
+  secondary?: SecondaryValues[];
+}
+
+export interface SourceCount {
+  name: string;
+  pieces: number;
+}
+
+export interface SecondaryValues {
+  name: string;
+  values: string[];
+  pieces: number;
 }
 
 export interface ModelProperty {
@@ -102,6 +117,10 @@ export interface ElementDetail {
   mark_raw: string | null;
   mark: MarkPieces | null;
   groups: PropertyGroup[];
+  /** parâmetro de onde veio a marca desta peça (ex.: "Nome da montagem") */
+  mark_source?: string | null;
+  /** outros parâmetros da regra preenchidos nesta peça */
+  mark_alt?: { name: string; value: string }[];
 }
 
 export const fetchMarks = (versionId: number): Promise<MarkPieces[]> =>

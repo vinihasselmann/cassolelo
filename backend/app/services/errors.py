@@ -30,6 +30,12 @@ class ConflictError(DomainError):
     code = "conflict"
 
 
+class ObraFileDeletedError(ConflictError):
+    """O arquivo da obra foi excluído no Docs: a obra está bloqueada (só editar/excluir)."""
+
+    code = "obra_file_deleted"
+
+
 class ValidationError(DomainError):
     status_code = 422
     code = "validation"

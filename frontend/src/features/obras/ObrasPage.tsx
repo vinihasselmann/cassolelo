@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { fetchObras, type Obra } from '../../api/obras';
+import { FILE_STATE_LABELS, fetchObras, isFileBlocked, type Obra } from '../../api/obras';
+import { formatDateTime } from '../../lib/format';
 import { errorMessage } from '../../lib/errors';
 import { EDITOR_ROLES, hasRole, useCurrentUser } from '../dev-user/useCurrentUser';
 import { NewObraForm } from './NewObraForm';
@@ -57,12 +58,24 @@ export function ObrasPage() {
           </thead>
           <tbody>
             {obras.data.map((o) => (
-              <tr key={o.id}>
+              <tr
+                key={o.id}
+                className={isFileBlocked(o) ? 'row-blocked' : undefined}
+                aria-disabled={isFileBlocked(o) || undefined}
+              >
                 <td>
-                  <Link to={`/obras/${o.id}`}>{o.code}</Link>
+                  {/* arquivo excluído no Docs: não abre; só Editar/Excluir */}
+                  {isFileBlocked(o) ? o.code : <Link to={`/obras/${o.id}`}>{o.code}</Link>}
                 </td>
                 <td>{o.name}</td>
-                <td>{o.acc_item_name ?? '—'}</td>
+                <td>
+                  {o.acc_item_name ?? '—'}
+                  {o.acc_file_state !== 'ok' && (
+                    <span className="blocked-badge" title={o.acc_file_state_at ? `Desde ${formatDateTime(o.acc_file_state_at)}` : undefined}>
+                      {FILE_STATE_LABELS[o.acc_file_state]}
+                    </span>
+                  )}
+                </td>
                 {canEdit && (
                   <td className="row-actions">
                     <button

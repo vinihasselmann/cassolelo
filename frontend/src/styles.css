@@ -192,6 +192,10 @@ button.link.danger:disabled { color: var(--text-muted); }
 .acc-picker__row.is-selected { background: var(--selected-bg); font-weight: 600; }
 
 .notice-row td { padding-top: 0; }
+/* obra com o arquivo excluído no Docs: cinza claro, não abre (só Editar/Excluir) */
+.table tr.row-blocked td { background: var(--blocked-bg); color: var(--blocked-text); }
+.blocked-badge { display: inline-block; margin-left: 8px; padding: 1px 6px; border-radius: var(--radius-sm); background: var(--blocked-badge-bg); color: var(--blocked-badge-ink); font-size: var(--fs-sm); white-space: nowrap; }
+.blocked-panel { margin-top: 12px; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--blocked-bg); color: var(--text-secondary); }
 .notice { margin: 0; padding: 8px 10px; border: 1px solid var(--notice-border); border-radius: var(--radius); background: var(--notice-tint); font-size: var(--fs-sm); }
 
 /* ---- Gerenciar (coluna esquerda): gestão recolhida acima da lista de marcas ---- */
@@ -270,6 +274,7 @@ button.link.danger:disabled { color: var(--text-muted); }
 .kv { display: grid; gap: 4px; margin: 0 0 10px; font-size: var(--fs-sm); }
 .kv__row { display: grid; grid-template-columns: minmax(90px, 40%) 1fr; gap: 8px; }
 .kv dt { color: var(--text-muted); word-break: break-word; }
+.piece-ident { margin: 6px 0 0; }
 .kv dd { margin: 0; word-break: break-word; }
 
 /* ---- Busca ---- */
@@ -290,11 +295,16 @@ button.link.danger:disabled { color: var(--text-muted); }
 .factory-sub h5 { margin: 0 0 6px; font-size: var(--fs-sm); font-weight: 600; color: var(--text-secondary); }
 .factory-sub .reshead h5 { margin: 0; }
 .mark-list { list-style: none; margin: 8px 0 0; padding: 0; }
-.mark-item { display: grid; grid-template-columns: 10px auto 1fr auto; gap: 8px; align-items: center; min-height: var(--tap); }
+.mark-item { display: grid; grid-template-columns: 10px auto 1fr auto; column-gap: 8px; row-gap: 1px; align-items: center; min-height: var(--tap-sm); padding-block: 4px; font-size: var(--fs-list); }
 .mark-item__status { display: inline-flex; }
 .mark-item__code { font-weight: 600; }
-.mark-item__cat { color: var(--text-muted); font-size: var(--fs-xs); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.mark-item__qty { font-size: var(--fs-xs); color: var(--text-muted); }
+.mark-item__cat { color: var(--text-muted); font-size: var(--fs-list-meta); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mark-item__qty { font-size: var(--fs-list-meta); color: var(--text-muted); }
+/* 2ª linha: origem diferente da principal e parâmetros secundários (ex.: "Marca: P01") */
+.mark-item__alt { grid-column: 2 / -1; display: flex; flex-wrap: wrap; gap: 0 10px; color: var(--text-secondary); font-size: var(--fs-list-meta); line-height: 1.35; }
+.mark-item__via { color: var(--text-muted); font-style: italic; }
+.mark-item__warn { color: var(--warn-ink); }
+.origin-line { margin: 2px 0 0; font-size: var(--fs-list-meta); color: var(--text-muted); }
 .mark-item--loose .mark-item__code { font-style: italic; font-weight: 500; }
 .pager { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; }
 /* O campo de busca fica sempre à vista ao rolar a lista (tablet). */

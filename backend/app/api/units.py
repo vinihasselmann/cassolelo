@@ -14,6 +14,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
+from app.api.obra_guard import require_file_available
 from app.auth import CurrentUser, Role, require_role
 from app.db import SessionDep
 from app.models import Mark, ParamDef, User
@@ -21,7 +22,8 @@ from app.models.enums import LinkMethod, ParamType, UnitStatus
 from app.services import piece_values, unit_orphans
 from app.services.mark_batch import BatchMode
 
-router = APIRouter(prefix="/obras", tags=["units"])
+# Obra com o arquivo excluído no Docs fica bloqueada (só editar/excluir).
+router = APIRouter(prefix="/obras", tags=["units"], dependencies=[Depends(require_file_available)])
 
 ParamEditor = Annotated[User, Depends(require_role(Role.FABRICA, Role.ADMIN))]
 

@@ -45,6 +45,6 @@ async def folder_contents(project_id: str, folder_id: str, aps: ApsDep) -> list[
             supported=is_supported(e.file_type),
         )
         for e in entries
-        if not (isinstance(e, Folder) and e.hidden)
+        if not e.hidden  # pasta oculta ou arquivo na lixeira do Docs
     ]
     return sorted(out, key=lambda e: (e.kind != "folder", e.name.casefold()))

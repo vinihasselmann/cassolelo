@@ -182,9 +182,19 @@ export function ParamDefDialog({ obraId, obraCode, categories, param, presetCate
         </div>
 
         <label className="check">
-          <input type="checkbox" checked={required} onChange={(e) => { setRequired(e.target.checked); }} /> Obrigatório (define o
-          status completo/pendente da marca)
+          <input
+            type="checkbox"
+            checked={required}
+            aria-describedby="pd-required-hint"
+            onChange={(e) => { setRequired(e.target.checked); }}
+          />{' '}
+          Obrigatório: define o status da peça (Pendente, Parcial ou Completa)
         </label>
+        {/* Regra do status (CLAUDE.md): contam os obrigatórios; sem nenhum, contam todos. */}
+        <p id="pd-required-hint" className="hint">
+          Só os obrigatórios contam para o status. Se nenhum parâmetro da obra for obrigatório, todos contam:
+          um parâmetro vazio deixa a peça Parcial.
+        </p>
 
         {error && (
           <p role="alert" className="error small">

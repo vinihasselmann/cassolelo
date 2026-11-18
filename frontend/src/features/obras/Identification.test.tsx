@@ -21,6 +21,8 @@ const OBRA: Obra = {
   acc_item_id: 'urn:i',
   acc_item_name: 'OBRA-001.rvt',
   active: true,
+  acc_file_state: 'ok',
+  acc_file_state_at: null,
   created_at: '2026-11-10T12:00:00Z',
   updated_at: '2026-11-10T12:00:00Z',
 };

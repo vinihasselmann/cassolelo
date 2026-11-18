@@ -21,6 +21,7 @@ from app.models import (
     PieceUnit,
     PieceValue,
     User,
+    WebhookEvent,
 )
 from app.models.enums import Role
 from app.services import audit
@@ -225,6 +226,9 @@ async def delete_obra(session: AsyncSession, obra: Obra, *, actor: User) -> Dele
     await session.execute(delete(ObraParam).where(ObraParam.obra_id == obra.id))
     await session.execute(delete(ObraParam).where(ObraParam.def_id.in_(obra_defs_q)))
     await session.execute(delete(ParamDef).where(ParamDef.obra_id == obra.id))
+    # Eventos de webhook recebidos para a obra (a FK só anularia o obra_id). O audit_log
+    # fica: é o registro da exclusão.
+    await session.execute(delete(WebhookEvent).where(WebhookEvent.obra_id == obra.id))
     obra_id = obra.id
     await session.delete(obra)
     await session.flush()

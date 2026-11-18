@@ -2,6 +2,7 @@ import type { SyncResult } from '../../api/obras';
 import { plural } from '../../lib/format';
 
 export function syncMessage(r: SyncResult): string {
+  if (r.file_state === 'deleted') return 'O arquivo desta obra foi excluído do Autodesk Docs.';
   if (r.created === 0) return 'Nenhuma versão nova no Docs.';
   const parts = [`${plural(r.created, 'versão nova importada', 'versões novas importadas')}.`];
   const details: string[] = [];

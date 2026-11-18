@@ -42,7 +42,10 @@ export function useObraEvents(obraId: number | null) {
 
   const handle = useCallback(
     (ev: ObraEvent) => {
-      if (ev.type === 'version_ready' || ev.type === 'version_failed') {
+      if (ev.type === 'obra_file_state') {
+        // arquivo excluído/restaurado no Docs: a obra (e a lista) mudam de situação
+        void queryClient.invalidateQueries({ queryKey: ['obras'] });
+      } else if (ev.type === 'version_ready' || ev.type === 'version_failed') {
         void queryClient.invalidateQueries({ queryKey: ['obras', obraId, 'versions'] });
         if (ev.type === 'version_ready' && typeof ev.data.version_id === 'number') {
           setNewVersion({ versionId: ev.data.version_id, versionNumber: Number(ev.data.version_number) });

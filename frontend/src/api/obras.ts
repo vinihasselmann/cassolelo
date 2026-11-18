@@ -10,9 +10,28 @@ export interface Obra {
   acc_item_id: string | null;
   acc_item_name: string | null;
   active: boolean;
+  /** "deleted"/"missing": arquivo excluído no Docs; a obra fica bloqueada (só editar/excluir). */
+  acc_file_state: AccFileState;
+  acc_file_state_at: string | null;
   created_at: string;
   updated_at: string;
 }
+
+export type AccFileState = 'ok' | 'deleted' | 'missing';
+
+export const isFileBlocked = (o: Pick<Obra, 'acc_file_state'>): boolean => o.acc_file_state !== 'ok';
+
+export const FILE_STATE_LABELS: Record<Exclude<AccFileState, 'ok'>, string> = {
+  deleted: 'Arquivo excluído no Docs',
+  missing: 'Arquivo não encontrado no Docs',
+};
+
+export const BLOCKED_MESSAGE: Record<Exclude<AccFileState, 'ok'>, string> = {
+  deleted:
+    'O arquivo desta obra foi excluído do Autodesk Docs. A obra fica bloqueada: só é possível editá-la ou excluí-la na lista de obras. Se o arquivo for restaurado no Docs, ela é liberada.',
+  missing:
+    'O arquivo desta obra não foi encontrado no Autodesk Docs. A obra fica bloqueada: só é possível editá-la ou excluí-la na lista de obras.',
+};
 
 export interface AccLink {
   hub_id: string;
@@ -33,7 +52,8 @@ export type VersionStatus =
   | 'processing'
   | 'ready'
   | 'failed'
-  | 'no_translation';
+  | 'no_translation'
+  | 'deleted';
 
 export const VERSION_STATUS_LABELS: Record<VersionStatus, string> = {
   pending: 'Aguardando processamento',
@@ -42,6 +62,7 @@ export const VERSION_STATUS_LABELS: Record<VersionStatus, string> = {
   ready: 'Pronta',
   failed: 'Falhou',
   no_translation: 'Sem conversão no Docs',
+  deleted: 'Excluída no Docs',
 };
 
 export const NO_TRANSLATION_MESSAGE =
@@ -68,6 +89,8 @@ export interface SyncResult {
   failed: number;
   enqueued: number;
   enqueue_failed: number;
+  deleted: number;
+  file_state: AccFileState;
 }
 
 export const fetchObras = (): Promise<Obra[]> => apiFetch('/obras');

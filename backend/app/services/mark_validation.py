@@ -145,6 +145,23 @@ def mark_values(props: dict[str, Any], mark_names: list[str]) -> list[tuple[str,
     return out
 
 
+def mark_origin(
+    props: dict[str, Any], mark_names: list[str], mark_code: str | None
+) -> tuple[str | None, list[list[str]]]:
+    """De qual parâmetro da regra veio o nome da peça e os outros preenchidos.
+
+    Origem = o primeiro da regra cujo valor dá a marca da peça (vale o primeiro: os outros
+    são apelidos). Secundários = [[parâmetro, valor], ...] dos demais nomes da regra que a
+    peça tem, na ordem da regra (lista, porque o JSONB não guarda a ordem das chaves).
+    Peça sem marca: sem origem e sem secundários."""
+    if not mark_code:
+        return None, []
+    values = mark_values(props, mark_names)
+    source = next((n for n, v in values if normalize_mark(v) == mark_code), None)
+    alt = [[n, v[:255]] for n, v in values if n != source and v]
+    return source, alt
+
+
 def divergent_pieces(
     elements: list[ExtractedElement], mark_names: list[str]
 ) -> list[dict[str, Any]]:

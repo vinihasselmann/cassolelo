@@ -17,6 +17,15 @@ class VersionStatus(StrEnum):
     READY = "ready"
     FAILED = "failed"
     NO_TRANSLATION = "no_translation"
+    DELETED = "deleted"  # versão "Deleted" do Docs: o arquivo foi excluído (vai à lixeira)
+
+
+class AccFileState(StrEnum):
+    """Situação do arquivo da obra no Autodesk Docs (vista no último sync)."""
+
+    OK = "ok"
+    DELETED = "deleted"  # na lixeira do Docs (item oculto / última versão "Deleted")
+    MISSING = "missing"  # o Docs não acha mais o item (404/403): sai da verificação periódica
 
 
 class ReviewStatus(StrEnum):

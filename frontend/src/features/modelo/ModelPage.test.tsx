@@ -44,6 +44,8 @@ const OBRA: Obra = {
   acc_item_id: 'urn:i',
   acc_item_name: 'OBRA-001.rvt',
   active: true,
+  acc_file_state: 'ok',
+  acc_file_state_at: null,
   created_at: '2026-11-10T12:00:00Z',
   updated_at: '2026-11-10T12:00:00Z',
 };
@@ -1530,7 +1532,7 @@ describe('Coloração, legenda e progresso (6.4 / F4)', () => {
 
   it('sem obrigatórios o rodapé explica', async () => {
     await open({ 'GET /api/versions/1/progress': { marks: 3, pieces: 6, required: [] } });
-    expect(await screen.findByText(/Nenhum parâmetro obrigatório\./)).toBeInTheDocument();
+    expect(await screen.findByText(/Nenhum parâmetro obrigatório: o status das peças conta todos os parâmetros/)).toBeInTheDocument();
   });
 
   it('salvar valores atualiza status, cores e progresso', async () => {

@@ -20,6 +20,24 @@ class VersionNotReadyError(ConflictError):
 
 
 @dataclass(frozen=True)
+class SourceCount:
+    """Peças da marca cujo nome veio deste parâmetro da regra."""
+
+    name: str
+    pieces: int
+
+
+@dataclass(frozen=True)
+class SecondaryValues:
+    """Outro parâmetro da regra preenchido nas peças da marca: valores distintos e quantas
+    peças têm valor. Mais de um valor = as peças da marca divergem nesse parâmetro."""
+
+    name: str
+    values: list[str]
+    pieces: int
+
+
+@dataclass(frozen=True)
 class MarkPieces:
     mark_id: int
     code: str
@@ -28,6 +46,8 @@ class MarkPieces:
     dbids: list[int]
     # dbIds dos membros das peças (consolos, geometria): um clique neles acha a marca
     member_dbids: list[int] = field(default_factory=list)
+    sources: list[SourceCount] = field(default_factory=list)
+    secondary: list[SecondaryValues] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -39,6 +59,8 @@ class ElementDetail:
     mark_raw: str | None
     mark: MarkPieces | None
     groups: list[dict[str, Any]] = field(default_factory=list)
+    mark_source: str | None = None
+    mark_alt: list[list[str]] = field(default_factory=list)
 
 
 async def get_ready_version(session: AsyncSession, version_id: int) -> ModelVersion:
@@ -72,6 +94,7 @@ async def list_marks(session: AsyncSession, version_id: int) -> list[MarkPieces]
         )
     ):
         members.setdefault(mark_id, []).extend(member_dbids)
+    origins = await _origins(session, version_id)
     return [
         MarkPieces(
             mark_id=r[0],
@@ -80,9 +103,52 @@ async def list_marks(session: AsyncSession, version_id: int) -> list[MarkPieces]
             count=r[3],
             dbids=list(r[4]),
             member_dbids=sorted(members.get(r[0], [])),
+            sources=origins[r[0]].sources() if r[0] in origins else [],
+            secondary=origins[r[0]].secondary() if r[0] in origins else [],
         )
         for r in rows
     ]
+
+
+class _Origin:
+    """Acumula, por marca, as origens e os parâmetros secundários das peças."""
+
+    def __init__(self) -> None:
+        self.by_source: dict[str, int] = {}
+        # parâmetro -> (valores distintos na ordem em que apareceram, peças com valor)
+        self.alt: dict[str, tuple[dict[str, str], list[int]]] = {}
+
+    def add(self, source: str | None, alt: list[Any]) -> None:
+        if source:
+            self.by_source[source] = self.by_source.get(source, 0) + 1
+        for item in alt:
+            if not isinstance(item, list) or len(item) != 2:
+                continue
+            name, value = str(item[0]), str(item[1]).strip()
+            values, count = self.alt.setdefault(name, ({}, [0]))
+            values.setdefault(value.casefold(), value)
+            count[0] += 1
+
+    def sources(self) -> list[SourceCount]:
+        ordered = sorted(self.by_source.items(), key=lambda kv: (-kv[1], kv[0].casefold()))
+        return [SourceCount(name=n, pieces=c) for n, c in ordered]
+
+    def secondary(self) -> list[SecondaryValues]:
+        return [
+            SecondaryValues(name=n, values=sorted(v.values(), key=_key), pieces=c[0])
+            for n, (v, c) in self.alt.items()
+        ]
+
+
+async def _origins(session: AsyncSession, version_id: int) -> dict[int, _Origin]:
+    out: dict[int, _Origin] = {}
+    for mark_id, source, alt in await session.execute(
+        select(Element.mark_id, Element.mark_source, Element.mark_alt)
+        .where(Element.version_id == version_id, Element.mark_id.is_not(None))
+        .order_by(Element.dbid)  # ordem estável dos secundários (a da regra, peça a peça)
+    ):
+        out.setdefault(mark_id, _Origin()).add(source, alt or [])
+    return out
 
 
 def _compare(a: str, b: str) -> int:
@@ -161,5 +227,7 @@ async def get_element(session: AsyncSession, version_id: int, dbid: int) -> Elem
         category=element.category,
         mark_raw=element.mark_raw,
         mark=mark,
+        mark_source=element.mark_source,
+        mark_alt=[[str(a[0]), str(a[1])] for a in element.mark_alt or [] if len(a) == 2],
         groups=group_properties(element.props or {}),
     )

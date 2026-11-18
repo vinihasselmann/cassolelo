@@ -21,7 +21,8 @@ export type ObraEventType =
   | 'unit_values_changed'
   | 'unit_batch_applied'
   | 'unit_batch_undone'
-  | 'unit_orphan_changed';
+  | 'unit_orphan_changed'
+  | 'obra_file_state'; // arquivo da obra excluído / restaurado no Docs
 
 export interface EventActor {
   id: number;

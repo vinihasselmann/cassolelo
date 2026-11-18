@@ -28,12 +28,15 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import AuthorMixin, Base, TimestampMixin
-from app.models.enums import ReviewStatus, VersionStatus, check_in
+from app.models.enums import AccFileState, ReviewStatus, VersionStatus, check_in
 
 
 class Obra(TimestampMixin, AuthorMixin, Base):
     __tablename__ = "obras"
-    __table_args__ = (UniqueConstraint("code", name="uq_obras_code"),)
+    __table_args__ = (
+        UniqueConstraint("code", name="uq_obras_code"),
+        CheckConstraint(check_in("acc_file_state", AccFileState), name="ck_obras_acc_file_state"),
+    )
 
     id: Mapped[int] = mapped_column(BigInteger, Identity(), primary_key=True)
     code: Mapped[str] = mapped_column(String(50))
@@ -45,6 +48,12 @@ class Obra(TimestampMixin, AuthorMixin, Base):
     acc_item_name: Mapped[str | None] = mapped_column(String(255))  # só para exibição
     # Obras inativas saem da verificação periódica de versões.
     active: Mapped[bool] = mapped_column(Boolean, default=True, server_default=true())
+    # Arquivo excluído no Docs: a obra fica bloqueada (só editar/excluir). Volta a "ok"
+    # sozinha se o arquivo for restaurado. `acc_file_state_at` = quando o app percebeu.
+    acc_file_state: Mapped[str] = mapped_column(
+        String(20), default=AccFileState.OK, server_default=text("'ok'")
+    )
+    acc_file_state_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     # Regra de identificação das peças (nulo = padrão do servidor): parâmetros do modelo
     # que dão a marca e a categoria, em ordem de prioridade.
     mark_property_names: Mapped[list[str] | None] = mapped_column(JSONB)
@@ -155,6 +164,10 @@ class Element(Base):
     dbid: Mapped[int] = mapped_column(Integer)
     name: Mapped[str | None] = mapped_column(String(512))
     mark_raw: Mapped[str | None] = mapped_column(String(255))
+    # De qual parâmetro da regra da obra veio a marca (ex.: "Nome da montagem") e os outros
+    # parâmetros da regra preenchidos na peça: [["Marca", "P01"], ...] na ordem da regra.
+    mark_source: Mapped[str | None] = mapped_column(String(255))
+    mark_alt: Mapped[list[Any]] = mapped_column(default=list, server_default=text("'[]'::jsonb"))
     category: Mapped[str | None] = mapped_column(String(255))
     level: Mapped[str | None] = mapped_column(String(255))  # nível/pavimento (busca)
     # nome, categoria, marca, nível e valores de SEARCH_PROPERTY_NAMES (texto livre)

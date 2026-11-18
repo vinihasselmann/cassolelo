@@ -7,12 +7,14 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
+from app.api.obra_guard import require_file_available
 from app.auth import Role, require_role
 from app.db import SessionDep
 from app.models import User
 from app.services import review
 
-router = APIRouter(prefix="/marks", tags=["marks"])
+# Obra com o arquivo excluído no Docs fica bloqueada (só editar/excluir).
+router = APIRouter(prefix="/marks", tags=["marks"], dependencies=[Depends(require_file_available)])
 
 ParamEditor = Annotated[User, Depends(require_role(Role.FABRICA, Role.ADMIN))]
 
