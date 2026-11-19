@@ -33,9 +33,25 @@ class Settings(BaseSettings):
     )
 
     app_env: AppEnv = "dev"
-    # Usuário simulado (X-Dev-User) fora de dev, até a Fase 11: só no ambiente de teste
-    # com a fábrica (APP_ENV=staging). Com APP_ENV=prod o backend não sobe com ele ligado.
+    # Removido na Fase 11 (X-Dev-User só com APP_ENV=dev). Fica aqui só para recusar a
+    # subida de quem ainda o tiver ligado fora de dev, em vez de ignorar em silêncio.
     dev_users_enabled: bool = False
+
+    # Login Microsoft (Fase 11): app registrado no Entra ID pela TI. O frontend lê estes
+    # valores em GET /api/auth/config; o backend valida o access token (JWKS do tenant).
+    entra_client_id: str = ""
+    entra_tenant_id: str = ""
+    # Escopo pedido pelo frontend ("Expose an API" no registro do app). Vazio =
+    # api://<ENTRA_CLIENT_ID>/access_as_user.
+    entra_api_scope: str = ""
+    # Só entram e-mails destes domínios (separados por vírgulas). Vazio = ninguém entra.
+    allowed_email_domains: str = "cassol.ind.br"
+    # Sempre admin ao entrar (o primeiro admin não depende da TI nem de grupos).
+    bootstrap_admin_emails: str = "vhbastos@cassol.ind.br"
+    # Papel pelo grupo do Entra, opcional: "admin=<id do grupo>;projetos=<id>;fabrica=<id>"
+    # A ordem é a prioridade (quem está em dois grupos fica com o primeiro). Configurado,
+    # o grupo manda: quem não está em nenhum fica "leitura". Vazio: vale a tabela users.
+    entra_role_groups: str = ""
     log_level: str = "INFO"
     # Observabilidade (10.1): json (uma linha por evento, para o coletor) ou text
     log_format: Literal["json", "text"] = "json"
@@ -185,8 +201,31 @@ class Settings(BaseSettings):
 
     @property
     def dev_users_allowed(self) -> bool:
-        """X-Dev-User vale: sempre em dev; em staging só com DEV_USERS_ENABLED."""
-        return self.is_dev or (self.app_env == "staging" and self.dev_users_enabled)
+        """X-Dev-User (usuário simulado) vale só com APP_ENV=dev."""
+        return self.is_dev
+
+    @property
+    def entra_configured(self) -> bool:
+        return bool(self.entra_client_id.strip() and self.entra_tenant_id.strip())
+
+    @property
+    def entra_scope(self) -> str:
+        return (
+            self.entra_api_scope.strip() or f"api://{self.entra_client_id.strip()}/access_as_user"
+        )
+
+    @property
+    def allowed_email_domain_list(self) -> list[str]:
+        parts = self.allowed_email_domains.split(",")
+        return [d.strip().lower().lstrip("@") for d in parts if d.strip()]
+
+    @property
+    def bootstrap_admin_list(self) -> list[str]:
+        return [e.strip().lower() for e in self.bootstrap_admin_emails.split(",") if e.strip()]
+
+    @property
+    def entra_role_group_list(self) -> list[tuple[str, str]]:
+        return parse_role_groups(self.entra_role_groups)
 
     @property
     def axis_z_rules(self) -> dict[str, str]:
@@ -198,10 +237,44 @@ class Settings(BaseSettings):
         return self
 
     @model_validator(mode="after")
-    def _no_dev_users_in_prod(self) -> Settings:
-        if self.dev_users_enabled and self.app_env == "prod":
-            raise ValueError("DEV_USERS_ENABLED não é permitido com APP_ENV=prod.")
+    def _no_dev_users_outside_dev(self) -> Settings:
+        if self.dev_users_enabled and not self.is_dev:
+            raise ValueError(
+                "DEV_USERS_ENABLED foi removido na Fase 11: fora de dev o login é pela "
+                "conta Microsoft. Apague a variável e configure ENTRA_CLIENT_ID/ENTRA_TENANT_ID."
+            )
         return self
+
+    @model_validator(mode="after")
+    def _entra_valid(self) -> Settings:
+        parse_role_groups(self.entra_role_groups)  # erro na inicialização
+        if self.app_env == "prod":
+            if not self.entra_configured:
+                raise ValueError("APP_ENV=prod exige ENTRA_CLIENT_ID e ENTRA_TENANT_ID (login).")
+            if not self.allowed_email_domain_list:
+                raise ValueError("APP_ENV=prod exige ALLOWED_EMAIL_DOMAINS (ex.: cassol.ind.br).")
+        return self
+
+
+ROLE_NAMES = ("projetos", "fabrica", "admin", "leitura")
+
+
+def parse_role_groups(text: str) -> list[tuple[str, str]]:
+    """ "admin=<guid>;fabrica=<guid>" -> [("admin", "<guid>"), ...], na ordem (prioridade).
+    Aceita ";" ou "," entre os pares; papel desconhecido ou par sem "=" é erro."""
+    pairs: list[tuple[str, str]] = []
+    for part in text.replace(",", ";").split(";"):
+        if not part.strip():
+            continue
+        role, sep, group = part.partition("=")
+        r, g = role.strip().lower(), group.strip().lower()
+        if not sep or not g or r not in ROLE_NAMES:
+            raise ValueError(
+                f"ENTRA_ROLE_GROUPS: par inválido {part.strip()!r} "
+                "(use papel=<id do grupo>; papéis: projetos, fabrica, admin, leitura)."
+            )
+        pairs.append((r, g))
+    return pairs
 
 
 AXIS_Z_DEFAULT = {"pilar": "base", "viga": "meia altura", "laje": "face inferior"}

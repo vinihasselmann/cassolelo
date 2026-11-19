@@ -17,7 +17,6 @@ from collections.abc import Iterator
 import httpx
 import pytest
 import respx
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import User
 from app.models.enums import Role
@@ -38,6 +37,11 @@ MATRIX: dict[str, frozenset[Role] | str] = {
     "GET /api/metrics": ADMIN,  # ou o coletor com Bearer METRICS_TOKEN
     "GET /api/me": ALL,
     "GET /api/dev/users": PUBLIC,  # 404 fora de dev
+    "GET /api/auth/config": PUBLIC,  # o que o frontend precisa para o login (sem segredo)
+    # tela "Usuários" (11.2): papel, ativo e obras de cada um
+    "GET /api/users": ADMIN,
+    "POST /api/users": ADMIN,
+    "PATCH /api/users/{user_id}": ADMIN,
     "GET /api/acc/hubs": EDITOR,
     "GET /api/acc/hubs/{hub_id}/projects": EDITOR,
     "GET /api/acc/hubs/{hub_id}/projects/{project_id}/top-folders": EDITOR,
@@ -74,6 +78,9 @@ MATRIX: dict[str, frozenset[Role] | str] = {
     "GET /api/obras/{obra_id}/events": ALL,
     "GET /api/obras/{obra_id}/export.xlsx": ALL,
     "POST /api/obras/{obra_id}/export.xlsx": ALL,
+    # importar valores pelo Excel: prévia e aplicar (fábrica e admin)
+    "POST /api/obras/{obra_id}/import-xlsx/preview": FACTORY,
+    "POST /api/obras/{obra_id}/import-xlsx/apply": FACTORY,
     "POST /api/batches/{batch_id}/undo": FACTORY,
     "POST /api/marks/{mark_id}/review/keep": FACTORY,
     "POST /api/orphans/{orphan_id}/relink": FACTORY,
@@ -190,16 +197,3 @@ async def test_dev_users_hidden_outside_dev() -> None:
         assert (await c.get("/api/dev/users")).status_code == 404
         # fora de dev o usuário simulado não vale: tudo que pede usuário dá 401
         assert (await c.get("/api/obras", headers={"X-Dev-User": "1"})).status_code == 401
-
-
-async def test_staging_with_dev_users_for_the_factory_pilot(
-    session: AsyncSession, users: dict[Role, User]
-) -> None:
-    """Ambiente de teste com a fábrica (10.3): usuário simulado e papéis valem iguais."""
-    app = build_app(session, app_env="staging", dev_users_enabled=True)
-    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://t") as c:
-        assert (await c.get("/api/dev/users")).status_code == 200
-        assert (await c.get("/api/obras", headers=as_user(users[Role.LEITURA]))).status_code == 200
-        r = await c.post("/api/param-defs", json={}, headers=as_user(users[Role.PROJETOS]))
-        assert r.status_code == 403
-        assert (await c.get("/docs")).status_code == 404  # endurecimento continua

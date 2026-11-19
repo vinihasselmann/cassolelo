@@ -20,6 +20,11 @@ describe('CSP do app (10.2)', () => {
     expect(prod.get('img-src')).toEqual(expect.arrayContaining(['data:', 'blob:']));
   });
 
+  it('libera o login Microsoft (MSAL): token por fetch e iframe de renovação', () => {
+    expect(prod.get('connect-src')).toContain('https://login.microsoftonline.com');
+    expect(prod.get('frame-src')).toEqual(["'self'", 'https://login.microsoftonline.com']);
+  });
+
   it('produção não aceita script inline, eval nem ser embutida em frame', () => {
     expect(prod.get('script-src')).not.toContain("'unsafe-inline'");
     expect(APP_CSP).not.toContain("'unsafe-eval'");

@@ -85,7 +85,9 @@ class MetricsForbiddenError(DomainError):
 async def _authorize(request: Request, session: SessionDep) -> None:
     configured = request.app.state.settings.metrics_token.get_secret_value()
     auth = request.headers.get("authorization", "")
-    if configured and auth.lower().startswith("bearer "):
+    # um JWT (login Microsoft do admin, Fase 11) segue para current_user
+    is_jwt = auth[7:].strip().count(".") == 2
+    if configured and auth.lower().startswith("bearer ") and not is_jwt:
         if secrets.compare_digest(auth[7:].strip(), configured):
             return
         raise MetricsForbiddenError("Token de métricas inválido.")

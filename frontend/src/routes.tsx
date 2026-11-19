@@ -6,6 +6,7 @@ import { ObraFileGate } from './features/obras/ObraBlocked';
 import { ObraPage } from './features/obras/ObraPage';
 import { ObrasPage } from './features/obras/ObrasPage';
 import { VersionsTab } from './features/obras/VersionsTab';
+import { UsersPage } from './features/usuarios/UsersPage';
 import { Layout } from './Layout';
 
 function NotFoundPage() {
@@ -31,6 +32,7 @@ export function AppRoutes() {
             </ObraFileGate>
           }
         />
+        <Route path="usuarios" element={<UsersPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

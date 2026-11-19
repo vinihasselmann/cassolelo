@@ -18,6 +18,7 @@ from tests import dbutil
 
 TABLES = {
     "users",
+    "user_obras",
     "obras",
     "model_versions",
     "elements",

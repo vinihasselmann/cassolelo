@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Any
 from urllib.parse import urlsplit
 
 import pytest
@@ -56,13 +57,33 @@ def test_get_settings_uses_secrets_dir_env(tmp_path: Path, monkeypatch: pytest.M
         get_settings.cache_clear()
 
 
-def test_dev_users_only_in_dev_or_staging_with_flag() -> None:
+def test_dev_users_only_in_dev() -> None:
     assert make_settings(app_env="dev").dev_users_allowed
-    assert not make_settings(app_env="staging").dev_users_allowed
-    assert make_settings(app_env="staging", dev_users_enabled=True).dev_users_allowed
-    assert not make_settings(app_env="test", dev_users_enabled=True).dev_users_allowed
+    for env in ("staging", "test", "prod"):
+        assert not make_settings(app_env=env, **ENTRA_OK).dev_users_allowed
 
 
-def test_dev_users_flag_refused_in_prod() -> None:
-    with pytest.raises(ValueError, match="APP_ENV=prod"):
-        make_settings(app_env="prod", dev_users_enabled=True)
+@pytest.mark.parametrize("env", ["staging", "test", "prod"])
+def test_dev_users_flag_refused_outside_dev(env: str) -> None:
+    with pytest.raises(ValueError, match="DEV_USERS_ENABLED foi removido"):
+        make_settings(app_env=env, dev_users_enabled=True, **ENTRA_OK)
+
+
+ENTRA_OK: dict[str, Any] = {"entra_client_id": "cid", "entra_tenant_id": "tid"}
+
+
+def test_prod_requires_entra_and_domains() -> None:
+    with pytest.raises(ValueError, match="ENTRA_CLIENT_ID"):
+        make_settings(app_env="prod")
+    with pytest.raises(ValueError, match="ALLOWED_EMAIL_DOMAINS"):
+        make_settings(app_env="prod", allowed_email_domains=" ", **ENTRA_OK)
+    s = make_settings(app_env="prod", **ENTRA_OK)
+    assert s.allowed_email_domain_list == ["cassol.ind.br"]
+    assert s.bootstrap_admin_list == ["vhbastos@cassol.ind.br"]
+    assert s.entra_scope == "api://cid/access_as_user"
+    make_settings(app_env="staging")  # staging sobe sem login (só responde 401)
+
+
+def test_invalid_role_groups_fail_at_startup() -> None:
+    with pytest.raises(ValueError, match="ENTRA_ROLE_GROUPS"):
+        make_settings(entra_role_groups="gerente=abc")

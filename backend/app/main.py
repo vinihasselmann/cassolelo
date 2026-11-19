@@ -17,6 +17,7 @@ from app.api import (
     dev,
     errors,
     events,
+    excel_import,
     export,
     health,
     marks,
@@ -26,11 +27,13 @@ from app.api import (
     param_defs,
     saved_filters,
     units,
+    users,
     versions,
     viewer,
     webhooks,
 )
 from app.aps import ApsClient, build_aps_client
+from app.auth import router as auth_router
 from app.config import Settings, get_settings
 from app.db import create_engine, create_sessionmaker
 from app.observability import metrics
@@ -97,6 +100,8 @@ def create_app(
         await limiter.close()
         await queue.close()
         await aps.http.aclose()
+        if getattr(_app.state, "entra", None) is not None:
+            await _app.state.entra.aclose()
         await engine.dispose()
 
     # Swagger/ReDoc só em dev (fora dele a API não se descreve publicamente)
@@ -121,7 +126,22 @@ def create_app(
     app.add_middleware(RequestContextMiddleware)  # request_id, obra e linha de acesso
 
     errors.register(app)
-    core = (health, me, dev, acc, obras, events, export, batches, marks, orphans, units)
+    app.include_router(auth_router.router, prefix="/api")  # login (Fase 11)
+    core = (
+        health,
+        me,
+        dev,
+        users,
+        acc,
+        obras,
+        events,
+        export,
+        excel_import,
+        batches,
+        marks,
+        orphans,
+        units,
+    )
     views = (saved_filters, color_schemes)
     for module in (*core, param_defs, *views, versions, viewer, webhooks):
         app.include_router(module.router, prefix="/api")

@@ -8,14 +8,19 @@ from typing import Annotated, Any
 from fastapi import APIRouter, Depends, status
 from pydantic import BaseModel, Field
 
+from app.api.obra_access import require_obra_access
 from app.auth import CurrentUser, Role, require_role
 from app.db import SessionDep
 from app.models import User
 from app.models.enums import ParamLevel, ParamScope, ParamType
+from app.services import obra_access
 from app.services import param_defs as service
 from app.services.param_defs import ParamDefInfo, ParamDefInput
 
-router = APIRouter(prefix="/param-defs", tags=["param-defs"])
+# Acesso por obra (11.2): 404 nas obras que o usuário não vê.
+router = APIRouter(
+    prefix="/param-defs", tags=["param-defs"], dependencies=[Depends(require_obra_access)]
+)
 
 # Só a fábrica (e o admin) cria, edita e exclui parâmetros.
 PARAM_EDITOR_ROLES = (Role.FABRICA, Role.ADMIN)
@@ -109,24 +114,27 @@ def _input(body: BaseModel) -> ParamDefInput:
 @router.get("", response_model=list[ParamDefOut])
 async def list_param_defs(
     session: SessionDep,
-    _user: CurrentUser,
+    user: CurrentUser,
     obra_id: int | None = None,
     include_inactive: bool = False,
     library: bool = False,
 ) -> list[ParamDefOut]:
     """Com obra_id: os que valem na obra (os dela + os da biblioteca incluídos nela); com
     library=true também os da biblioteca não incluídos (in_obra=false). Sem obra_id: todos.
-    Excluídos só com include_inactive."""
+    Excluídos só com include_inactive. Os de obras que o usuário não vê ficam de fora."""
     infos = await service.list_params(
         session, obra_id=obra_id, include_inactive=include_inactive, library=library
     )
-    return [_out(i) for i in infos]
+    visible = await obra_access.visible_obra_ids(session, user)
+    return [_out(i) for i in infos if visible is None or i.param.obra_id in (None, *visible)]
 
 
 @router.post("", response_model=ParamDefOut, status_code=status.HTTP_201_CREATED)
 async def create_param_def(
     body: ParamDefCreate, session: SessionDep, user: ParamEditor
 ) -> ParamDefOut:
+    await obra_access.ensure_body_obra(session, user, body.obra_id)
+    await obra_access.ensure_body_obra(session, user, body.include_in_obra_id)
     p = await service.create_param(session, _input(body), user)
     await session.commit()
     return _out(await service.describe(session, p))
@@ -136,6 +144,7 @@ async def create_param_def(
 async def update_param_def(
     def_id: int, body: ParamDefUpdate, session: SessionDep, user: ParamEditor
 ) -> ParamDefOut:
+    await obra_access.ensure_body_obra(session, user, body.obra_id)
     p = await service.update_param(session, def_id, _input(body), user)
     await session.commit()
     return _out(await service.describe(session, p))

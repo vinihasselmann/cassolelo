@@ -13,7 +13,7 @@
 | 8 | Distribuição automática e tempo real | pronto (8.1–8.2; aceite ok) |
 | 9 | Exportação | pronto (9.1; aceite ok; 9.2 não será feito) |
 | 10 | Endurecimento | pronto (10.1–10.3; aceite ok, 2026-11-12); falta instalar no PC de teste da fábrica |
-| 11 | Login e piloto | não iniciada |
+| 11 | Login e piloto | 11.1 código pronto (login Microsoft); falta o registro no Entra pela TI, HTTPS e o aceite real |
 
 ## Fase 0 · Spike APS/Docs
 
@@ -1890,3 +1890,169 @@ Pedido: com várias marcas selecionadas (ex.: Tipo > Pilar), preencher um parâm
 - Correção: `fields` entrou em `VALUE_DEPENDENT` (`features/params/invalidate.ts`). Vale também para as outras abas, que recebem o evento `param_def_changed`.
 - Teste: "fábrica cria um parâmetro de lista" confere que a lista de campos é pedida de novo. Sem a correção ele falha; com ela, passa.
 - Verificação: tsc ok, ESLint ok, Vitest 271/271 (+2 todo), E2E 86 passaram e 8 foram pulados.
+
+## Fase 11 · Login e piloto
+
+### 11.1 · Login Microsoft (2026-11-19): código pronto, aceite real pendente
+
+Troca do usuário simulado pelo login Microsoft (Entra ID), **sem alterar nenhum endpoint**.
+Guia da TI: `docs/LOGIN.md`.
+
+- **Backend (`app/auth/`)**
+  - `entra.py`: valida o access token. Confere a assinatura RS256 pelo JWKS do tenant (cache de 24 h; um `kid` novo força nova busca, no máximo 1/min), o emissor do tenant (v2 e v1), a audiência (`<client id>` ou `api://…`), `tid`, `exp`/`nbf` (tolerância de 60 s) e o escopo `access_as_user` no `scp`. `none`/HS256 são recusados. Microsoft fora do ar responde 503.
+  - `users.py`: acha o usuário pelo e-mail (`preferred_username` → `email` → `upn`, sem diferenciar maiúsculas) ou o cria como **leitura**. Só passam e-mails de `ALLOWED_EMAIL_DOMAINS` (padrão `cassol.ind.br`; outro domínio recebe 403). Usuário desativado recebe 403. Criação e troca de papel vão para o audit_log.
+  - Papel:
+    - `BOOTSTRAP_ADMIN_EMAILS` (padrão `vhbastos@cassol.ind.br`) é sempre admin;
+    - com `ENTRA_ROLE_GROUPS`, vale o 1º grupo da lista ou, sem grupo, leitura; token sem a claim de grupos fica com o papel da tabela;
+    - nos outros casos, o papel da tabela `users`.
+  - `current.py`: aceita primeiro `Authorization: Bearer`. **X-Dev-User só com `APP_ENV=dev`**. `DEV_USERS_ENABLED` foi removido: se ainda estiver configurado fora de dev, o backend não sobe e a mensagem explica.
+  - `router.py`: `GET /api/auth/config` (público) devolve client id, tenant, escopo e `dev_login`.
+  - `config.py`: com `APP_ENV=prod`, o backend exige `ENTRA_CLIENT_ID`, `ENTRA_TENANT_ID` e `ALLOWED_EMAIL_DOMAINS`. Um `ENTRA_ROLE_GROUPS` inválido falha na subida.
+  - `cli users list | set-role <email> <papel> [--name] | activate | deactivate`, com auditoria: o admin gerencia papéis sem depender da TI.
+  - `/api/metrics`: um Bearer que é JWT (admin logado) segue para o login normal, e o token do coletor continua valendo.
+- **Frontend**
+  - `@azure/msal-browser` 5.27.0 (versão fixa), fluxo authorization code + PKCE por redirect, tokens no sessionStorage. A configuração vem do backend, então a mesma build serve qualquer servidor.
+  - `features/auth/`:
+    - `AuthGate` (em `main.tsx`): mostra a tela "Entrar com Microsoft" e depois confere `/api/me`. E-mail fora do domínio ou usuário desativado mostra o motivo e "Sair e usar outra conta".
+    - `UserMenu`: nome, papel e "Sair".
+    - Em dev sem Microsoft, o app segue direto com o seletor simulado; em dev com Microsoft, o usuário escolhe.
+  - `api/client.ts`: `setTokenProvider`/`authFetch` mandam Bearer em todas as chamadas (inclusive o SSE e o Excel), e um 401 renova o token e repete uma vez. Sessão vencida na Microsoft volta ao login por redirect.
+  - CSP: `connect-src` e `frame-src` liberam `https://login.microsoftonline.com`.
+- **Testes**
+  - backend: `test_auth_entra.py`, 37 testes com chave RSA de teste e JWKS via respx (token válido e cada recusa, domínio, desativado, grupos e prioridade, admin inicial, cache e rotação do JWKS, 503, X-Dev-User fora de dev, config, metrics, cli). Também foram ajustados `test_config`, `test_auth`, `test_security` e `test_role_matrix` (o teste do staging com usuário simulado saiu).
+  - frontend: `client.auth.test.ts` e `AuthGate.test.tsx` (MSAL simulado) e a CSP.
+  - Resultado: backend 806 ok, ruff ok, mypy ok; frontend 290 ok (+2 todo), lint ok, typecheck ok, build ok. O Playwright (e2e) não foi rodado: em dev sem Entra o fluxo é o mesmo de antes.
+
+**Falta (11.1)**
+1. TI: registrar o app no Entra (`docs/LOGIN.md` §1: redirect SPA, "Expor uma API" com `access_as_user`, token v2) e passar Client ID e Tenant ID.
+2. **HTTPS no servidor**: sem ele o login não funciona (PKCE e redirect URI). O `http://servidor-bim` do PC de teste precisa de TLS (proxy da TI) ou de outro endereço.
+3. Apagar `DEV_USERS_ENABLED=true` do `infra/.env.prod` do PC de teste (o backend novo recusa subir com ele) e preencher `ENTRA_*`.
+4. Aceite real: entrar com `vhbastos@cassol.ind.br` (admin), com uma conta da fábrica (leitura, depois `cli users set-role`) e com uma conta de fora (403).
+5. Opcional: grupos do Entra (`ENTRA_ROLE_GROUPS`). A tela de admin para papéis saiu na 11.2.
+
+### 11.2 · Administração de usuários e acesso por obra (2026-11-19)
+
+Decisões (confirmadas pelo usuário em 2026-11-19):
+- obra que o usuário não vê responde **404** (não 403), para não revelar que ela existe;
+- usuário restrito **não** recebe as obras criadas depois, exceto a que ele mesmo cria;
+- o admin pode **cadastrar pelo e-mail** antes do primeiro acesso.
+
+- **Banco** (migração `0021`): `users.all_obras` (padrão true, inclusive para os
+  existentes) e a tabela `user_obras` (user_id, obra_id, created_by/updated_by; cascade
+  com o usuário e com a obra).
+- **Backend**
+  - `services/obra_access.py`: admin e `all_obras` veem todas; os outros, só as de
+    `user_obras`. `grant_creator` dá ao restrito a obra que ele cadastra (auditado).
+  - `api/obra_resolve.py`: acha a obra pela rota (`obra_id`, `version_id`, `mark_id`,
+    `orphan_id`, `def_id`, `filter_id`, `scheme_id`, `batch_id`) ou pela query das listas.
+    O `obra_guard` (arquivo excluído) passou a usar o mesmo código.
+  - `api/obra_access.py`: dependência `require_obra_access` em todos os routers de obra
+    (obras, units, export, marks, orphans, versions, batches, saved-filters,
+    color-schemes, param-defs) e no SSE. Vem antes do bloqueio de arquivo excluído: quem não
+    vê a obra não sabe nem que ela está bloqueada. Corpos com `obra_id` (criar/editar
+    filtro, esquema, parâmetro) respondem 422 "Obra não encontrada.".
+  - Listas filtradas: `GET /obras`, filtros salvos, esquemas de cores e parâmetros (os de
+    obras invisíveis ficam de fora).
+  - `api/users.py` + `services/user_admin.py` (só admin): `GET/POST /api/users`,
+    `PATCH /api/users/{id}` (nome, papel, ativo, `all_obras`, `obra_ids`), `role_source`
+    (`table` / `bootstrap` / `groups`). Recusa (409): trocar papel de admin fixo ou vindo
+    de grupos, desativar a si mesmo, tirar o próprio admin, rebaixar ou desativar o último
+    admin ativo. E-mail validado pelo `ALLOWED_EMAIL_DOMAINS`. Tudo no audit_log com o autor.
+  - Login (`auth/users.py`): quem foi cadastrado só com o e-mail recebe o nome da conta
+    Microsoft no primeiro acesso, e a auditoria mostra esse nome.
+- **Frontend**
+  - Tela **Usuários** (`/usuarios`, `features/usuarios/`): busca, tabela (nome, e-mail,
+    papel, situação, obras) e janela de cadastrar/editar (papel com explicação, ativo,
+    "todas as obras" ou escolha das obras). Admin fixo e o próprio admin aparecem
+    travados, com o motivo. Link "Usuários" no cabeçalho só para admin.
+  - **Usuário simulado fora do build de produção:** o seletor carrega por `lazy()` atrás de
+    `import.meta.env.DEV`, e o envio do `X-Dev-User` (cliente HTTP), o atalho do AuthGate e
+    o botão da tela de login também ficam atrás dessa condição. O `npm run build` termina
+    com `scripts/check-prod-bundle.mjs`, que falha se `X-Dev-User`, `/dev/users` ou
+    "usuário simulado" aparecerem no `dist/`. Conferido que o verificador acusa um build em
+    modo dev.
+- **Testes**
+  - `test_obra_access.py` (122 testes): toda rota de obra da matriz responde 404 para a
+    obra oculta e passa pela checagem na visível; listas, query, corpos (422), SSE, obra
+    nova, criador restrito e admin.
+  - `test_users_admin.py`: lista, cadastro (normaliza o e-mail, domínio, obras
+    inexistentes, duplicado), papel, ativo, obras, auditoria (e nada gravado quando nada
+    muda), proteções contra trancar o app, bootstrap e grupos.
+  - `test_access_e2e.py`, **ponta a ponta com token Microsoft** (APP_ENV=prod, chave de
+    teste): sem login 401 (e X-Dev-User recusado); Fábrica não cria obra; Projetos não
+    edita parâmetro (nem lote nem catálogo); usuário sem a obra não a vê (lista, detalhe,
+    versões, valores, Excel, SSE, gravação) até o admin liberar; a auditoria mostra o nome
+    da conta Microsoft.
+  - Playwright `e2e/acesso.spec.ts`: os mesmos quatro cenários na pilha real, com o admin
+    restringindo as obras pela tela Usuários.
+  - Vitest `Users.test.tsx` (7 testes); `DevUserSelector.test.tsx` passou a esperar o
+    seletor carregado sob demanda.
+  - Resultado: backend 944 ok (+1 skip), ruff ok, mypy ok; frontend 297 ok (+2 todo),
+    eslint ok, tsc ok, build ok com o verificador; Playwright 96 ok (8 pulados: os do
+    Viewer real).
+
+**Falta (11.2)**
+1. Aceite real com o login Microsoft (depende das pendências 1 a 4 da 11.1): restringir
+   uma conta da fábrica a uma obra pela tela e conferir no tablet.
+2. A CLI `users` ainda não mostra nem edita as obras de cada usuário (a tela cobre isso).
+
+## Barra da obra mais baixa (2026-11-19)
+
+Na tela do modelo, a barra "‹ Obras · Obra · Versão ativa · Exportar Excel · Versões e
+validação" ficou de 67 px para 39 px (desktop, 1366 px): o rótulo fica ao lado do valor
+("Obra E2E-01 — …", "Versão ativa [lista]") em vez de em cima, com textos de 14 px, lista de
+versões e botão do Excel compactos (30 px) e o link em 13 px (`styles.css`, `.model-bar`).
+Na tela de toque (tablet) a lista e o botão mantêm 44 px de alvo de toque, como o resto do
+app. Testes do modelo (Vitest) 95 ok, eslint e tsc ok.
+
+## Importar valores pelo Excel (2026-11-19)
+
+Pedido da gestora: exportar a obra, preencher no Excel os parâmetros que faltam (ex.:
+Concretagem dos pilares) e enviar o arquivo de volta. Decisões (recomendadas e aceitas em
+2026-11-19): por padrão só **preenche campos vazios** (sobrescrever exige marcar "Também
+alterar"); **célula vazia não apaga** nada; **linhas com erro ficam de fora** e as válidas
+são aplicadas.
+
+- **Backend**
+  - `services/excel_import.py`: lê o Excel EXPORTADO pelo app. Aba "Sobre" confere a obra
+    (arquivo de outra obra: 422); "Marcas" = parâmetros por marca (Marca + Categoria, na
+    versão ativa); "Peças" = parâmetros por peça, pela unidade ligada ao **externalId** na
+    versão ativa, ou pelo rótulo "Peça" sem externalId (NWD); rótulo diferente do atual
+    vira aviso "Conferir" (a numeração mudou depois do export). Colunas de parâmetro pelo
+    cabeçalho "Nome (unidade)"; as outras são ignoradas. Validação igual à da tela
+    (`mark_values.normalize`): datas do Excel ou dd/mm/aaaa (1900–2100), opções da lista
+    sem diferenciar maiúsculas, número, sim/não, parâmetro que não vale para a categoria,
+    marca/peça fora da versão ativa, órfã/arquivada, mesma linha repetida com outro valor.
+    Proteções: só .xlsx (sem macro), 5 MB, 100 MB descompactado, 20 mil linhas por aba,
+    fórmulas pelo valor salvo (nunca executadas).
+  - `POST /api/obras/{id}/import-xlsx/preview` (nada gravado) e `.../apply?fingerprint=&overwrite=`
+    (fábrica e admin; acesso por obra da 11.2). O arquivo vai no corpo (sem multipart). O
+    apply recalcula a prévia e responde 409 se o `fingerprint` mudou (alguém gravou no meio).
+  - Lotes: `mark_batch.apply_values` e `piece_values.apply_values` gravam um valor por alvo
+    sob um `batch_id` comum (`apply` de sempre passou a usar o mesmo `_write`). Auditoria
+    com `"source": "import"`; eventos `batch_applied` / `unit_batch_applied`; status,
+    revisão, motor de filtros e trava da numeração como na edição manual.
+  - `POST /api/batches/{id}/undo` desfaz lote misto (marcas e peças), tudo ou nada.
+- **Frontend**: botão **"Importar Excel"** na barra da obra (fábrica e admin) →
+  janela com o arquivo, prévia (a preencher, diferentes, iguais, erros com aba/linha/coluna,
+  avisos, resumo por parâmetro, detalhe em tabela com datas dd/mm/aaaa), "Também alterar" e
+  "Aplicar N valores"; depois, o aviso "Importação: N valores gravados" com **Desfazer**. Um
+  409 oferece "Conferir de novo".
+- **Testes**
+  - `test_excel_import.py` (9): o caso da gestora (vigas preenchidas, pilares não), alterar
+    só com overwrite e célula vazia que não apaga, erros listados e válidas aplicadas, por
+    peça pelo externalId com aviso e pelo rótulo, lote misto e desfazer, 409 da prévia
+    velha, linha repetida, arquivos recusados (não Excel, vazio, outra obra, sem "Sobre",
+    macro, grande demais), papéis. Matriz de papéis com as 2 rotas; o acesso por obra as
+    cobre sozinho.
+  - Vitest `ImportExcel.test.tsx` (4). Playwright `e2e/importar.spec.ts`: exporta pelo
+    botão, preenche o arquivo (`backend/tests/e2e_edit_xlsx.py`), importa, confere a
+    prévia, aplica e desfaz pelo aviso (tablet e desktop).
+  - Resultado: backend 959 ok (+1 skip), ruff ok, mypy ok; frontend 301 ok (+2 todo),
+    eslint ok, tsc ok; Playwright 98 ok (8 pulados: Viewer real).
+
+**Falta**
+1. Aceite com a gestora num arquivo real (ex.: obra 9121): conferir mensagens e tempo com
+   centenas de marcas.
+2. Ideia, não feita: importar de uma planilha própria da fábrica (sem a aba "Sobre"),
+   escolhendo as colunas na tela.

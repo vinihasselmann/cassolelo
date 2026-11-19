@@ -3,11 +3,11 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Annotated, Any, Literal
 
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import APIRouter, Query, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
-from app.api.obra_guard import require_file_available
+from app.api.obra_access import OBRA_ROUTER_DEPS
 from app.api.schemas import Coordinates
 from app.auth import CurrentUser
 from app.db import SessionDep
@@ -27,9 +27,11 @@ from app.services import (
 )
 from app.services.errors import NotFoundError, ValidationError
 
-# Obra com o arquivo excluído no Docs fica bloqueada (só editar/excluir).
+# Acesso por obra (11.2) e obra com o arquivo excluído no Docs bloqueada (só editar/excluir).
 router = APIRouter(
-    prefix="/versions", tags=["versions"], dependencies=[Depends(require_file_available)]
+    prefix="/versions",
+    tags=["versions"],
+    dependencies=OBRA_ROUTER_DEPS,
 )
 
 

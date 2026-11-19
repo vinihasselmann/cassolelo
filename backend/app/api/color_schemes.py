@@ -8,16 +8,21 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
-from fastapi import APIRouter, Request, status
+from fastapi import APIRouter, Depends, Request, status
 from pydantic import BaseModel
 
+from app.api.obra_access import require_obra_access
 from app.api.saved_filters import can_edit, roles
 from app.auth import CurrentUser
 from app.db import SessionDep
 from app.models import ColorScheme, User
+from app.services import obra_access
 from app.services import saved_filters as service
 
-router = APIRouter(prefix="/color-schemes", tags=["color-schemes"])
+# Acesso por obra (11.2): 404 nas obras que o usuário não vê.
+router = APIRouter(
+    prefix="/color-schemes", tags=["color-schemes"], dependencies=[Depends(require_obra_access)]
+)
 
 
 class ColorSchemeOut(BaseModel):
@@ -55,7 +60,9 @@ async def list_color_schemes(
     request: Request, session: SessionDep, user: CurrentUser, obra_id: int | None = None
 ) -> list[ColorSchemeOut]:
     allowed = roles(request)
-    return [_out(s, user, allowed) for s in await service.list_schemes(session, user, obra_id)]
+    visible = await obra_access.visible_obra_ids(session, user)  # 11.2
+    items = await service.list_schemes(session, user, obra_id, visible)
+    return [_out(s, user, allowed) for s in items]
 
 
 @router.get("/{scheme_id}", response_model=ColorSchemeOut)
@@ -69,6 +76,7 @@ async def get_color_scheme(
 async def create_color_scheme(
     body: service.ColorSchemeInput, request: Request, session: SessionDep, user: CurrentUser
 ) -> ColorSchemeOut:
+    await obra_access.ensure_body_obra(session, user, body.obra_id)
     allowed = roles(request)
     item = await service.create_scheme(session, body, user, allowed)
     await session.commit()
@@ -84,6 +92,7 @@ async def update_color_scheme(
     session: SessionDep,
     user: CurrentUser,
 ) -> ColorSchemeOut:
+    await obra_access.ensure_body_obra(session, user, body.obra_id)
     allowed = roles(request)
     item = await service.update_scheme(session, scheme_id, body, user, allowed)
     await session.commit()

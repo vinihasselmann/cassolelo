@@ -4,6 +4,7 @@ from sqlalchemy import (
     BigInteger,
     Boolean,
     CheckConstraint,
+    ForeignKey,
     Identity,
     String,
     UniqueConstraint,
@@ -27,3 +28,18 @@ class User(TimestampMixin, AuthorMixin, Base):
     email: Mapped[str] = mapped_column(String(320))
     role: Mapped[str] = mapped_column(String(20))
     active: Mapped[bool] = mapped_column(Boolean, default=True, server_default=true())
+    # vê todas as obras (padrão); false = só as de user_obras (11.2). Admin vê sempre todas.
+    all_obras: Mapped[bool] = mapped_column(Boolean, default=True, server_default=true())
+
+
+class UserObra(AuthorMixin, Base):
+    """Obra que um usuário restrito (all_obras = false) pode ver (11.2)."""
+
+    __tablename__ = "user_obras"
+
+    user_id: Mapped[int] = mapped_column(
+        BigInteger, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
+    )
+    obra_id: Mapped[int] = mapped_column(
+        BigInteger, ForeignKey("obras.id", ondelete="CASCADE"), primary_key=True, index=True
+    )

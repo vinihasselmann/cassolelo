@@ -1,7 +1,7 @@
 """Limite de taxa por usuário nas escritas (POST/PUT/PATCH/DELETE).
 
 Janela fixa de 60 s por usuário, contada no Redis (compartilhada entre instâncias da
-API). Chamado por `current_user` (app/auth/dev.py): na Fase 11 o login muda e o limite
+API). Chamado por `current_user` (app/auth/current.py): na Fase 11 o login muda e o limite
 continua no mesmo lugar. O webhook do APS não tem usuário e fica fora (assinatura).
 """
 

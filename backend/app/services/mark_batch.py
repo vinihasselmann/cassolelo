@@ -86,11 +86,13 @@ class _Context:
     values: dict[tuple[int, int], ParamValue]  # (mark_id, def_id) -> linha
 
 
-async def _load(session: AsyncSession, obra_id: int, mark_ids: list[int]) -> _Context:
+async def _load(
+    session: AsyncSession, obra_id: int, mark_ids: list[int], limit: int | None = MAX_MARKS
+) -> _Context:
     ids = list(dict.fromkeys(mark_ids))
     if not ids:
         raise ValidationError("Selecione ao menos uma marca.")
-    if len(ids) > MAX_MARKS:
+    if limit is not None and len(ids) > limit:
         raise ValidationError(f"No máximo {MAX_MARKS} marcas por lote.")
     marks = list(
         await session.scalars(
@@ -233,40 +235,80 @@ async def apply(
         raise ValidationError("Nenhum campo alterado.")
     ctx = await _load(session, obra_id, mark_ids)
     normalized = _normalize_changes(ctx, changes)
-    batch = uuid.uuid4()
+    targets = [
+        (mark, def_id, new) for def_id, new in normalized.items() for mark in ctx.applies[def_id]
+    ]
+    return await _write(session, obra_id, ctx, targets, mode, actor, SOURCE, uuid.uuid4())
+
+
+async def apply_values(
+    session: AsyncSession,
+    obra_id: int,
+    values: dict[int, dict[int, Any]],
+    mode: BatchMode,
+    actor: User,
+    *,
+    source: str,
+    batch: uuid.UUID,
+) -> BatchResult:
+    """Um valor por (marca, parâmetro), JÁ NORMALIZADO (importação do Excel). O mesmo
+    `batch` pode ser usado com `piece_values.apply_values`: um só "Desfazer"."""
+    if not values:
+        return BatchResult(None, 0, 0)
+    ctx = await _load(session, obra_id, list(values), limit=None)
+    by_id = {m.id: m for m in ctx.marks}
+    targets = []
+    for mark_id, fields in values.items():
+        mark = by_id[mark_id]
+        for def_id, new in fields.items():
+            if mark not in ctx.applies.get(def_id, []):
+                raise ValidationError(f"O parâmetro {def_id} não se aplica à marca {mark.code}.")
+            targets.append((mark, def_id, new))
+    return await _write(session, obra_id, ctx, targets, mode, actor, source, batch)
+
+
+async def _write(
+    session: AsyncSession,
+    obra_id: int,
+    ctx: _Context,
+    targets: list[tuple[Mark, int, Any]],
+    mode: BatchMode,
+    actor: User,
+    source: str,
+    batch: uuid.UUID,
+) -> BatchResult:
     audits: dict[str, list[tuple[int, dict[str, Any], dict[str, Any]]]] = defaultdict(list)
     marks_changed: set[int] = set()
-    for def_id, new in normalized.items():
+    fields: dict[int, str] = {}
+    for mark, def_id, new in targets:
         param = ctx.params[def_id]
-        for mark in ctx.applies[def_id]:
-            row = ctx.values.get((mark.id, def_id))
-            old = _current(ctx, mark, def_id)
-            if not _will_change(old, new, mode):
-                continue
-            if row is None:
-                session.add(
-                    ParamValue(
-                        mark_id=mark.id,
-                        def_id=def_id,
-                        value=new,
-                        created_by=actor.id,
-                        updated_by=actor.id,
-                    )
-                )
-            else:
-                row.value = new
-                row.updated_by = actor.id
-            base = {
-                "mark_id": mark.id,
-                "mark": mark.code,
-                "def_id": def_id,
-                "param": param.name,
-                "source": SOURCE,
-            }
-            audits[_action(old, new)].append(
-                (mark.id, {**base, "value": old}, {**base, "value": new})
+        row = ctx.values.get((mark.id, def_id))
+        old = _current(ctx, mark, def_id)
+        if not _will_change(old, new, mode):
+            continue
+        if row is None:
+            row = ParamValue(
+                mark_id=mark.id,
+                def_id=def_id,
+                value=new,
+                created_by=actor.id,
+                updated_by=actor.id,
             )
-            marks_changed.add(mark.id)
+            session.add(row)
+            ctx.values[(mark.id, def_id)] = row
+        else:
+            row.value = new
+            row.updated_by = actor.id
+        base = {
+            "mark_id": mark.id,
+            "mark": mark.code,
+            "def_id": def_id,
+            "param": param.name,
+            "source": source,
+        }
+        audits[_action(old, new)].append((mark.id, {**base, "value": old}, {**base, "value": new}))
+        marks_changed.add(mark.id)
+        fields[def_id] = param.name
     if not marks_changed:
         return BatchResult(None, 0, 0)
     await _flush_or_conflict(session)
@@ -282,10 +324,11 @@ async def apply(
         {
             "batch_id": str(batch),
             "mode": mode.value,
+            "source": source,
             "marks": len(marks_changed),
             "mark_ids": sorted(marks_changed),
             "mark_codes": sorted(m.code for m in changed),
-            "fields": [ctx.params[d].name for d in normalized],
+            "fields": list(fields.values()),
         },
         actor,
     )
@@ -297,6 +340,15 @@ async def apply(
 class UndoResult:
     batch_id: uuid.UUID  # lote do desfazer (também auditado)
     restored: int
+
+
+async def has_batch(session: AsyncSession, batch_id: uuid.UUID) -> bool:
+    found = await session.scalar(
+        select(AuditLog.id)
+        .where(AuditLog.batch_id == batch_id, AuditLog.entity == AUDIT_ENTITY)
+        .limit(1)
+    )
+    return found is not None
 
 
 async def undo(session: AsyncSession, batch_id: uuid.UUID, actor: User) -> UndoResult:

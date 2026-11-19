@@ -6,7 +6,8 @@ Vale para os dois ambientes:
 | | Ambiente de teste com a fábrica (agora) | Servidor definitivo (TI) |
 |---|---|---|
 | Máquina | PC Windows dedicado com Docker Desktop | Servidor Linux com Docker Engine |
-| `APP_ENV` | `staging` + `DEV_USERS_ENABLED=true` (usuário simulado) | `prod` (exige o login da Fase 11) |
+| `APP_ENV` | `staging` + login Microsoft (`docs/LOGIN.md`) | `prod` (login Microsoft obrigatório) |
+| HTTPS | obrigatório para o login (seção 9) | proxy da TI |
 | Backup agendado por | Tarefa Agendada do Windows | timer do systemd |
 | Cópias do backup | pasta compartilhada (e SharePoint, se configurado) | pasta compartilhada + SharePoint |
 | Webhooks do APS | desligados (sem acesso externo) | quando a TI publicar uma URL HTTPS |
@@ -99,7 +100,12 @@ Modelo comentado em `infra/.env.prod.example`. **Nada de segredo aqui.**
 | Variável | Padrão | Para que serve |
 |---|---|---|
 | `APP_ENV` | `staging` | `staging` (teste com a fábrica) ou `prod` (definitivo). Fora de `dev`: sem Swagger, HSTS ligado, credenciais do APS obrigatórias no `/api/ready` |
-| `DEV_USERS_ENABLED` | `true` | usuário simulado (X-Dev-User) até a Fase 11. **Só aceito com `staging`**; com `prod` o backend não sobe. Atenção: qualquer pessoa na rede escolhe qualquer usuário, inclusive admin |
+| `ENTRA_CLIENT_ID` / `ENTRA_TENANT_ID` | — | login Microsoft (registro do app no Entra ID). **Obrigatórios com `prod`**; passo a passo em `docs/LOGIN.md` |
+| `ENTRA_API_SCOPE` | vazio | escopo do app; vazio = `api://<ENTRA_CLIENT_ID>/access_as_user` |
+| `ALLOWED_EMAIL_DOMAINS` | `cassol.ind.br` | só estes domínios entram |
+| `BOOTSTRAP_ADMIN_EMAILS` | `vhbastos@cassol.ind.br` | sempre admin ao entrar (o primeiro admin) |
+| `ENTRA_ROLE_GROUPS` | vazio | papel pelo grupo do Entra (`admin=<id>;fabrica=<id>`); vazio = papel da tabela `users` |
+| ~~`DEV_USERS_ENABLED`~~ | — | **removido na Fase 11**: o usuário simulado só existe com `APP_ENV=dev`. Se ainda estiver no arquivo, o backend recusa subir |
 | `APP_VERSION` | `local` | etiqueta das imagens (ex.: `2026.11.12`): permite voltar à anterior |
 | `COMPOSE_PROJECT_NAME` | `visualizador-bim-prod` | prefixo dos contêineres e volumes |
 | `LOG_LEVEL` / `LOG_FORMAT` | `INFO` / `json` | logs (ver `docs/operacao.md`) |
@@ -262,10 +268,29 @@ Trocou de domínio de novo? Repita os passos 2 e 4.
 
 ## 9. HTTPS
 
-O nginx do app escuta em HTTP (porta `HTTP_PORT`). No servidor definitivo, o TLS fica no
-proxy da TI (ou balanceador) na frente, que repassa para `http://servidor:HTTP_PORT`,
-mantendo `X-Forwarded-Proto: https`. Com HTTPS, o HSTS enviado pelo app passa a valer.
-No ambiente de teste (rede interna, HTTP), o HSTS é ignorado pelo navegador.
+O nginx do app escuta em HTTP (porta `HTTP_PORT`). O TLS fica no proxy da TI (ou
+balanceador) na frente, que repassa para `http://servidor:HTTP_PORT`, mantendo
+`X-Forwarded-Proto: https`. Com HTTPS, o HSTS enviado pelo app passa a valer.
+
+**Desde a Fase 11 o HTTPS é obrigatório em qualquer ambiente fora do PC do
+desenvolvedor**: o login Microsoft (MSAL/PKCE) não funciona em `http://` (só em
+`http://localhost`) e o Entra recusa redirect URI `http://`. Ver `docs/LOGIN.md`.
+
+Requisitos do proxy da TI (2026-11-19):
+- 443 com TLS 1.2+; a porta 80 redireciona para `https://`;
+- tudo (`/` e `/api/`) vai para `http://<servidor>:<HTTP_PORT>`, mantendo o `Host`, com
+  `X-Forwarded-For` e `X-Forwarded-Proto: https`;
+- **sem buffer de resposta** e tempo limite de leitura de 1 h, pelo menos em
+  `/api/obras/*/events` (tempo real, SSE). No IIS/ARR: *Response buffer threshold* = 0 e
+  sem compressão dinâmica para `text/event-stream`;
+- corpo de até 10 MB (importação de Excel e lotes);
+- não remover nem reescrever os cabeçalhos de segurança do app.
+
+Com o proxy na mesma máquina: `HTTP_BIND=127.0.0.1` e `HTTP_PORT=8080` no `.env.prod`.
+`APP_BASE_URL` passa a ser o endereço `https://`. Certificado: curinga público da empresa
+ou público para o nome; CA interna exige instalar a raiz em cada tablet. Depois de ativo,
+o HSTS (1 ano) impede voltar para `http://` nesse nome: a renovação do certificado precisa
+estar agendada.
 
 ## 10. Atualizar o app
 
@@ -283,7 +308,8 @@ tinha migração de banco, restaure o backup do passo 1 (seção 7).
 ## 11. Ambiente de teste → definitivo
 
 1. Aceite com a fábrica no ambiente de teste.
-2. Fase 11 (login): `APP_ENV=prod`, `DEV_USERS_ENABLED` removido.
+2. Fase 11 (login): registro no Entra ID e HTTPS (`docs/LOGIN.md`), `APP_ENV=prod`,
+   `DEV_USERS_ENABLED` apagado do `.env.prod`.
 3. Servidor Linux da TI: seções 2 a 6 e 9; restaurar o último backup do teste (seção 7)
    para levar as obras e os parâmetros já preenchidos.
 4. Repetir o teste de restauração e o teste de carga (`loadtest/locustfile.py`) no servidor.

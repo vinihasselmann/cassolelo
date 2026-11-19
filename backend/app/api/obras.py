@@ -10,7 +10,7 @@ from pydantic import BaseModel
 from sqlalchemy import select
 
 from app.api.deps import EDITOR_ROLES, SYNC_ROLES, ApsDep, QueueDep
-from app.api.obra_guard import require_file_available
+from app.api.obra_access import OBRA_ROUTER_DEPS
 from app.api.schemas import ModelVersionOut, ObraCreate, ObraOut, ObraUpdate, SyncOut
 from app.aps.client import ApsClient
 from app.aps.errors import ApsError
@@ -19,7 +19,7 @@ from app.config import Settings
 from app.db import SessionDep
 from app.models import ModelVersion, Obra, User
 from app.models.enums import AccFileState, OrphanStatus, ParamType, VersionStatus
-from app.services import mark_batch, mark_rule, mark_values, review
+from app.services import mark_batch, mark_rule, mark_values, obra_access, review
 from app.services import obras as obras_service
 from app.services import param_defs as param_defs_service
 from app.services import versions as versions_service
@@ -28,8 +28,12 @@ from app.services.obras import AccLink
 
 log = logging.getLogger("app.api.obras")
 
-# Obra com o arquivo excluído no Docs fica bloqueada (só editar/excluir).
-router = APIRouter(prefix="/obras", tags=["obras"], dependencies=[Depends(require_file_available)])
+# Acesso por obra (11.2) e obra com o arquivo excluído no Docs bloqueada (só editar/excluir).
+router = APIRouter(
+    prefix="/obras",
+    tags=["obras"],
+    dependencies=OBRA_ROUTER_DEPS,
+)
 
 Editor = Annotated[User, Depends(require_role(*EDITOR_ROLES))]
 Syncer = Annotated[User, Depends(require_role(*SYNC_ROLES))]
@@ -37,8 +41,13 @@ ParamEditor = Annotated[User, Depends(require_role(Role.FABRICA, Role.ADMIN))]
 
 
 @router.get("", response_model=list[ObraOut])
-async def list_obras(session: SessionDep, _user: CurrentUser) -> list[Obra]:
-    return list(await session.scalars(select(Obra).order_by(Obra.code)))
+async def list_obras(session: SessionDep, user: CurrentUser) -> list[Obra]:
+    """Só as obras que o usuário vê (11.2)."""
+    stmt = select(Obra).order_by(Obra.code)
+    visible = await obra_access.visible_obra_ids(session, user)
+    if visible is not None:
+        stmt = stmt.where(Obra.id.in_(visible))
+    return list(await session.scalars(stmt))
 
 
 @router.get("/{obra_id}", response_model=ObraOut)
@@ -63,6 +72,7 @@ async def create_obra(
         link=AccLink(**body.acc.model_dump()),
         actor=user,
     )
+    await obra_access.grant_creator(session, user, obra.id)  # restrito vê a obra que cria
     await session.commit()
     settings: Settings = request.app.state.settings
     if settings.webhook_callback_url:

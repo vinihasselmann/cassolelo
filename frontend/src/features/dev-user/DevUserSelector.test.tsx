@@ -64,7 +64,8 @@ describe('layout e usuário simulado', () => {
     const user = userEvent.setup();
     renderApp();
 
-    const select = screen.getByRole('combobox', { name: /usuário/i });
+    // o seletor carrega sob demanda (lazy: fica fora do build de produção)
+    const select = await screen.findByRole('combobox', { name: /usuário/i });
     await screen.findByRole('option', { name: /Fábio Fábrica/ });
     expect(screen.queryByTestId('current-role')).not.toBeInTheDocument();
 
@@ -82,6 +83,6 @@ describe('layout e usuário simulado', () => {
   it('avisa quando a lista de usuários não carrega', async () => {
     vi.stubGlobal('fetch', vi.fn<typeof fetch>().mockResolvedValue(new Response(null, { status: 500 })));
     renderApp();
-    expect(await screen.findByRole('alert')).toHaveTextContent('Não foi possível carregar');
+    expect(await screen.findByText('Não foi possível carregar os usuários.')).toHaveAttribute('role', 'alert');
   });
 });

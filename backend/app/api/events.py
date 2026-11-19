@@ -22,6 +22,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth import current_user
 from app.db import get_session
+from app.services import obra_access
 from app.services import obras as obras_service
 from app.services.events import EVENT_ID, EventBus, id_key
 
@@ -56,8 +57,10 @@ ShortSession = Annotated[AsyncSession, Depends(get_session, scope="function")]
 
 
 async def authorize(obra_id: int, request: Request, session: ShortSession) -> None:
-    """Usuário válido e obra existente (401/404), sem prender a conexão do banco."""
-    await current_user(request, session)
+    """Usuário válido e obra existente e visível para ele (401/404), sem prender a
+    conexão do banco."""
+    user = await current_user(request, session)
+    await obra_access.ensure_visible(session, user, obra_id)
     await obras_service.get_obra(session, obra_id)
 
 

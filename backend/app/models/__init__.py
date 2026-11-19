@@ -12,7 +12,7 @@ from app.models.obra import (
 )
 from app.models.params import ObraParam, Orphan, ParamDef, ParamValue
 from app.models.units import PieceUnit, PieceUnitLink, PieceValue
-from app.models.user import User
+from app.models.user import User, UserObra
 from app.models.views import ColorScheme, SavedFilter
 
 __all__ = [
@@ -33,6 +33,7 @@ __all__ = [
     "PieceValue",
     "SavedFilter",
     "User",
+    "UserObra",
     "VersionDiff",
     "VersionPropertyName",
     "VersionReport",

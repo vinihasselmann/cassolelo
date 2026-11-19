@@ -94,7 +94,7 @@ async def test_inactive_user_401(
 
 @pytest.mark.parametrize("env", ["test", "staging", "prod"])
 async def test_dev_header_rejected_outside_dev(env: str) -> None:
-    app = build_app(app_env=env)
+    app = build_app(app_env=env, entra_client_id="cid", entra_tenant_id="tid")
     async with _client(app) as c:
         r = await c.get("/api/me", headers={DEV_USER_HEADER: "1"})
         dev = await c.get("/api/dev/users")

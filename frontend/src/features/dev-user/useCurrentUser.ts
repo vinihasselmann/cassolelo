@@ -1,16 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { getDevUser } from '../../api/client';
+import { isSignedIn } from '../../api/client';
 import { fetchMe, type Role, type User } from '../../api/users';
 
-/** Usuário atual (via /api/me). Mesma chave usada pelo seletor do cabeçalho. */
+/** Usuário atual (via /api/me): login Microsoft ou usuário simulado. Mesma chave do seletor. */
 export function useCurrentUser() {
   return useQuery<User>({
     queryKey: ['me'],
     queryFn: fetchMe,
-    enabled: getDevUser() !== null,
+    enabled: isSignedIn(),
     retry: false,
-    // Só muda quando o usuário simulado é trocado, e aí o seletor invalida a query.
+    // Só muda ao trocar o usuário simulado (o seletor invalida) ou ao sair (cache limpo).
     staleTime: Infinity,
   });
 }

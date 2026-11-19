@@ -8,6 +8,9 @@
  * - o Viewer cria workers por blob: e injeta estilos inline;
  * - geometria SVF2 vem de cdn.derivative.autodesk.com por https e WebSocket (wss);
  * - texturas, mapas de ambiente e ícones por https, data: e blob:.
+ * - login Microsoft (MSAL, Fase 11): troca de código e renovação do token por fetch em
+ *   login.microsoftonline.com (connect-src) e, se o refresh token falhar, iframe oculto
+ *   (frame-src). O login em si é um redirect de página inteira (não precisa de CSP).
  * - a telemetria do Viewer (api-js.mixpanel.com) fica BLOQUEADA de propósito: não afeta
  *   o modelo e nenhum dado de uso da fábrica vai para terceiros.
  */
@@ -15,6 +18,7 @@
 const AUTODESK = 'https://*.autodesk.com';
 const AUTODESK_WS = 'wss://*.autodesk.com';
 const VIEWER_CDN = 'https://developer.api.autodesk.com';
+const MS_LOGIN = 'https://login.microsoftonline.com';
 
 const DIRECTIVES: Record<string, string[]> = {
   'default-src': ["'self'"],
@@ -23,7 +27,8 @@ const DIRECTIVES: Record<string, string[]> = {
   'style-src': ["'self'", "'unsafe-inline'", VIEWER_CDN],
   'img-src': ["'self'", 'data:', 'blob:', AUTODESK],
   'font-src': ["'self'", 'data:', AUTODESK],
-  'connect-src': ["'self'", AUTODESK, AUTODESK_WS],
+  'connect-src': ["'self'", AUTODESK, AUTODESK_WS, MS_LOGIN],
+  'frame-src': ["'self'", MS_LOGIN],
   'media-src': ["'self'", 'blob:'],
   'object-src': ["'none'"],
   'base-uri': ["'self'"],

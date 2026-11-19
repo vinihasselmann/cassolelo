@@ -8,11 +8,11 @@ from __future__ import annotations
 from typing import Annotated, Literal
 from urllib.parse import quote
 
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import APIRouter, Query, Request
 from fastapi.responses import Response
 from pydantic import BaseModel, ConfigDict
 
-from app.api.obra_guard import require_file_available
+from app.api.obra_access import OBRA_ROUTER_DEPS
 from app.api.schemas import Coordinates
 from app.api.versions import parse_prop
 from app.auth import CurrentUser
@@ -20,8 +20,12 @@ from app.db import SessionDep
 from app.models import User
 from app.services import export, filters, search
 
-# Obra com o arquivo excluído no Docs fica bloqueada (só editar/excluir).
-router = APIRouter(prefix="/obras", tags=["export"], dependencies=[Depends(require_file_available)])
+# Acesso por obra (11.2) e obra com o arquivo excluído no Docs bloqueada (só editar/excluir).
+router = APIRouter(
+    prefix="/obras",
+    tags=["export"],
+    dependencies=OBRA_ROUTER_DEPS,
+)
 
 
 @router.get("/{obra_id}/export.xlsx", response_class=Response)

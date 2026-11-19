@@ -9,15 +9,20 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
-from fastapi import APIRouter, Request, status
+from fastapi import APIRouter, Depends, Request, status
 from pydantic import BaseModel
 
+from app.api.obra_access import require_obra_access
 from app.auth import CurrentUser
 from app.db import SessionDep
 from app.models import SavedFilter, User
+from app.services import obra_access
 from app.services import saved_filters as service
 
-router = APIRouter(prefix="/saved-filters", tags=["saved-filters"])
+# Acesso por obra (11.2): 404 nas obras que o usuário não vê.
+router = APIRouter(
+    prefix="/saved-filters", tags=["saved-filters"], dependencies=[Depends(require_obra_access)]
+)
 
 
 class SavedFilterOut(BaseModel):
@@ -72,7 +77,9 @@ async def list_saved_filters(
     """Os que o usuário vê: compartilhados + os pessoais dele. Com obra_id, só os que
     valem na obra (os dela e os de todas as obras). Os de sistema vêm primeiro."""
     allowed = roles(request)
-    return [_out(f, user, allowed) for f in await service.list_filters(session, user, obra_id)]
+    visible = await obra_access.visible_obra_ids(session, user)  # 11.2
+    items = await service.list_filters(session, user, obra_id, visible)
+    return [_out(f, user, allowed) for f in items]
 
 
 @router.get("/{filter_id}", response_model=SavedFilterOut)
@@ -86,6 +93,7 @@ async def get_saved_filter(
 async def create_saved_filter(
     body: service.SavedFilterInput, request: Request, session: SessionDep, user: CurrentUser
 ) -> SavedFilterOut:
+    await obra_access.ensure_body_obra(session, user, body.obra_id)
     allowed = roles(request)
     item = await service.create_filter(session, body, user, allowed)
     await session.commit()
@@ -101,6 +109,7 @@ async def update_saved_filter(
     session: SessionDep,
     user: CurrentUser,
 ) -> SavedFilterOut:
+    await obra_access.ensure_body_obra(session, user, body.obra_id)
     allowed = roles(request)
     item = await service.update_filter(session, filter_id, body, user, allowed)
     await session.commit()

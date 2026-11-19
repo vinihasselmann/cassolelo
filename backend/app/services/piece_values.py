@@ -412,11 +412,13 @@ class _Ctx:
     values: dict[tuple[int, int], PieceValue]  # (unit_id, def_id) -> linha
 
 
-async def _load(session: AsyncSession, obra_id: int, unit_ids: list[int]) -> _Ctx:
+async def _load(
+    session: AsyncSession, obra_id: int, unit_ids: list[int], limit: int | None = MAX_UNITS
+) -> _Ctx:
     ids = list(dict.fromkeys(unit_ids))
     if not ids:
         raise ValidationError("Selecione ao menos uma peça.")
-    if len(ids) > MAX_UNITS:
+    if limit is not None and len(ids) > limit:
         raise ValidationError(f"No máximo {MAX_UNITS} peças por lote.")
     units = list(
         await session.scalars(
@@ -589,32 +591,73 @@ async def apply(
         raise ValidationError("Nenhum campo alterado.")
     ctx = await _load(session, obra_id, unit_ids)
     normalized = _normalize(ctx, changes)
-    batch = uuid.uuid4()
+    targets = [(u, def_id, new) for def_id, new in normalized.items() for u in ctx.applies[def_id]]
+    return await _write(session, obra_id, ctx, targets, mode, actor, SOURCE, uuid.uuid4())
+
+
+async def apply_values(
+    session: AsyncSession,
+    obra_id: int,
+    values: dict[int, dict[int, Any]],
+    mode: BatchMode,
+    actor: User,
+    *,
+    source: str,
+    batch: uuid.UUID,
+) -> BatchResult:
+    """Um valor por (unidade, parâmetro), JÁ NORMALIZADO (importação do Excel). O mesmo
+    `batch` pode ser usado com `mark_batch.apply_values`: um só "Desfazer"."""
+    if not values:
+        return BatchResult(None, 0, 0)
+    ctx = await _load(session, obra_id, list(values), limit=None)
+    by_id = {u.id: u for u in ctx.units}
+    targets = []
+    for unit_id, fields in values.items():
+        unit = by_id[unit_id]
+        for def_id, new in fields.items():
+            if unit not in ctx.applies.get(def_id, []):
+                label = unit_label(ctx.marks[unit.mark_id], unit)
+                raise ValidationError(f"O parâmetro {def_id} não se aplica à peça {label}.")
+            targets.append((unit, def_id, new))
+    return await _write(session, obra_id, ctx, targets, mode, actor, source, batch)
+
+
+async def _write(
+    session: AsyncSession,
+    obra_id: int,
+    ctx: _Ctx,
+    targets: list[tuple[PieceUnit, int, Any]],
+    mode: BatchMode,
+    actor: User,
+    source: str,
+    batch: uuid.UUID,
+) -> BatchResult:
     audits: dict[str, list[tuple[int, dict[str, Any], dict[str, Any]]]] = defaultdict(list)
     changed: set[int] = set()
-    for def_id, new in normalized.items():
+    fields: dict[int, str] = {}
+    for u, def_id, new in targets:
         param = ctx.params[def_id]
-        for u in ctx.applies[def_id]:
-            row = ctx.values.get((u.id, def_id))
-            old = _current(ctx, u, def_id)
-            if not _will_change(old, new, mode):
-                continue
-            if row is None:
-                session.add(
-                    PieceValue(
-                        unit_id=u.id,
-                        def_id=def_id,
-                        value=new,
-                        created_by=actor.id,
-                        updated_by=actor.id,
-                    )
-                )
-            else:
-                row.value = new
-                row.updated_by = actor.id
-            base = {**_base(u, ctx.marks[u.mark_id], param), "source": SOURCE}
-            audits[_action(old, new)].append((u.id, {**base, "value": old}, {**base, "value": new}))
-            changed.add(u.id)
+        row = ctx.values.get((u.id, def_id))
+        old = _current(ctx, u, def_id)
+        if not _will_change(old, new, mode):
+            continue
+        if row is None:
+            row = PieceValue(
+                unit_id=u.id,
+                def_id=def_id,
+                value=new,
+                created_by=actor.id,
+                updated_by=actor.id,
+            )
+            session.add(row)
+            ctx.values[(u.id, def_id)] = row
+        else:
+            row.value = new
+            row.updated_by = actor.id
+        base = {**_base(u, ctx.marks[u.mark_id], param), "source": source}
+        audits[_action(old, new)].append((u.id, {**base, "value": old}, {**base, "value": new}))
+        changed.add(u.id)
+        fields[def_id] = param.name
     if not changed:
         return BatchResult(None, 0, 0)
     await _flush_or_conflict(session)
@@ -630,10 +673,11 @@ async def apply(
         {
             "batch_id": str(batch),
             "mode": mode.value,
+            "source": source,
             "units": len(changed),
             "unit_ids": sorted(changed),
             "mark_ids": sorted({u.mark_id for u in touched}),
-            "fields": [ctx.params[d].name for d in normalized],
+            "fields": list(fields.values()),
         },
         actor,
     )

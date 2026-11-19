@@ -112,6 +112,13 @@ O webhook do APS fica fora (não tem usuário; a assinatura protege).
 Coberta inteira por `backend/tests/test_role_matrix.py` (rota nova sem linha na matriz
 reprova o teste). Papel negado: 403; sem usuário: 401.
 
+**Acesso por obra (11.2):** além do papel, cada usuário vê todas as obras (padrão) ou só as
+escolhidas na tela "Usuários". Toda rota de uma obra (pelo caminho, como `obra_id`,
+`version_id`, `mark_id`, ou pela query `?obra_id=` das listas) responde **404 "Obra não
+encontrada."** para quem não a vê, em leitura e escrita, para não revelar que a obra existe.
+As listas (obras, filtros, esquemas, parâmetros) só trazem as obras visíveis. O admin vê
+sempre todas. Coberto por `backend/tests/test_obra_access.py`, gerado a partir da matriz.
+
 | Rotas | projetos | fábrica | admin | leitura |
 |---|:-:|:-:|:-:|:-:|
 | Leitura: obras, versões, relatório, busca, facetas, status, progresso, peça, valores, histórico, unidades de peça e valores por peça (com histórico), órfãs, peças órfãs, diff, catálogo, eventos (SSE), Excel, token e configuração do Viewer, `/api/me`, prévia de lote (por marca e por peça) | ✓ | ✓ | ✓ | ✓ |
@@ -120,6 +127,7 @@ reprova o teste). Papel negado: 403; sem usuário: 401.
 | Filtros salvos e esquemas de cores **compartilhados**: criar, editar, excluir (`SHARED_FILTER_ROLES`, padrão fábrica e admin; ver todos podem). Os de sistema (antigos atalhos) ninguém edita | – | ✓ | ✓ | – |
 | Navegar no Docs (`/api/acc/*`), cadastrar/editar obra | ✓ | – | ✓ | – |
 | Sincronizar agora | ✓ | ✓ | ✓ | – |
-| Editar valores (por marca e por peça), aplicar/desfazer lote, manter valores (revisar), religar/arquivar órfã (marca e peça), criar/editar/excluir parâmetro | – | ✓ | ✓ | – |
+| Editar valores (por marca e por peça), aplicar/desfazer lote, **importar valores do Excel** (prévia e aplicar), manter valores (revisar), religar/arquivar órfã (marca e peça), criar/editar/excluir parâmetro | – | ✓ | ✓ | – |
 | `/api/metrics` (ou Bearer `METRICS_TOKEN`) | – | – | ✓ | – |
+| Tela "Usuários" (`/api/users`): listar, cadastrar pelo e-mail, papel, ativar/desativar, obras de cada um | – | – | ✓ | – |
 | Públicas: `/api/health`, `/api/ready`, `/api/dev/users` (só dev), webhook do APS (assinatura) | | | | |

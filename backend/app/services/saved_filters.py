@@ -94,10 +94,15 @@ async def _get(session: AsyncSession, cls: type[Item], item_id: int, user: User)
     return item
 
 
-def _visible(cls: type[Item], user: User, obra_id: int | None) -> list[Any]:
+def _visible(
+    cls: type[Item], user: User, obra_id: int | None, visible_obras: set[int] | None = None
+) -> list[Any]:
+    """visible_obras: obras que o usuário vê (11.2); None = todas."""
     conds: list[Any] = [or_(cls.scope == SHARED, cls.owner_id == user.id)]
     if obra_id is not None:
         conds.append(or_(cls.obra_id.is_(None), cls.obra_id == obra_id))
+    if visible_obras is not None:
+        conds.append(or_(cls.obra_id.is_(None), cls.obra_id.in_(visible_obras)))
     return conds
 
 
@@ -170,13 +175,16 @@ class SavedFilterPatch(BaseModel):
 
 
 async def list_filters(
-    session: AsyncSession, user: User, obra_id: int | None = None
+    session: AsyncSession,
+    user: User,
+    obra_id: int | None = None,
+    visible_obras: set[int] | None = None,
 ) -> list[SavedFilter]:
     """Os do sistema primeiro (na ordem dos atalhos), depois por nome."""
     rows = list(
         await session.scalars(
             select(SavedFilter)
-            .where(*_visible(SavedFilter, user, obra_id))
+            .where(*_visible(SavedFilter, user, obra_id, visible_obras))
             .order_by(func.lower(SavedFilter.name), SavedFilter.id)
         )
     )
@@ -360,12 +368,15 @@ def _rules_json(rules: list[SchemeRule]) -> list[Any]:
 
 
 async def list_schemes(
-    session: AsyncSession, user: User, obra_id: int | None = None
+    session: AsyncSession,
+    user: User,
+    obra_id: int | None = None,
+    visible_obras: set[int] | None = None,
 ) -> list[ColorScheme]:
     return list(
         await session.scalars(
             select(ColorScheme)
-            .where(*_visible(ColorScheme, user, obra_id))
+            .where(*_visible(ColorScheme, user, obra_id, visible_obras))
             .order_by(func.lower(ColorScheme.name), ColorScheme.id)
         )
     )

@@ -39,10 +39,26 @@ body { margin: 0; }
 .app__main { flex: 1; min-height: 0; overflow: auto; padding: 16px; }
 .app__main:has(> .model-page) { padding: 0; overflow: hidden; }
 
+.app__nav { margin-right: auto; display: flex; gap: 4px; font-size: var(--fs-sm); }
+.app__nav a { display: inline-flex; align-items: center; min-height: var(--tap-sm); padding: 4px 10px; border-radius: var(--radius); color: var(--text); text-decoration: none; }
+.app__nav a:hover { background: var(--surface-muted); }
+.app__nav a.active { background: var(--selected-bg-soft); color: var(--action); }
+
+/* Tela Usuários (11.2): lista de obras com rolagem própria */
+.user-obras { max-height: 240px; overflow: auto; margin-top: 8px; padding: 8px; border: 1px solid var(--border-control); border-radius: var(--radius); }
+
 .dev-user { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-size: var(--fs-sm); }
 .dev-user select { font-size: var(--fs-sm); padding: 4px 6px; min-height: var(--tap-sm); }
 .dev-user__role { padding: 2px 8px; border-radius: var(--radius-pill); background: var(--surface-muted); color: var(--brand-graphite); }
 .dev-user__error { color: var(--danger); }
+
+/* Tela de entrada (Fase 11): cartão centralizado, "Entrar com Microsoft". */
+.login { min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; background: var(--bg); }
+.login__card { width: 100%; max-width: 380px; display: flex; flex-direction: column; align-items: stretch; gap: 14px; padding: 28px 24px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); }
+.login__card > svg { align-self: flex-start; }
+.login__title { margin: 4px 0 0; font-size: 1.25rem; }
+.login__hint { margin: 0; color: var(--text-secondary); font-size: var(--fs-sm); }
+.login__error { margin: 0; color: var(--danger); font-size: var(--fs-sm); }
 
 /* ================================================================ tipografia */
 h1, h2, h3, h4, h5 { font-weight: 600; line-height: var(--lh-tight); text-wrap: balance; }
@@ -211,10 +227,14 @@ button.link.danger:disabled { color: var(--text-muted); }
 
 /* ================================================================ tela do modelo: barra + 3 colunas */
 .model-page { height: 100%; display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; min-height: 0; overflow: hidden; } /* barra · avisos · área de trabalho · rodapé */
-.model-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; padding: 8px 16px; background: var(--surface); border-bottom: 1px solid var(--border); }
-.model-bar__item { display: flex; flex-direction: column; line-height: 1.2; }
-.model-bar__item small { color: var(--text-muted); font-size: var(--fs-2xs); }
-.model-bar__item select { font-weight: 600; padding: 4px 6px; min-height: var(--tap-sm); }
+/* Barra da obra: rótulo e valor na mesma linha ("Obra 9121 — …", "Versão ativa [lista]"), compacta. */
+.model-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 20px; padding: 4px 16px; background: var(--surface); border-bottom: 1px solid var(--border); font-size: var(--fs-sm); }
+.model-bar__item { display: flex; align-items: center; gap: 6px; line-height: 1.2; min-width: 0; }
+.model-bar__item small { color: var(--text-muted); font-size: var(--fs-2xs); white-space: nowrap; }
+.model-bar__item strong { font-size: var(--fs-sm); }
+.model-bar__item select { font-size: var(--fs-sm); font-weight: 600; padding: 2px 6px; min-height: 30px; }
+.model-bar .export button { min-height: 30px; padding: 4px 10px; font-size: var(--fs-xs); }
+.model-bar .small { font-size: var(--fs-xs); }
 .model-bar__spacer { flex: 1; }
 /* Colunas por variável: esconder um painel lateral zera a largura dele (usePanels). */
 .model-cols { --left: 280px; --right: 340px; display: grid; grid-template-columns: var(--left) minmax(0, 1fr) var(--right); grid-template-rows: minmax(0, 1fr); min-height: 0; }
@@ -553,6 +573,7 @@ fieldset.field .check { display: inline-flex; margin-right: 16px; }
 @media (pointer: coarse) {
   :root { --tap: 48px; --tap-sm: 44px; }
   button.link { min-height: var(--tap-sm); }
+  .model-bar__item select, .model-bar .export button { min-height: var(--tap-sm); }
   .tag button { min-width: var(--tap-sm); min-height: var(--tap-sm); }
   .legend__row { min-height: 40px; font-size: var(--fs-xs); }
   .legend { max-width: 250px; } /* no toque o título cabe numa linha */
@@ -568,3 +589,13 @@ fieldset.field .check { display: inline-flex; margin-right: 16px; }
   .floating__grip { width: 28px; }
   .floating--top-right, .coloring-error, .relink-bar { top: 68px; } /* abaixo da barra, que no toque é mais alta */
 }
+
+/* Importar valores do Excel (2026-11-19) */
+.import__summary { margin: 8px 0; }
+.import__params { margin: 4px 0 8px; padding-left: 20px; font-size: var(--fs-sm); }
+.import__block { margin: 8px 0; }
+.import__block > summary { cursor: pointer; min-height: var(--tap-sm); display: flex; align-items: center; font-size: var(--fs-sm); }
+.import__issues { margin: 4px 0; padding-left: 20px; max-height: 200px; overflow: auto; font-size: var(--fs-sm); }
+.import__issues--error li { color: var(--danger); }
+.import__where { color: var(--text-muted); font-size: var(--fs-xs); }
+.import__table { max-height: 260px; overflow: auto; }

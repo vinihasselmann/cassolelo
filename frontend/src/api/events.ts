@@ -7,7 +7,7 @@
  * heartbeat de 20 s), considera a conexão morta e reconecta.
  */
 
-import { DEV_USER_HEADER, getDevUser } from './client';
+import { authFetch } from './client';
 
 export type ObraEventType =
   | 'version_ready'
@@ -104,8 +104,6 @@ export function connectObraEvents(obraId: number, options: ConnectOptions): () =
 
   async function once(): Promise<boolean> {
     const headers = new Headers({ Accept: 'text/event-stream' });
-    const user = getDevUser();
-    if (user !== null) headers.set(DEV_USER_HEADER, user);
     if (lastId !== null) headers.set('Last-Event-ID', lastId);
     const attempt = new AbortController();
     const abort = () => { attempt.abort(); };
@@ -116,7 +114,7 @@ export function connectObraEvents(obraId: number, options: ConnectOptions): () =
       watchdog = setTimeout(abort, watchdogMs);
     };
     try {
-      const res = await fetch(`/api/obras/${String(obraId)}/events`, { headers, signal: attempt.signal });
+      const res = await authFetch(`/obras/${String(obraId)}/events`, { headers, signal: attempt.signal });
       if (res.status === 404) return false; // obra não existe: não insistir
       if (!res.ok || !res.body) throw new Error(`HTTP ${String(res.status)}`);
       failures = 0;

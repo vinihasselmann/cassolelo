@@ -12,6 +12,9 @@
     uv run python -m app.cli sync --obra 1 | --all     # "Sincronizar agora" pela linha de comando
     uv run python -m app.cli dates list [--obra 12]    # datas fora de 1900–2100 (por marca e peça)
     uv run python -m app.cli dates fix p:34 --clear | --set 2026-05-05 [--user email]
+    uv run python -m app.cli users list                   # usuários e papéis
+    uv run python -m app.cli users set-role fulano@cassol.ind.br fabrica [--name "Fulano"]
+    uv run python -m app.cli users deactivate fulano@cassol.ind.br   # (activate desfaz)
 
 O callback é PUBLIC_BASE_URL + /api/webhooks/aps (ex.: URL do túnel).
 """
@@ -24,7 +27,7 @@ import sys
 from collections.abc import Sequence
 from datetime import UTC, datetime
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.aps import build_aps_client
@@ -36,7 +39,7 @@ from app.db import create_engine, create_sessionmaker
 from app.models import ModelVersion, Obra, User
 from app.models.enums import Role, VersionStatus
 from app.observability import alerts
-from app.services import invalid_dates, mark_origin, piece_props, piece_type
+from app.services import audit, invalid_dates, mark_origin, piece_props, piece_type
 from app.services import versions as versions_service
 from app.services import webhooks as hooks_service
 from app.services.errors import DomainError
@@ -97,6 +100,18 @@ def _parser() -> argparse.ArgumentParser:
     ptype_target = ptype.add_mutually_exclusive_group(required=True)
     ptype_target.add_argument("--version", type=int, help="id da versão")
     ptype_target.add_argument("--all", action="store_true", help="todas as versões prontas")
+    users_cmd = sub.add_parser("users", help="usuários do app e papéis (auditado)")
+    users_cmds = users_cmd.add_subparsers(dest="cmd", required=True)
+    users_cmds.add_parser("list", help="lista os usuários")
+    set_role = users_cmds.add_parser(
+        "set-role", help="define o papel (cria o usuário se ainda não entrou no app)"
+    )
+    set_role.add_argument("email")
+    set_role.add_argument("role", choices=[r.value for r in Role])
+    set_role.add_argument("--name", help="nome, se o usuário for criado agora")
+    for name in ("activate", "deactivate"):
+        c = users_cmds.add_parser(name, help=f"{'re' if name == 'activate' else 'des'}ativa")
+        c.add_argument("email")
     sync_cmd = sub.add_parser("sync", help='"Sincronizar agora" (uma obra ou todas as ativas)')
     target = sync_cmd.add_mutually_exclusive_group(required=True)
     target.add_argument("--obra", type=int, help="id da obra")
@@ -250,6 +265,45 @@ async def _dates(session: AsyncSession, args: argparse.Namespace) -> int:
     return 0
 
 
+async def _users(session: AsyncSession, args: argparse.Namespace) -> int:
+    if args.cmd == "list":
+        rows = await session.scalars(select(User).order_by(User.id))
+        for u in rows:
+            state = "" if u.active else "  (desativado)"
+            print(f"{u.id:>4}  {u.role:<9} {u.email:<40} {u.name}{state}")
+        return 0
+    email = args.email.strip().lower()
+    if "@" not in email:
+        print("ERRO: informe o e-mail.", file=sys.stderr)
+        return 2
+    user = await session.scalar(select(User).where(func.lower(User.email) == email))
+    if args.cmd == "set-role":
+        if user is None:
+            user = User(name=args.name or email, email=email, role=args.role, active=True)
+            session.add(user)
+            await session.flush()
+            await audit.record(session, "user", user.id, "create", None, audit.snapshot(user), None)
+            await session.commit()
+            print(f"Usuário {email} criado como {args.role}.")
+            return 0
+        if user.role == args.role:
+            print(f"{email} já é {args.role}.")
+            return 0
+        before = audit.snapshot(user)
+        user.role = args.role
+    else:
+        if user is None:
+            print(f"ERRO: usuário {email} não encontrado.", file=sys.stderr)
+            return 1
+        before = audit.snapshot(user)
+        user.active = args.cmd == "activate"
+    await session.flush()
+    await audit.record(session, "user", user.id, "update", before, audit.snapshot(user), None)
+    await session.commit()
+    print(f"{email}: papel {user.role}, {'ativo' if user.active else 'desativado'}.")
+    return 0
+
+
 async def run(
     argv: Sequence[str],
     settings: Settings,
@@ -266,6 +320,8 @@ async def run(
         return await _backfill_piece_props(session, None if args.all else args.version)
     if args.group == "dates":
         return await _dates(session, args)
+    if args.group == "users":
+        return await _users(session, args)
     if args.group == "sync":
         if queue is None:  # pragma: no cover - _main sempre passa
             raise RuntimeError("fila não configurada")

@@ -1,5 +1,5 @@
 import { roundedCoordinates } from './centroids';
-import { DEV_USER_HEADER, getDevUser, toApiError } from './client';
+import { authFetch, toApiError } from './client';
 import type { FilterDefinition } from './filters';
 
 /** Nome do arquivo do Content-Disposition (filename*=UTF-8'' tem prioridade). */
@@ -24,9 +24,7 @@ export async function downloadObraExcel(
   coordinates: ReadonlyMap<number, readonly [number, number, number]> | null = null,
 ): Promise<string> {
   const headers = new Headers({ 'Content-Type': 'application/json' });
-  const user = getDevUser();
-  if (user !== null) headers.set(DEV_USER_HEADER, user);
-  const res = await fetch(`/api/obras/${String(obraId)}/export.xlsx`, {
+  const res = await authFetch(`/obras/${String(obraId)}/export.xlsx`, {
     method: 'POST',
     headers,
     body: JSON.stringify({

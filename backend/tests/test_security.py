@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import AsyncIterator
+from typing import Any
 
 import httpx
 import pytest
@@ -18,6 +19,9 @@ from tests.conftest import as_user, build_app, make_settings
 
 APP = "https://bim.cassol.local"
 
+# fora de dev o backend exige o login Microsoft configurado (Fase 11)
+ENTRA: dict[str, Any] = {"entra_client_id": "cid", "entra_tenant_id": "tid"}
+
 
 def _client(app: object) -> httpx.AsyncClient:
     return httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://t")  # type: ignore[arg-type]
@@ -27,7 +31,7 @@ def _client(app: object) -> httpx.AsyncClient:
 
 
 def test_cors_origins_default_to_app_base_url_outside_dev() -> None:
-    s = make_settings(app_env="prod", app_base_url=APP + "/")
+    s = make_settings(app_env="prod", **ENTRA, app_base_url=APP + "/")
     assert s.cors_origin_list == [APP]
     assert make_settings(app_env="dev", app_base_url=APP).cors_origin_list == []
 
@@ -93,10 +97,10 @@ async def test_security_headers_on_api_responses() -> None:
 
 
 async def test_hsts_outside_dev_and_configurable() -> None:
-    async with _client(build_app(app_env="prod")) as c:
+    async with _client(build_app(app_env="prod", **ENTRA)) as c:
         r = await c.get("/api/health")
         assert r.headers["strict-transport-security"] == "max-age=31536000; includeSubDomains"
-    async with _client(build_app(app_env="prod", hsts_max_age=0)) as c:
+    async with _client(build_app(app_env="prod", **ENTRA, hsts_max_age=0)) as c:
         assert "strict-transport-security" not in (await c.get("/api/health")).headers
 
 
@@ -105,7 +109,7 @@ async def test_docs_only_in_dev_and_without_api_csp() -> None:
         r = await c.get("/docs")
         assert r.status_code == 200
         assert "content-security-policy" not in r.headers  # Swagger usa CDN
-    async with _client(build_app(app_env="prod")) as c:
+    async with _client(build_app(app_env="prod", **ENTRA)) as c:
         assert (await c.get("/docs")).status_code == 404
         assert (await c.get("/openapi.json")).status_code == 404
 

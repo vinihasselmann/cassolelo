@@ -23,7 +23,8 @@ migração divergirem.
 
 | Tabela | Colunas | Regras |
 |---|---|---|
-| **users** | id, name, email, role, active, autoria | `uq_users_email`; `role ∈ {projetos, fabrica, admin, leitura}` |
+| **users** | id, name, email, role, active, all_obras, autoria | `uq_users_email`; `role ∈ {projetos, fabrica, admin, leitura}`; `all_obras` (padrão true): vê todas as obras; false = só as de `user_obras` (11.2). Admin vê sempre todas |
+| **user_obras** | user_id, obra_id, created_by, updated_by | PK (user_id, obra_id); FKs `CASCADE` com o usuário e com a obra; índice em obra_id. Obras de um usuário restrito (11.2, migração `0021`) |
 | **obras** | id, code, name, acc_hub_id, acc_project_id, acc_folder_id, acc_item_id, acc_item_name, active, mark_property_names JSONB, category_property_names JSONB, autoria | `uq_obras_code`; `mark_property_names`/`category_property_names`: regra de identificação da obra (lista em ordem de prioridade; nulo = padrão do servidor); `active` (padrão true): obras inativas saem da verificação periódica; `acc_item_name` é só para exibição (nome do arquivo no Docs, conferido no vínculo) |
 | **model_versions** | id, obra_id, acc_version_id, version_number, urn, status, published_by, published_at, comment, error, autoria | `uq_model_versions_acc_version_id`; `status ∈ {pending, translating, processing, ready, failed, no_translation}` (padrão `pending`); índice (obra_id, version_number); `published_by` é o nome vindo do ACC (texto, não FK) |
 | **elements** | id, version_id, external_id, dbid, name, mark_raw, category, level, search_text, props JSONB, mark_id, created_at | `uq_elements_version_id_dbid`; índice (version_id, external_id); índice mark_id; índice (version_id, level); `level` vem de `LEVEL_PROPERTY_NAMES`; `search_text` = nome, categoria, marca, nível e valores de `SEARCH_PROPERTY_NAMES` (busca livre); **índice GIN `ix_elements_props_gin` em props** (consultas `props @> {...}`); FK version_id `CASCADE`, mark_id `SET NULL` |

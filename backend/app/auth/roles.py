@@ -5,7 +5,7 @@ from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
 
-from app.auth.dev import current_user
+from app.auth.current import current_user
 from app.models import User
 from app.models.enums import Role
 

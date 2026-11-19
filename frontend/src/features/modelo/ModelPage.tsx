@@ -16,6 +16,7 @@ import { useObraId } from '../obras/useObraId';
 import { CatalogDialog } from '../params/CatalogDialog';
 import { ParamDefDialog } from '../params/ParamDefDialog';
 import { UndoToast } from '../params/UndoToast';
+import { ImportExcelButton } from './ImportExcel';
 import { ExportButton } from './ExportButton';
 import { NumberingNotice } from './NumberingNotice';
 import { useCentroidSync } from './useCentroidSync';
@@ -417,6 +418,12 @@ export function ModelPage() {
               centroids.status.pieces > 0 &&
               centroids.status.stored >= centroids.status.pieces
             }
+          />
+        )}
+        {canEditParams && (
+          <ImportExcelButton
+            obraId={obraId}
+            onApplied={(batchId, text) => { setUndo({ batchId, text }); }}
           />
         )}
         <NumberingNotice numbering={obra.data?.unit_numbering} state={centroids.state} />
