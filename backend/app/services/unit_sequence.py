@@ -5,7 +5,7 @@ O servidor não tem a geometria (o CLAUDE.md proíbe baixar o derivativo): o nav
 
 1. guarda o centro em `elements.centroid` (vale para a versão; o reprocessamento da mesma
    versão leva junto, ver `processing._store`);
-2. **renumera** as unidades de cada marca pela sequência de montagem (X → Y → Z, faixas de
+2. **renumera** as unidades de cada marca pela sequência de montagem (Z → X → Y, faixas de
    0,10 m; `assembly_order`), uma única vez, se a obra ainda está com a numeração
    PROVISÓRIA, a versão é a mais recente e nenhuma unidade da obra tem valor por peça.
    Exceção aprovada à regra "o número nunca muda": como ninguém gravou nada nas peças, o
@@ -41,7 +41,7 @@ from app.models import (
 )
 from app.models.enums import LinkMethod, UnitNumbering, UnitStatus, VersionStatus
 from app.services import audit, events, piece_props, piece_units
-from app.services.assembly_order import Point, sequence
+from app.services.assembly_order import CURRENT, Point, sequence
 from app.services.errors import NotFoundError
 from app.services.param_defs import has_value
 from app.services.version_data import VersionNotReadyError
@@ -175,10 +175,10 @@ async def store(
     return result
 
 
-async def _renumber(
-    session: AsyncSession, version: ModelVersion, obra: Obra, actor: User | None
-) -> int:
-    """Permuta os números de cada marca pela sequência de montagem; a obra fica `sequence`."""
+async def _plan(
+    session: AsyncSession, version: ModelVersion, obra: Obra
+) -> tuple[list[PieceUnit], dict[int, int]]:
+    """Unidades da obra e o número novo de cada uma que muda (sequência atual)."""
     linked: dict[int, Point | None] = {}
     for unit_id, centroid in await session.execute(
         select(PieceUnitLink.unit_id, Element.centroid)
@@ -212,12 +212,24 @@ async def _renumber(
                 rest_linked.append(u)
             else:
                 unlinked.append(u)
-        ordered = sequence(with_xyz) + rest_linked + unlinked
+        ordered = sequence(with_xyz, order=CURRENT) + rest_linked + unlinked
         numbers = [u.number for u in mark_units]  # os mesmos números, em ordem
         for u, n in zip(ordered, numbers, strict=True):
             if u.number != n:
                 new_number[u.id] = n
+    return units, new_number
 
+
+async def _renumber(
+    session: AsyncSession,
+    version: ModelVersion,
+    obra: Obra,
+    actor: User | None,
+    reason: str | None = None,
+) -> int:
+    """Permuta os números de cada marca pela sequência de montagem; a obra fica `sequence`."""
+    before = {"unit_numbering": obra.unit_numbering, "sequence_axes": obra.sequence_axes}
+    units, new_number = await _plan(session, version, obra)
     changed = [u for u in units if u.id in new_number]
     if changed:
         codes = dict(
@@ -251,20 +263,86 @@ async def _renumber(
             session, version, {u.id: f"{codes[u.mark_id]}-{u.number}" for u in changed}
         )
     obra.unit_numbering = UnitNumbering.SEQUENCE.value
+    obra.sequence_axes = CURRENT  # a ligação pela ordem segue a mesma ordem dos números
     await audit.record(
         session,
         "obra",
         obra.id,
         "unit_numbering",
-        {"unit_numbering": UnitNumbering.PROVISIONAL.value},
+        before,
         {
             "unit_numbering": UnitNumbering.SEQUENCE.value,
             "renumbered": len(changed),
+            "sequence_axes": CURRENT,
             "version_id": version.id,
+            **({"reason": reason} if reason else {}),
         },
         actor,
     )
     return len(changed)
+
+
+@dataclass(frozen=True)
+class ObraRenumber:
+    version_id: int
+    pieces: int  # peças da versão
+    stored: int  # com centro de gravidade
+    changed: int  # unidades que mudam (ou mudaram) de número
+    applied: bool
+
+
+async def renumber_obra(
+    session: AsyncSession, obra_id: int, actor: User | None, *, apply: bool
+) -> ObraRenumber:
+    """Renumera uma obra JÁ numerada pela sequência na ordem atual (Z → X → Y), por decisão
+    explícita do usuário (ex.: a 9121, numerada em X → Y → Z; 2026-11-19), ou uma obra
+    travada (`fixed`) que não tem mais nenhum valor por peça. Permutação dos
+    números de cada marca: os valores ficam nas mesmas unidades (as mesmas peças físicas),
+    só os rótulos mudam. Auditado por unidade. `apply=False` só conta. Sem commit."""
+    obra = await session.get(Obra, obra_id)
+    if obra is None:
+        raise NotFoundError("Obra não encontrada.")
+    # `fixed` sem nenhum valor por peça: a trava veio de um valor que já foi apagado (ex.: a
+    # GUI, travada enquanto os centros eram recusados; 2026-11-19); vale como provisória.
+    fixed_empty = obra.unit_numbering == UnitNumbering.FIXED.value and not (
+        await obra_has_piece_values(session, obra.id)
+    )
+    if obra.unit_numbering != UnitNumbering.SEQUENCE.value and not fixed_empty:
+        raise ValueError(
+            f"A obra está com numeração '{obra.unit_numbering}': só se renumera aqui uma obra "
+            "já numerada pela sequência ('sequence') ou travada sem nenhum valor por peça."
+        )
+    version = await session.scalar(
+        select(ModelVersion)
+        .where(ModelVersion.obra_id == obra.id, ModelVersion.status == VersionStatus.READY.value)
+        .order_by(ModelVersion.version_number.desc())
+        .limit(1)
+    )
+    if version is None or not await piece_units._is_latest(session, version):
+        raise ValueError("A versão mais recente da obra não está pronta.")
+    st = await _status(session, version, obra)
+    if st.stored < st.pieces:
+        raise ValueError(
+            f"Faltam centros de gravidade ({st.stored} de {st.pieces}): abra o 3D da obra antes."
+        )
+    if not apply:
+        _units, new_number = await _plan(session, version, obra)
+        return ObraRenumber(version.id, st.pieces, st.stored, len(new_number), False)
+    changed = await _renumber(session, version, obra, actor, reason="manual")
+    await session.flush()
+    events.emit(
+        session,
+        obra.id,
+        "units_renumbered",
+        {
+            "version_id": version.id,
+            "renumbered": changed,
+            "relinked": False,
+            "numbering": obra.unit_numbering,
+        },
+        actor,
+    )
+    return ObraRenumber(version.id, st.pieces, st.stored, changed, True)
 
 
 async def _relabel_diff(

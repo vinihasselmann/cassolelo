@@ -86,3 +86,25 @@ def test_models_match_migrations(empty_db: str) -> None:
     dbutil.upgrade(empty_db)
     diff = _run_sync(empty_db, _diff)
     assert diff == [], f"modelos e migração divergem (crie uma migração): {diff}"
+
+
+def test_0022_keeps_xyz_for_obras_already_numbered(empty_db: str) -> None:
+    """Obras já numeradas pela sequência guardam X → Y → Z; as demais ficam em Z → X → Y."""
+    dbutil.upgrade(empty_db, "0021")
+
+    def seed(conn: Connection) -> None:
+        conn.exec_driver_sql(
+            "INSERT INTO obras (code, name, unit_numbering) VALUES "
+            "('SEQ', 'numerada', 'sequence'), ('PROV', 'provisória', 'provisional'), "
+            "('FIX', 'travada', 'fixed')"
+        )
+        conn.commit()
+
+    _run_sync(empty_db, seed)
+    dbutil.upgrade(empty_db)
+
+    def axes(conn: Connection) -> dict[str, str]:
+        rows = conn.exec_driver_sql("SELECT code, sequence_axes FROM obras").all()
+        return {code: ax for code, ax in rows}
+
+    assert _run_sync(empty_db, axes) == {"SEQ": "xyz", "PROV": "zxy", "FIX": "zxy"}

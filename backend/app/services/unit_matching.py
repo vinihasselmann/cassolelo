@@ -8,7 +8,7 @@ Regra (docs/pecas/verificacao.md, decisão de 2026-11-16):
 2. **Pela ordem:** unidades e elementos que sobraram são ligados numa ordem ESTÁVEL e
    sem relação com o Viewer: unidades pelo número; elementos por nível, nome e externalId
    ou, nas obras numeradas pela montagem (`by_sequence`), pela sequência de montagem do
-   centro de gravidade (X → Y → Z; os sem centro depois). Se há menos elementos que
+   centro de gravidade (na ordem de eixos da obra; os sem centro depois). Se há menos elementos que
    unidades, ficam com peça primeiro as unidades com valores (para não deixar sem peça um
    dado que existe); os valores não mudam o par quando há peça para todas (2026-11-18:
    antes eles iam na frente e, no NWD, um reprocessamento passava o valor da PP001-5 para
@@ -29,7 +29,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from app.services.assembly_order import Point, sequence
+from app.services.assembly_order import CURRENT, Point, sequence
 
 KEY = "key"
 ORDER = "order"
@@ -75,13 +75,15 @@ def element_order(e: ElementIn) -> tuple[bool, str, str, str]:
     return (e.level is None, e.level or "", e.name or "", e.external_id or "")
 
 
-def ordered_elements(elements: list[ElementIn], by_sequence: bool = False) -> list[ElementIn]:
+def ordered_elements(
+    elements: list[ElementIn], by_sequence: bool = False, axes: str = CURRENT
+) -> list[ElementIn]:
     """Elementos na ordem da ligação pela ordem e da numeração das unidades novas."""
     stable = sorted(elements, key=element_order)
     if not by_sequence:
         return stable
     with_xyz = [(e, e.centroid) for e in stable if e.centroid is not None]
-    return sequence(with_xyz) + [e for e in stable if e.centroid is None]
+    return sequence(with_xyz, order=axes) + [e for e in stable if e.centroid is None]
 
 
 def match(
@@ -92,12 +94,14 @@ def match(
     create: bool = True,
     next_number: int | None = None,
     by_sequence: bool = False,
+    axes: str = CURRENT,
 ) -> MatchResult:
     """Liga as unidades de UMA marca aos elementos dela numa versão.
 
     `next_number`: primeiro número livre da marca (padrão: maior número + 1).
     `create=False` (versão antiga): não cria unidades novas.
-    `by_sequence`: obra numerada pela sequência de montagem (ver `ordered_elements`)."""
+    `by_sequence`: obra numerada pela sequência de montagem (ver `ordered_elements`), na
+    ordem de eixos `axes` da obra."""
     result = MatchResult()
     free_units = list(units)
     free_elems = list(elements)
@@ -121,7 +125,7 @@ def match(
 
     free_units = [u for u in free_units if not u.key_only]
 
-    free_elems = ordered_elements(free_elems, by_sequence)
+    free_elems = ordered_elements(free_elems, by_sequence, axes)
     pairs = min(len(free_units), len(free_elems))
     # quem fica com peça: com valores primeiro; o par, pelo número
     chosen = sorted(free_units, key=lambda u: (not u.has_values, u.number))[:pairs]

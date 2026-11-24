@@ -1,4 +1,4 @@
-"""Numeração das unidades pela sequência de montagem X → Y → Z (passo 2, 2026-11-18).
+"""Numeração das unidades pela sequência de montagem Z → X → Y (passo 2; ordem de 2026-11-19).
 
 O 3D manda o centro de gravidade das peças; a obra provisória e sem valores por peça é
 renumerada uma única vez (permutação dos números da marca); o 1º valor trava a numeração;
@@ -10,12 +10,15 @@ from __future__ import annotations
 from typing import Any
 
 import httpx
+import pytest
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.aps.client import ApsClient
 from app.models import (
     AuditLog,
     Element,
+    Mark,
     ModelVersion,
     Obra,
     ParamDef,
@@ -26,12 +29,13 @@ from app.models import (
 )
 from app.models.enums import Role
 from app.services import piece_units, piece_values, processing, unit_sequence
+from app.services.errors import NotFoundError
 from app.services.extraction import ExtractedElement
 from app.services.unit_matching import ElementIn, UnitIn, match, ordered_elements
 from tests.conftest import as_user
 from tests.test_piece_units import _linked, _obra, _units, _version
 
-Z = {"a": 10.0, "b": 0.0, "c": 5.0}  # posição em X: b, c, a (X → Y → Z, como o Dynamo)
+Z = {"a": 10.0, "b": 0.0, "c": 5.0}  # altura (Z): b, c, a (Z → X → Y)
 
 
 async def _coords(
@@ -40,9 +44,9 @@ async def _coords(
     rows = await session.execute(
         select(Element.dbid, Element.external_id).where(Element.version_id == v.id)
     )
-    # X decide; o Z vai ao contrário, para provar que ele só entra depois de X e Y
+    # Z decide; o X vai ao contrário, para provar que ele só entra depois do Z
     return {
-        dbid: (z[ext[-1]], 0.0, 10.0 - z[ext[-1]]) for dbid, ext in rows if ext and ext[-1] in z
+        dbid: (10.0 - z[ext[-1]], 0.0, z[ext[-1]]) for dbid, ext in rows if ext and ext[-1] in z
     }
 
 
@@ -79,6 +83,7 @@ async def test_provisional_obra_is_renumbered_by_sequence_once(session: AsyncSes
     assert (r.stored, r.renumbered, r.status.numbering) == (3, 3, "sequence")
     assert (r.status.pieces, r.status.stored) == (3, 3)
     assert await _numbers(session, v1) == {"b": 1, "c": 2, "a": 3}
+    assert obra.sequence_axes == "zxy"
 
     audits = list(
         await session.scalars(
@@ -184,6 +189,145 @@ async def test_nwd_numbering_stays_stable_on_relink_and_follows_new_versions(
     r = await unit_sequence.store(session, v2.id, await _coords(session, v2, Z), None)
     assert (r.renumbered, r.relinked) == (0, True)
     assert await _numbers(session, v2) == {"1/b": 1, "1/c": 2, "1/a": 3}
+
+
+async def test_nwd_legacy_obra_links_by_its_own_axes(session: AsyncSession) -> None:
+    """Obra numerada em X → Y → Z (antes de 2026-11-19): a versão nova liga as peças pela
+    ordem DELA, senão as peças (e os valores) trocariam de lugar dentro da marca."""
+    obra, mark = await _obra(session, "modelo.nwd")
+    v1, _ = await _version(session, obra, mark, 1, [(10, "0/a"), (11, "0/b"), (12, "0/c")])
+    await unit_sequence.store(session, v1.id, await _coords(session, v1, Z), None)
+    obra.sequence_axes = "xyz"  # como a migração 0022 marca as obras já numeradas
+    await session.flush()
+
+    v2, _ = await _version(session, obra, mark, 2, [(20, "1/a"), (21, "1/b"), (22, "1/c")])
+    r = await unit_sequence.store(session, v2.id, await _coords(session, v2, Z), None)
+    assert (r.renumbered, r.relinked) == (0, True)
+    # X crescente (em _coords, X = 10 - Z): a, c, b; em Z → X → Y seria b, c, a
+    assert await _numbers(session, v2) == {"1/a": 1, "1/c": 2, "1/b": 3}
+
+
+async def _legacy_obra_with_value(
+    session: AsyncSession,
+) -> tuple[Obra, ModelVersion, ParamDef]:
+    """Obra NWD numerada em X → Y → Z (como a 9121): a, c, b = 1, 2, 3; valor na PP001-1."""
+    obra, mark = await _obra(session, "modelo.nwd")
+    v1, _ = await _version(session, obra, mark, 1, [(10, "0/a"), (11, "0/b"), (12, "0/c")])
+    for e in await session.scalars(select(Element).where(Element.version_id == v1.id)):
+        z = Z[str(e.external_id)[-1]]
+        e.centroid = [10.0 - z, 0.0, z]  # X = 10 - Z: em X → Y → Z a ordem é a, c, b
+    obra.unit_numbering, obra.sequence_axes = "sequence", "xyz"
+    await session.flush()
+    await piece_units.link_version(session, v1)
+    assert await _numbers(session, v1) == {"0/a": 1, "0/c": 2, "0/b": 3}
+    param = await _text_param(session, obra)
+    unit1 = await session.scalar(
+        select(PieceUnit).where(PieceUnit.obra_id == obra.id, PieceUnit.number == 1)
+    )
+    assert unit1 is not None
+    session.add(PieceValue(unit_id=unit1.id, def_id=param.id, value="F-A"))
+    await session.flush()
+    return obra, v1, param
+
+
+async def test_renumber_obra_to_current_order_keeps_values_on_the_same_piece(
+    session: AsyncSession,
+) -> None:
+    """Decisão de 2026-11-19: a 9121 passa para Z → X → Y; os valores seguem a peça física."""
+    obra, v1, param = await _legacy_obra_with_value(session)
+    user = await _user(session)
+
+    dry = await unit_sequence.renumber_obra(session, obra.id, user, apply=False)
+    assert (dry.changed, dry.applied, dry.pieces) == (2, False, 3)  # a: 1->3, b: 3->1
+    assert await _numbers(session, v1) == {"0/a": 1, "0/c": 2, "0/b": 3}  # nada gravado
+
+    r = await unit_sequence.renumber_obra(session, obra.id, user, apply=True)
+    assert (r.changed, r.applied) == (2, True)
+    assert await _numbers(session, v1) == {"0/b": 1, "0/c": 2, "0/a": 3}
+    assert (obra.unit_numbering, obra.sequence_axes) == ("sequence", "zxy")
+    # o valor continua na peça "a" (agora PP001-3)
+    value_unit = await session.scalar(
+        select(PieceValue.unit_id).where(PieceValue.def_id == param.id)
+    )
+    number = await session.scalar(select(PieceUnit.number).where(PieceUnit.id == value_unit))
+    assert number == 3
+    audit_row = await session.scalar(
+        select(AuditLog).where(AuditLog.entity == "obra", AuditLog.action == "unit_numbering")
+    )
+    assert audit_row is not None
+    assert audit_row.before == {"unit_numbering": "sequence", "sequence_axes": "xyz"}
+    assert (audit_row.after or {})["reason"] == "manual"
+    assert audit_row.user_id == user.id
+
+    # versão nova: liga pela ordem nova, a mesma dos números
+    mark = await session.scalar(select(PieceUnit.mark_id).where(PieceUnit.obra_id == obra.id))
+    assert mark is not None
+    v2, _ = await _version(
+        session, obra, await session.get_one(Mark, mark), 2, [(20, "1/a"), (21, "1/b"), (22, "1/c")]
+    )
+    await unit_sequence.store(session, v2.id, await _coords(session, v2, Z), None)
+    assert await _numbers(session, v2) == {"1/b": 1, "1/c": 2, "1/a": 3}
+
+
+async def test_renumber_obra_refuses_other_states(session: AsyncSession) -> None:
+    obra, mark = await _obra(session)
+    v1, _ = await _version(session, obra, mark, 1, [(10, "a"), (11, "b")])
+    with pytest.raises(ValueError, match="provisional"):
+        await unit_sequence.renumber_obra(session, obra.id, None, apply=True)
+    obra.unit_numbering = "sequence"
+    await session.flush()
+    with pytest.raises(ValueError, match="centros de gravidade"):  # sem os centros do 3D
+        await unit_sequence.renumber_obra(session, obra.id, None, apply=True)
+    with pytest.raises(NotFoundError):
+        await unit_sequence.renumber_obra(session, 999_999, None, apply=True)
+    assert v1.id
+
+
+async def test_renumber_fixed_obra_only_without_piece_values(session: AsyncSession) -> None:
+    """Travada por um valor que depois foi apagado: renumera; com valor, recusa."""
+    obra, mark = await _obra(session)
+    v1, _ = await _version(session, obra, mark, 1, [(10, "a"), (11, "b"), (12, "c")])
+    for e in await session.scalars(select(Element).where(Element.version_id == v1.id)):
+        z = Z[str(e.external_id)[-1]]
+        e.centroid = [10.0 - z, 0.0, z]
+    obra.unit_numbering = "fixed"
+    param = await _text_param(session, obra)
+    unit = await session.scalar(select(PieceUnit).where(PieceUnit.obra_id == obra.id).limit(1))
+    assert unit is not None
+    value = PieceValue(unit_id=unit.id, def_id=param.id, value="F-1")
+    session.add(value)
+    await session.flush()
+    with pytest.raises(ValueError, match="fixed"):
+        await unit_sequence.renumber_obra(session, obra.id, None, apply=True)
+
+    value.value = None  # apagado depois
+    await session.flush()
+    r = await unit_sequence.renumber_obra(session, obra.id, None, apply=True)
+    assert r.applied
+    assert await _numbers(session, v1) == {"b": 1, "c": 2, "a": 3}
+    assert (obra.unit_numbering, obra.sequence_axes) == ("sequence", "zxy")
+
+
+async def test_cli_units_renumber(
+    session: AsyncSession, aps: ApsClient, capsys: pytest.CaptureFixture[str]
+) -> None:
+    from app.cli import run as cli_run
+    from tests.conftest import make_settings
+
+    obra, v1, _param = await _legacy_obra_with_value(session)
+    admin = User(name="Admin", email="admin-renum@test", role=Role.ADMIN)
+    session.add(admin)
+    await session.flush()
+    args = ["units", "renumber", "--obra", str(obra.id), "--user", admin.email]
+    assert await cli_run(args, make_settings(), session, aps) == 0
+    assert "2 de 3 peças mudariam" in capsys.readouterr().out
+    assert await _numbers(session, v1) == {"0/a": 1, "0/c": 2, "0/b": 3}
+    assert await cli_run([*args, "--yes"], make_settings(), session, aps) == 0
+    assert "2 peças renumeradas em Z → X → Y (por Admin)" in capsys.readouterr().out
+    assert await _numbers(session, v1) == {"0/b": 1, "0/c": 2, "0/a": 3}
+    assert (
+        await cli_run(["units", "renumber", "--obra", "999999"], make_settings(), session, aps) == 2
+    )
 
 
 async def test_reprocess_keeps_stored_centroids(session: AsyncSession) -> None:

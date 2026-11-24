@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import type { Evaluation } from '../../api/filters';
 import type { MarkStatus } from '../../api/status';
 import type { MarkPieces, PieceType } from '../../api/versions';
+import { Icon } from '../../components/Icon';
 import { errorMessage } from '../../lib/errors';
+import { normalizeName } from '../../lib/normalizeName';
 import { StatusDot } from '../modelo/StatusBadge';
 import { STATUS_LABEL } from '../modelo/statusLabel';
 import { markAlt, versionOrigin } from './markOrigin';
@@ -105,11 +107,18 @@ export function FilterResultList({
         : [],
     }));
   }, [marks, evaluation, filtered]);
+  // Lupa (2026-11-24): busca a marca pelo nome; só filtra a lista, não mexe na seleção do 3D
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const searchBox = useRef<HTMLInputElement>(null);
+  useEffect(() => { if (searchOpen) searchBox.current?.focus(); }, [searchOpen]);
+  const needle = normalizeName(query);
+  const closeSearch = () => { setQuery(''); setSearchOpen(false); };
   // Filtro "Tipo": só as marcas dos tipos marcados (as peças sem marca saem)
-  const rows = useMemo(
-    () => (types.size === 0 ? allRows : allRows.filter((r) => r.markId !== null && types.has(byId.get(r.markId)?.piece_type ?? 'outros'))),
-    [allRows, types, byId],
-  );
+  const rows = useMemo(() => {
+    const byType = types.size === 0 ? allRows : allRows.filter((r) => r.markId !== null && types.has(byId.get(r.markId)?.piece_type ?? 'outros'));
+    return needle === '' ? byType : byType.filter((r) => normalizeName(r.code).includes(needle));
+  }, [allRows, types, byId, needle]);
   const typeCounts = useMemo(() => {
     const out = new Map<PieceType, number>();
     for (const r of allRows) {
@@ -142,11 +151,35 @@ export function FilterResultList({
         <h3 id="result-title" className="section-title">
           {/* o nome do parâmetro de onde vêm os nomes das peças (regra da obra) */}
           {origin.split.length === 1 && origin.main ? origin.main : 'Marcas'} (
-          {num(types.size > 0 ? rows.length : filtered ? (evaluation?.matched_marks ?? 0) : marks.length)})
+          {num(types.size > 0 || needle !== '' ? rows.length : filtered ? (evaluation?.matched_marks ?? 0) : marks.length)})
           {loading && <span className="muted small"> filtrando…</span>}
         </h3>
+        <button
+          type="button"
+          className={searchOpen ? 'link name-search__btn name-search__btn--on' : 'link name-search__btn'}
+          aria-label="Buscar peça pelo nome"
+          aria-expanded={searchOpen}
+          title="Buscar peça pelo nome"
+          onClick={() => { if (searchOpen) closeSearch(); else setSearchOpen(true); }}
+        >
+          <Icon name="search" />
+        </button>
         <PieceTypeFilter counts={typeCounts} selected={types} onChange={changeTypes} />
       </div>
+      {searchOpen && (
+        <div className="name-search">
+          <input
+            ref={searchBox}
+            type="search"
+            className="search-input"
+            aria-label="Nome da peça"
+            placeholder="Nome da peça (ex.: PP001)"
+            value={query}
+            onChange={(e) => { setQuery(e.target.value); }}
+            onKeyDown={(e) => { if (e.key === 'Escape') { e.preventDefault(); closeSearch(); } }}
+          />
+        </div>
+      )}
       {origin.split.length > 1 && (
         <p className="origin-line">
           Origem: {origin.split.map((s) => `${s.name} ${num(s.pieces)}`).join(' · ')} peças
@@ -173,7 +206,7 @@ export function FilterResultList({
         </p>
       )}
       {rows.length === 0 && !loading && (filtered ? evaluation !== undefined : true) && (
-        <p className="muted small">{filtered ? 'Nenhuma peça no filtro.' : 'Nenhuma marca nesta versão.'}</p>
+        <p className="muted small">{needle !== '' ? `Nenhuma peça com "${query.trim()}" no nome.` : filtered ? 'Nenhuma peça no filtro.' : 'Nenhuma marca nesta versão.'}</p>
       )}
       {shown.length > 0 && (
         <ul className="mark-list" aria-labelledby="result-title">

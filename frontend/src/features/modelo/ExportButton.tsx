@@ -25,7 +25,7 @@ const num = (n: number) => n.toLocaleString('pt-BR');
 /**
  * "Exportar Excel": as marcas da lista (versão aberta + filtro ativo) e as peças. Com o
  * modelo carregado, calcula antes o centro de gravidade de cada peça (colunas X/Y/Z e
- * sequência de montagem X → Y → Z), se o servidor ainda não o tem. O cálculo é o mesmo da
+ * sequência de montagem Z → X → Y), se o servidor ainda não o tem. O cálculo é o mesmo da
  * numeração das peças (centroidSync): feito uma vez por versão.
  */
 export function ExportButton({

@@ -13,6 +13,8 @@ montagem).
 Spike em [spikes/coordenadas](../spikes/coordenadas/README.md). **O app não foi alterado**,
 nem as opções de carga do Viewer.
 
+> **Decisão de 2026-11-19:** o app usa a **origem interna** do arquivo, `(mundo + globalOffset) × unidade`, sem a `refPointTransformation`. A origem interna é a referência confirmada pelo usuário. No RVT da obra GUI (georreferenciado em Guarulhos), a transformação traz o ponto de levantamento em UTM (E 305.250 m, N 7.405.374 m, altitude 751,7 m, giro de 32,7°), e a fórmula abaixo dava milhões de metros. O servidor recusava (limite de ±1.000 km) e o Excel falhava com "Dados inválidos". A seção abaixo fica como histórico do método.
+
 ## 1. Conversão Viewer → arquivo → ponto base do projeto
 
 ### Opções de carga atuais (as do app)

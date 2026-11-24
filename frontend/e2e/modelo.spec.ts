@@ -963,16 +963,17 @@ test('Exportar Excel: o arquivo tem as mesmas marcas, quantidades e valores da t
   expect(rows.find((r) => r.Marca === 'PP001')?.Status).toBe('Completa');
   expect((book.Peças as unknown[]).length).toBe(4);
   // X/Y/Z do centro de gravidade (Viewer falso: caixas); linhas por marca e número; a
-  // sequência de montagem X → Y → Z vai na coluna "Ordem de montagem"
+  // sequência de montagem Z → X → Y vai na coluna "Ordem de montagem"
   const pieces = book.Peças as Record<string, unknown>[];
   expect(pieces.every((p) => typeof p['X (m)'] === 'number' && typeof p['Z (m)'] === 'number')).toBe(true);
   const labels = pieces.map((p) => String(p['Peça']));
   expect(labels).toEqual([...labels].sort((a, b) => a.localeCompare(b, 'pt-BR', { numeric: true })));
   const bySeq = [...pieces].sort((a, b) => Number(a['Ordem de montagem']) - Number(b['Ordem de montagem']));
   expect(bySeq.map((p) => Number(p['Ordem de montagem']))).toEqual([1, 2, 3, 4]);
-  const xs = bySeq.map((p) => Number(p['X (m)']));
-  expect(xs).toEqual([...xs].sort((a, b) => a - b));
-  expect(String((book.Sobre as Record<string, unknown>)['Ordem das peças'])).toMatch(/^por marca e número da peça; coluna "Ordem de montagem": sequência de montagem X → Y → Z/);
+  // de baixo para cima: o Z decide primeiro
+  const zs = bySeq.map((p) => Number(p['Z (m)']));
+  expect(zs).toEqual([...zs].sort((a, b) => a - b));
+  expect(String((book.Sobre as Record<string, unknown>)['Ordem das peças'])).toMatch(/^por marca e número da peça; coluna "Ordem de montagem": sequência de montagem Z → X → Y/);
   expect(book['Marcas:layout']).toEqual({ freeze: 'A2', filter: 'A1:J3' }); // + coluna Data de expedição (F3)
   expect((book.Sobre as Record<string, unknown>).Filtros).toBe('texto "PP"');
 });
@@ -1495,9 +1496,9 @@ test.describe('Coordenadas do eixo', () => {
     await openModel(page, testInfo);
     const panel = page.getByRole('complementary', { name: 'Peça selecionada' });
 
-    // Pilar (PP001, 2 peças): coordenadas da peça CLICADA, em metros, ponto base do projeto
+    // Pilar (PP001, 2 peças): coordenadas da peça CLICADA, em metros, origem interna do arquivo
     await piece(page, 10).click();
-    await expect(panel.getByRole('heading', { name: 'Coordenadas do eixo (ponto base do projeto)' })).toBeVisible();
+    await expect(panel.getByRole('heading', { name: 'Coordenadas do eixo (origem interna)' })).toBeVisible();
     await expect(coords(page).getByRole('row')).toHaveCount(2);
     await expect.poll(() => cells(page, 1)).toEqual(['33,728', '67,256', '0,914']);
     await expect(panel.getByText(/Pilar · centro da seção na base · em metros/)).toBeVisible();

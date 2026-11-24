@@ -4,8 +4,8 @@ import type { SyncState } from './centroidSync';
 const num = (n: number) => n.toLocaleString('pt-BR');
 
 const EXPLAIN =
-  'As peças de cada marca (PP001-1, PP001-2…) são numeradas pela sequência de montagem: X, depois ' +
-  'Y, depois Z (como o Dynamo), pelo centro de gravidade. Isso é feito uma única vez, na primeira ' +
+  'As peças de cada marca (PP001-1, PP001-2…) são numeradas pela sequência de montagem: Z (de baixo ' +
+  'para cima), depois X, depois Y, pelo centro de gravidade. Isso é feito uma única vez, na primeira ' +
   'abertura do 3D, e só enquanto nenhuma peça tem valor preenchido. Depois os números não mudam mais.';
 
 /** Situação da numeração das peças na barra do modelo (passo 2, 2026-11-18). */

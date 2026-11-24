@@ -12,7 +12,7 @@ function ruleText(kind: PieceKind, rule: string): string {
   return `centro em planta na ${rule}`;
 }
 
-/** "Coordenadas do eixo (ponto base do projeto)": metros, 3 casas, copiar "X; Y; Z". */
+/** "Coordenadas do eixo (origem interna)": metros, 3 casas, copiar "X; Y; Z". */
 export function AxisCoordinatesSection({ state }: { state: AxisState }) {
   const [copied, setCopied] = useState<string | null>(null);
   useEffect(() => {
@@ -34,7 +34,7 @@ export function AxisCoordinatesSection({ state }: { state: AxisState }) {
 
   return (
     <section className="model-sec" aria-labelledby="axis-coords">
-      <h4 id="axis-coords">Coordenadas do eixo (ponto base do projeto)</h4>
+      <h4 id="axis-coords">Coordenadas do eixo (origem interna)</h4>
       {state.status === 'loading' && <p className="muted small">Calculando…</p>}
       {state.status === 'error' && (
         <p role="alert" className="error small">
@@ -83,9 +83,7 @@ export function AxisCoordinatesSection({ state }: { state: AxisState }) {
               })}
             </tbody>
           </table>
-          {state.data.noReference && (
-            <p className="hint">O modelo não informa o ponto base do projeto: valores relativos à origem do arquivo.</p>
-          )}
+          <p className="hint">Valores relativos à origem interna do arquivo.</p>
         </>
       )}
     </section>

@@ -18,7 +18,7 @@ import {
   piecesCentroids,
   pieceCoordinates,
   sub,
-  toProjectBase,
+  toInternalOrigin,
   unit,
   type GeometrySource,
 } from './coordinates';
@@ -103,15 +103,26 @@ describe('eixo da peça (peças sintéticas)', () => {
   });
 });
 
-describe('conversão para o ponto base do projeto', () => {
-  it('globalOffset, refPointTransformation (giro + translação) e unidade → metros', () => {
-    const c = Math.cos(0.3);
-    const s = Math.sin(0.3);
-    const frame: ModelFrame = { globalOffset: [5, 6, 7], unitScaleToM: 0.3048, refPointTransformation: [c, s, 0, -s, c, 0, 0, 0, 1, 10, 20, 1] };
-    const local: Vec3 = [2, 3, 4]; // pés, no sistema do ponto base
-    const model = add([10, 20, 1], [c * 2 - s * 3, s * 2 + c * 3, 4]);
-    near(toProjectBase(sub(model, frame.globalOffset), frame), mul(local, 0.3048), 1e-9);
-    near(toProjectBase([1, 2, 3], { ...frame, refPointTransformation: null }), mul([6, 8, 10], 0.3048), 1e-9);
+describe('conversão para a origem interna do arquivo', () => {
+  it('globalOffset e unidade → metros; a refPointTransformation não entra', () => {
+    const frame: ModelFrame = { globalOffset: [5, 6, 7], unitScaleToM: 0.3048, refPointTransformation: null };
+    near(toInternalOrigin([1, 2, 3], frame), mul([6, 8, 10], 0.3048), 1e-9);
+  });
+
+  it('modelo georreferenciado (obra GUI, 2026-11-19): fica perto da origem, não em UTM', () => {
+    // valores reais do RVT da GUI: ponto de levantamento em UTM (pés) com giro de 32,7°
+    const frame: ModelFrame = {
+      globalOffset: [161.31890439987183, -96.9816268554194, 52.411418437957764],
+      unitScaleToM: 0.3048,
+      refPointTransformation: [
+        0.8413011106041477, -0.540566777832515, 0, 0.540566777832515, 0.8413011106041477, 0, 0, 0, 1,
+        1001475.624403609, 24295846.125305187, 2466.1089238845143,
+      ],
+    };
+    // canto da caixa do modelo (mundo do Viewer, pés)
+    const xyz = toInternalOrigin([166.96194887161255, 125.62336002497507, 64.55052614212036], frame);
+    near(xyz, [(166.96194887161255 + 161.31890439987183) * 0.3048, (125.62336002497507 - 96.9816268554194) * 0.3048, (64.55052614212036 + 52.411418437957764) * 0.3048], 1e-9);
+    expect(xyz.every((v) => Math.abs(v) < 1000)).toBe(true);
   });
 
   it('formato: metros, 3 casas, vírgula decimal; copiar "X; Y; Z"', () => {
@@ -213,7 +224,6 @@ describe('membro principal de concreto', () => {
     const r = await pieceCoordinates(source(nodes, geometry), 11);
     expect(r.kind).toBe('viga');
     near((r.rows.at(1)?.xyz ?? NO), [8, 0, 4.8], 1e-9);
-    expect(r.noReference).toBe(true);
   });
 });
 

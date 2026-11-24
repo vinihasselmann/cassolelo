@@ -75,7 +75,7 @@ describe('Coordenadas do eixo no painel', () => {
     renderWithProviders(<Harness viewer={adapter} dbId={86} />);
 
     const table = await screen.findByRole('table', { name: 'Coordenadas do eixo' });
-    expect(screen.getByRole('heading', { name: 'Coordenadas do eixo (ponto base do projeto)' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Coordenadas do eixo (origem interna)' })).toBeInTheDocument();
     expect(screen.getByText(/Pilar · centro da seção na base · em metros/)).toBeInTheDocument();
     const rows = within(table).getAllByRole('row');
     expect(rows).toHaveLength(2); // cabeçalho + 1

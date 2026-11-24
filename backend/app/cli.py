@@ -39,7 +39,14 @@ from app.db import create_engine, create_sessionmaker
 from app.models import ModelVersion, Obra, User
 from app.models.enums import Role, VersionStatus
 from app.observability import alerts
-from app.services import audit, invalid_dates, mark_origin, piece_props, piece_type
+from app.services import (
+    audit,
+    invalid_dates,
+    mark_origin,
+    piece_props,
+    piece_type,
+    unit_sequence,
+)
 from app.services import versions as versions_service
 from app.services import webhooks as hooks_service
 from app.services.errors import DomainError
@@ -112,6 +119,15 @@ def _parser() -> argparse.ArgumentParser:
     for name in ("activate", "deactivate"):
         c = users_cmds.add_parser(name, help=f"{'re' if name == 'activate' else 'des'}ativa")
         c.add_argument("email")
+    units_cmd = sub.add_parser("units", help="unidades de peça (PP001-1, PP001-2…)")
+    units_cmds = units_cmd.add_subparsers(dest="cmd", required=True)
+    renum = units_cmds.add_parser(
+        "renumber",
+        help="renumera uma obra já numerada pela sequência na ordem atual Z → X → Y (auditado)",
+    )
+    renum.add_argument("--obra", type=int, required=True, help="id da obra")
+    renum.add_argument("--yes", action="store_true", help="grava (sem ele, só mostra quantas)")
+    renum.add_argument("--user", help="e-mail de quem decide (padrão: 1º admin)")
     sync_cmd = sub.add_parser("sync", help='"Sincronizar agora" (uma obra ou todas as ativas)')
     target = sync_cmd.add_mutually_exclusive_group(required=True)
     target.add_argument("--obra", type=int, help="id da obra")
@@ -237,6 +253,36 @@ async def _backfill_piece_props(session: AsyncSession, version_id: int | None) -
     return 0
 
 
+async def _renumber_units(session: AsyncSession, args: argparse.Namespace) -> int:
+    """Renumera uma obra já numerada pela sequência na ordem atual (decisão do usuário)."""
+    actor = await session.scalar(
+        select(User)
+        .where(User.email == args.user if args.user else User.role == Role.ADMIN.value)
+        .order_by(User.id)
+        .limit(1)
+    )
+    if actor is None:
+        print("ERRO: usuário não encontrado (use --user com o e-mail).", file=sys.stderr)
+        return 2
+    try:
+        r = await unit_sequence.renumber_obra(session, args.obra, actor, apply=args.yes)
+    except (DomainError, ValueError) as exc:
+        print(f"ERRO: {getattr(exc, 'message', exc)}", file=sys.stderr)
+        return 2
+    if not r.applied:
+        print(
+            f"Obra {args.obra}, versão {r.version_id}: {r.changed} de {r.pieces} peças mudariam "
+            "de número (Z → X → Y). Nada gravado; use --yes para gravar."
+        )
+        return 0
+    await session.commit()
+    print(
+        f"Obra {args.obra}, versão {r.version_id}: {r.changed} peças renumeradas em "
+        f"Z → X → Y (por {actor.name})."
+    )
+    return 0
+
+
 async def _dates(session: AsyncSession, args: argparse.Namespace) -> int:
     """Datas inválidas (docs/bugs/data-por-peca.md): listar, limpar ou corrigir."""
     if args.cmd == "list":
@@ -320,6 +366,8 @@ async def run(
         return await _backfill_piece_props(session, None if args.all else args.version)
     if args.group == "dates":
         return await _dates(session, args)
+    if args.group == "units":
+        return await _renumber_units(session, args)
     if args.group == "users":
         return await _users(session, args)
     if args.group == "sync":

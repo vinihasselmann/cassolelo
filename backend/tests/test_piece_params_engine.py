@@ -303,7 +303,7 @@ async def test_excel_pieces_sheet_has_unit_and_piece_params(
         "X (m)",  # centro de gravidade (vazio sem coordenadas no pedido)
         "Y (m)",
         "Z (m)",
-        "Ordem de montagem",  # sequência X → Y → Z (vazia sem coordenadas)
+        "Ordem de montagem",  # sequência Z → X → Y (vazia sem coordenadas)
         "Data de fabricação",
         "Obs. da viga",
     ]

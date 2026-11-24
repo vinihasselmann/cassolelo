@@ -16,7 +16,7 @@ interface Options {
 /**
  * Com o 3D carregado, manda ao servidor os centros de gravidade das peças que ele ainda
  * não tem (uma vez por versão, em segundo plano). Na obra com numeração provisória, é isso
- * que numera as peças pela sequência de montagem (X → Y → Z).
+ * que numera as peças pela sequência de montagem (Z → X → Y).
  */
 export function useCentroidSync({ obraId, versionId, viewer, modelReady, pieceDbIds }: Options): {
   status: CentroidStatus | undefined;

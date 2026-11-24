@@ -37,6 +37,7 @@ class Obra(TimestampMixin, AuthorMixin, Base):
         UniqueConstraint("code", name="uq_obras_code"),
         CheckConstraint(check_in("acc_file_state", AccFileState), name="ck_obras_acc_file_state"),
         CheckConstraint(check_in("unit_numbering", UnitNumbering), name="ck_obras_unit_numbering"),
+        CheckConstraint("sequence_axes IN ('zxy', 'xyz')", name="ck_obras_sequence_axes"),
     )
 
     id: Mapped[int] = mapped_column(BigInteger, Identity(), primary_key=True)
@@ -59,6 +60,11 @@ class Obra(TimestampMixin, AuthorMixin, Base):
     # renumerada pela sequência de montagem, se a obra ainda não tem valores por peça.
     unit_numbering: Mapped[str] = mapped_column(
         String(12), default=UnitNumbering.PROVISIONAL, server_default=text("'provisional'")
+    )
+    # Ordem dos eixos com que os números foram dados (assembly_order): `zxy`; `xyz` nas
+    # obras numeradas antes de 2026-11-19. A ligação pela ordem (NWD) usa a da obra.
+    sequence_axes: Mapped[str] = mapped_column(
+        String(3), default="zxy", server_default=text("'zxy'")
     )
     # Regra de identificação das peças (nulo = padrão do servidor): parâmetros do modelo
     # que dão a marca e a categoria, em ordem de prioridade.

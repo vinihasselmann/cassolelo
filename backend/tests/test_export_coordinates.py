@@ -1,7 +1,7 @@
 """Excel: colunas X/Y/Z (centro de gravidade) e sequência de montagem (2026-11-18).
 
-Ordem de montagem: X → Y → Z, crescente, faixas de 0,10 m (a mesma ordem do Dynamo da
-equipe; revisto em 2026-11-18). As linhas ficam por marca e número da peça (PP001-1,
+Ordem de montagem: Z → X → Y, crescente, faixas de 0,10 m (de baixo para cima; decisão
+de 2026-11-19, volta à proposta inicial). As linhas ficam por marca e número da peça (PP001-1,
 PP001-2… seguidas); a sequência vai na coluna "Ordem de montagem".
 Usa a obra da fixture `ctx` de test_export.py (6 peças com marca).
 """
@@ -12,6 +12,7 @@ import io
 from typing import Any
 
 import httpx
+import pytest
 from openpyxl import load_workbook
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -24,25 +25,33 @@ from tests.test_export import ctx as ctx  # fixture
 # ------------------------------------------------------------------ ordem (função pura)
 
 
-def test_x_first_then_y_then_z() -> None:
-    """Como o Dynamo: X decide antes de tudo, mesmo com a peça mais alta."""
-    items = [("x5-baixo", (5.0, 0.0, 2.6)), ("x0-topo", (0.0, 0.0, 13.6))]
-    assert sequence(items) == ["x0-topo", "x5-baixo"]
+def test_z_first_then_x_then_y() -> None:
+    """De baixo para cima: o Z decide antes de tudo, mesmo com X maior."""
+    items = [("x0-topo", (0.0, 0.0, 13.6)), ("x5-baixo", (5.0, 9.0, 2.6))]
+    assert sequence(items) == ["x5-baixo", "x0-topo"]
 
 
-def test_same_band_in_x_decides_by_y_then_z() -> None:
+def test_same_band_in_z_decides_by_x_then_y() -> None:
     items = [
-        ("b", (2.62, 5.0, 0.0)),
-        ("a", (2.60, 0.0, 9.0)),  # 2 cm em X: mesma faixa de X → decide o Y
-        ("c", (2.61, 5.04, -1.0)),  # mesmo Y (faixa de 0,10) que "b" → decide o Z
+        ("b", (5.0, 0.0, 2.62)),
+        ("a", (0.0, 9.0, 2.60)),  # 2 cm em Z: mesma faixa de Z → decide o X
+        ("c", (5.04, -1.0, 2.61)),  # mesmo X (faixa de 0,10) que "b" → decide o Y
     ]
     assert sequence(items) == ["a", "c", "b"]
 
 
 def test_band_starts_at_first_value() -> None:
-    """Faixas contadas do início: 0,00 / 0,08 juntos; 0,15 já é outra faixa de X."""
-    items = [("x15", (0.15, 0.0, 0.0)), ("x08", (0.08, 9.0, 0.0)), ("x00", (0.0, 5.0, 0.0))]
-    assert sequence(items) == ["x00", "x08", "x15"]
+    """Faixas contadas do início: 0,00 / 0,08 juntos; 0,15 já é outra faixa de Z."""
+    items = [("z15", (0.0, 0.0, 0.15)), ("z08", (9.0, 0.0, 0.08)), ("z00", (5.0, 0.0, 0.0))]
+    assert sequence(items) == ["z00", "z08", "z15"]
+
+
+def test_legacy_xyz_order_for_obras_numbered_before() -> None:
+    """X → Y → Z: a ordem das obras numeradas antes de 2026-11-19 (ligação no NWD)."""
+    items = [("x5-baixo", (5.0, 0.0, 2.6)), ("x0-topo", (0.0, 0.0, 13.6))]
+    assert sequence(items, order="xyz") == ["x0-topo", "x5-baixo"]
+    with pytest.raises(ValueError):
+        sequence(items, order="yzx")
 
 
 def test_identical_points_keep_input_order() -> None:
@@ -81,8 +90,9 @@ async def test_pieces_sheet_by_mark_with_xyz_and_assembly_order_column(
     by_mark = _rows(load_workbook(io.BytesIO(r0.content))["Peças"])  # sem coordenadas
     dbids = await _dbids(session, ctx)
     assert len(dbids) == 6
-    # X decrescente pela ordem de dbId: a ordem de montagem é a INVERSA; a última fica sem
-    coords = {str(d): [10.0 - i * 2.5, 1.0, float(i)] for i, d in enumerate(dbids[:-1])}
+    # Z decrescente pela ordem de dbId (X crescente, para provar que o Z decide antes): a
+    # ordem de montagem é a INVERSA; a última fica sem
+    coords = {str(d): [float(i), 1.0, 10.0 - i * 2.5] for i, d in enumerate(dbids[:-1])}
     r = await _post(client, ctx, coords)
     assert r.status_code == 200, r.text
     wb = load_workbook(io.BytesIO(r.content))
@@ -96,7 +106,7 @@ async def test_pieces_sheet_by_mark_with_xyz_and_assembly_order_column(
     assert [order[d] for d in reversed(dbids[:-1])] == [1, 2, 3, 4, 5]
     assert order[dbids[-1]] is None  # sem coordenada: sem ordem
     first = next(p for p in rows if p["Ordem de montagem"] == 1)
-    assert (first["X (m)"], first["Y (m)"], first["Z (m)"]) == (0.0, 1.0, 4.0)
+    assert (first["X (m)"], first["Y (m)"], first["Z (m)"]) == (4.0, 1.0, 0.0)
     assert wb["Peças"].cell(row=2, column=7).number_format == "0.000"
     header = [c.value for c in wb["Peças"][1]]
     assert header[6:10] == ["X (m)", "Y (m)", "Z (m)", "Ordem de montagem"]
@@ -106,7 +116,7 @@ async def test_pieces_sheet_by_mark_with_xyz_and_assembly_order_column(
     assert "origem interna" in str(about["Coordenadas"])
     assert about["Ordem das peças"] == (
         'por marca e número da peça; coluna "Ordem de montagem": sequência de montagem '
-        "X → Y → Z, crescente, em faixas de 0,10 m (ordene por ela); "
+        "Z → X → Y, crescente, em faixas de 0,10 m (ordene por ela); "
         "1 peça(s) sem coordenada, sem ordem de montagem"
     )
 
@@ -160,4 +170,4 @@ async def test_stored_centroids_are_used_without_browser_coordinates(
     order = {p["dbId"]: p["Ordem de montagem"] for p in _rows(wb["Peças"])}
     assert [order[d] for d in reversed(dbids)] == [1, 2, 3, 4, 5, 6]
     about = dict((row[0].value, row[1].value) for row in wb["Sobre"].iter_rows())
-    assert "X → Y → Z" in str(about["Ordem das peças"])
+    assert "Z → X → Y" in str(about["Ordem das peças"])

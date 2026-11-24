@@ -2056,3 +2056,56 @@ são aplicadas.
    centenas de marcas.
 2. Ideia, não feita: importar de uma planilha própria da fábrica (sem a aba "Sobre"),
    escolhendo as colunas na tela.
+
+## Sequência de montagem Z → X → Y (2026-11-19)
+
+O usuário pediu a volta à ordem proposta no início: **Z → X → Y**, crescente (de baixo para cima; na mesma altura, por X e depois por Y). Mantidos a faixa de 0,10 m e o centro de gravidade.
+
+- `assembly_order`: ordem atual `zxy`; `sequence(..., order=)` aceita também `xyz` (a ordem antiga). Excel ("Ordem de montagem" e aba "Sobre"), aviso da numeração no 3D e comentários com o texto novo.
+- **Proteção das obras já numeradas.** Numa obra `sequence` em NWD, cada versão nova liga as peças pela ordem; se a ordem mudasse, PP001-3 cairia noutra peça física, com os valores junto. A 9121 (id 19) tem 675 valores por peça, então os números dela são definitivos e não podem ser renumerados pela regra. Por isso:
+  - migração `0022`: `obras.sequence_axes` (`zxy` padrão; `xyz` para as obras já `sequence`). Aplicada no banco de dev: só a 9121 ficou `xyz`;
+  - a ligação pela ordem usa a ordem da obra; a renumeração (obra provisória) usa sempre `zxy` e grava `zxy` na obra;
+  - o Excel usa sempre a ordem atual (Z → X → Y), inclusive na 9121, onde a coluna "Ordem de montagem" passa a não bater com os números das peças.
+- **Testes**: ordem Z → X → Y e faixas (função pura), ordem antiga `xyz`, renumeração em Z, obra antiga em NWD ligando pela ordem dela, migração 0022 (só a `sequence` fica `xyz`), Excel; Playwright do Excel confere Z crescente. Resultado: backend 961 ok (+1 skip; `test_search_perf` passa sozinho e estoura o tempo só na suíte completa, sem relação com esta mudança), ruff ok, mypy ok; frontend 301 ok (+2 todo), tsc ok, eslint ok; Playwright do Excel ok (tablet e desktop).
+
+**9121 renumerada (decisão do usuário, 2026-11-19).** Comando novo `python -m app.cli units renumber --obra N [--yes] [--user e-mail]`, que chama `unit_sequence.renumber_obra`. Só aceita obra `sequence`, com a versão mais recente pronta e todos os centros de gravidade guardados. Sem `--yes`, só conta. A renumeração permuta os números de cada marca na ordem atual: os valores ficam nas mesmas unidades (mesmas peças físicas) e só os rótulos mudam. Grava `sequence_axes = 'zxy'`. Auditoria por unidade (`piece_unit`/`renumber`) e na obra (`unit_numbering`, com o estado anterior e `reason: manual`), evento `units_renumbered`. No dev: obra 19, versão 38, **535 de 1.433 peças** mudaram de número, os 675 valores por peça continuam nas mesmas peças, e a obra ficou `zxy`. Testes (3): conferência sem gravar, valor seguindo a peça física, versão nova ligando pela ordem nova, estados recusados e a CLI. Suíte: backend 964 ok (+1 skip), ruff ok, mypy ok. `test_search_perf` caiu na suíte completa com `WinError 121` (conexão do Windows com o Postgres do Docker) e passa sozinho.
+
+**Falta**
+1. Etiquetas ou planilhas da 9121 feitas antes de 2026-11-19 usam os números antigos. O de-para está na auditoria (`piece_unit`/`renumber`).
+
+## Excel recusado na obra GUI: coordenadas em UTM (2026-11-19)
+
+**Sintoma:** "Dados inválidos. Confira os campos e tente de novo" ao exportar o Excel da obra GUI (id 20, RVT de Guarulhos). Os centros de gravidade da obra também nunca foram guardados (0 de 363).
+
+**Causa:** o RVT é georreferenciado. A `refPointTransformation` traz o ponto de levantamento em UTM, e a conversão "ponto base" dava X ≈ 3.746.325 m e Y ≈ −6.395.179 m em todas as peças. O servidor recusa coordenadas acima de ±1.000 km (422) no `PUT /centroids` e no `POST /export.xlsx`. Diagnóstico feito com o Viewer real (Playwright capturando os corpos e o AEC do modelo).
+
+**Correção**
+- `viewer/coordinates.ts`: `toProjectBase` virou `toInternalOrigin`: (mundo + globalOffset) × unidade, sem a `refPointTransformation`. É a referência confirmada pelo usuário; nos modelos já testados, a transformação era identidade e nada muda neles. O painel passa a se chamar "Coordenadas do eixo (origem interna)" e sempre avisa a referência.
+- `api/centroids.ts`: `roundedCoordinates` deixa de fora coordenadas não finitas ou acima de ±1.000 km. Uma peça estranha fica sem coordenada, em vez de o servidor recusar todas.
+- No dev, a GUI agora tem os 363 centros, com valores na escala da obra (por exemplo 15,72 / −36,72 / 9,66 m), e o Excel sai com status 200 (conferido no Viewer real).
+- Numeração da GUI: tinha ficado `fixed`, porque um valor por peça foi gravado e depois apagado enquanto os centros eram recusados. Sem nenhum valor por peça, `units renumber` passou a aceitar uma obra `fixed` vazia. A GUI foi renumerada em Z → X → Y: 317 de 363 peças mudaram de número, e a obra agora é `sequence`/`zxy`.
+- **Testes:**
+  - Vitest:
+    - conversão para a origem interna, com os números reais da GUI;
+    - filtro das coordenadas (`centroids.test.ts`).
+  - Backend:
+    - `fixed` sem valores renumera; com valor, é recusada.
+  - Resultado:
+    - frontend 304 ok (+2 todo), tsc e eslint ok;
+    - backend 965 ok (+1 skip), ruff e mypy ok;
+    - `test_search_perf` só cai na suíte completa (conexão do Windows com o Docker).
+
+**Falta**
+1. Se a fábrica quiser coordenadas no sistema do projeto (ponto base ou UTM), será um pedido novo. Hoje é sempre a origem interna.
+2. Mensagem do 422 no navegador: segue genérica ("Dados inválidos"). Com o filtro, as coordenadas não devem mais causar isso.
+
+## Lupa na lista de marcas (2026-11-24)
+
+- Cabeçalho da coluna esquerda: botão com ícone de lupa ao lado de "Tipo ▾". Abre um campo "Nome da peça" (com foco) que filtra a lista pelo nome da marca: trecho em qualquer posição, sem diferenciar maiúsculas nem acentos (`012` acha PP012 e VA012).
+- Soma com o filtro Tipo e com o filtro do 3D; o total no título passa a contar o que sobrou. Só filtra a lista: não muda a seleção no 3D.
+- Sem resultado: "Nenhuma peça com "…" no nome.". Esc ou clicar de novo na lupa fecha e limpa a busca.
+- Arquivos: `FilterResultList.tsx`, `components/Icon.tsx` (ícone `search`), `lib/normalizeName.ts`, `styles.css` (`.name-search`).
+- Testes: `features/filtro/NameSearch.test.tsx` (4 novos); `PieceTypeFilter.test.tsx` ajustado ao novo botão. tsc, ESLint e Vitest de `features/filtro` (21) passando.
+
+### Falta
+- Conferir no tablet real (largura do cabeçalho com lupa + Tipo).

@@ -48,8 +48,8 @@ describe('filtro Tipo da lista', () => {
   it('fica ao lado do título (sem "Selecionar todas") e só mostra os tipos que existem, com contagem', async () => {
     renderList();
     const head = screen.getByRole('heading', { level: 3 }).parentElement as HTMLElement;
-    const buttons = within(head).getAllByRole('button').map((b) => b.textContent);
-    expect(buttons).toEqual(['Tipo ▾']);
+    const buttons = within(head).getAllByRole('button').map((b) => b.getAttribute('aria-label') ?? b.textContent);
+    expect(buttons).toEqual(['Buscar peça pelo nome', 'Tipo ▾']);
     await userEvent.setup().click(screen.getByRole('button', { name: /Tipo/ }));
     const menu = screen.getByRole('group', { name: 'Tipo de peça' });
     expect(within(menu).getAllByRole('checkbox').map((c) => c.parentElement?.textContent)).toEqual([

@@ -8,7 +8,7 @@ Status, uma coluna por parâmetro ativo da obra ("Nome (unidade)"), Última alte
 Autor (só os parâmetros POR MARCA). Aba "Peças": Marca, Categoria, externalId, Nível,
 dbId, Peça (unidade de peça, ex.: PP001-3), X, Y, Z (m; centro de gravidade, quando o
 navegador as manda ou o servidor já as tem), "Ordem de montagem" (posição na sequência
-X -> Y -> Z da obra, faixas de 0,10 m; assembly_order.py) e uma coluna por parâmetro POR
+Z -> X -> Y da obra, faixas de 0,10 m; assembly_order.py) e uma coluna por parâmetro POR
 PEÇA (P3). As linhas ficam sempre por marca e número da peça.
 Aba "Sobre": obra, versão, filtros, quando e quem gerou.
 
@@ -72,7 +72,7 @@ STATUS_LABELS = {
 }
 BASE_HEADERS = ["Marca", "Categoria", "Peças", "Seção", "Comprimento (cm)", "Status"]
 COORD_HEADERS = ["X (m)", "Y (m)", "Z (m)"]
-SEQ_HEADER = "Ordem de montagem"  # posição na sequência X → Y → Z da obra (1, 2, 3…)
+SEQ_HEADER = "Ordem de montagem"  # posição na sequência Z → X → Y da obra (1, 2, 3…)
 COORD_FMT = "0.000"
 NO_UNIT = 1 << 30  # peça sem unidade: depois das numeradas
 DATE_FMT = "dd/mm/yyyy"
@@ -339,7 +339,7 @@ async def build_workbook(
         if el.centroid
     }
     # Linhas por marca e, na marca, pelo número da peça (PP001-1, PP001-2… seguidas). A
-    # sequência de montagem da obra (X → Y → Z) vai na coluna "Ordem de montagem".
+    # sequência de montagem da obra (Z → X → Y) vai na coluna "Ordem de montagem".
     listed = [
         (m, el, units.get(el.id))
         for m in marks

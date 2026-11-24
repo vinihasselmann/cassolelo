@@ -58,7 +58,7 @@ class UnitNumbering(StrEnum):
 
     # ordem estável (nível, nome, id), à espera dos centros de gravidade do 3D
     PROVISIONAL = "provisional"
-    SEQUENCE = "sequence"  # renumeradas pela sequência de montagem (X → Y → Z)
+    SEQUENCE = "sequence"  # renumeradas pela sequência de montagem (Z → X → Y)
     FIXED = "fixed"  # travada na ordem estável (valores por peça antes dos centros)
 
 

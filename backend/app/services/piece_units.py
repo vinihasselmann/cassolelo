@@ -166,6 +166,7 @@ async def link_version(
             use_key=use_key,
             create=latest,
             by_sequence=by_sequence,
+            axes=obra.sequence_axes,
         )
         for link in result.links:
             if link.method == NEW:

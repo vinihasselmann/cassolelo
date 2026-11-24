@@ -1,5 +1,5 @@
 /**
- * Coordenadas do EIXO da peça clicada, relativas ao ponto base do projeto
+ * Coordenadas do EIXO da peça clicada, relativas à origem interna do arquivo
  * (método e resultados em docs/coordenadas.md).
  *
  * Só matemática e regras: não conhece o Autodesk Viewer (CLAUDE.md). A geometria e a
@@ -13,8 +13,8 @@
  *    de menor seção (o corpo prismático); pontas sem os trechos finos (< 20% da seção).
  * 4. Ponto pela regra de Z por tipo (AXIS_Z_RULE): pilar base|topo; viga meia altura|
  *    face inferior|face superior (início e fim); laje face inferior|face superior.
- * 5. Conversão: modelo = mundo + globalOffset; ponto base = Rᵀ·(modelo − t)
- *    (refPointTransformation); × unidade → metros.
+ * 5. Conversão: origem interna = (mundo + globalOffset) × unidade → metros (sem a
+ *    refPointTransformation; ver toInternalOrigin).
  */
 
 import type { DbId, GeometryPart, ModelFrame, ModelNode, Triangle, TriangleVisitor, Vec3 } from './ViewerAdapter';
@@ -377,17 +377,14 @@ export function pieceAxis(triangles: Triangle[], kind: PieceKind, rules: AxisZRu
 // ------------------------------------------------------------------ conversão
 
 /**
- * Mundo do Viewer → ponto base do projeto, em METROS:
- * modelo = mundo + globalOffset; pbp = Rᵀ·(modelo − t), R e t da refPointTransformation
- * (colunas X, Y, Z e origem); × unitScaleToM.
+ * Mundo do Viewer → ORIGEM INTERNA do arquivo, em METROS: (mundo + globalOffset) ×
+ * unitScaleToM. A refPointTransformation NÃO entra (decisão de 2026-11-19): a origem interna
+ * é a referência confirmada pelo usuário, e em modelos georreferenciados (ex.: obra GUI) a
+ * transformação traz o ponto de levantamento em UTM (E 305 km, N 7.405 km), o que dava
+ * milhões de metros e fazia o servidor recusar o Excel e os centros de gravidade.
  */
-export function toProjectBase(world: Vec3, frame: ModelFrame): Vec3 {
-  const m = add(world, frame.globalOffset);
-  const ref = frame.refPointTransformation;
-  if (!ref || ref.length < 12) return mul(m, frame.unitScaleToM);
-  const col = (i: number): Vec3 => [ref[3 * i] ?? 0, ref[3 * i + 1] ?? 0, ref[3 * i + 2] ?? 0];
-  const d = sub(m, col(3));
-  return mul([dot(col(0), d), dot(col(1), d), dot(col(2), d)], frame.unitScaleToM);
+export function toInternalOrigin(world: Vec3, frame: ModelFrame): Vec3 {
+  return mul(add(world, frame.globalOffset), frame.unitScaleToM);
 }
 
 // ------------------------------------------------------------------ peça clicada → membro
@@ -571,7 +568,7 @@ async function geometryParts(source: GeometrySource, dbId: DbId): Promise<Geomet
 }
 
 /**
- * Centro de gravidade da PEÇA (instância), em metros relativos ao ponto base do projeto:
+ * Centro de gravidade da PEÇA (instância), em metros relativos à origem interna do arquivo:
  * toda a geometria abaixo do nó da peça (corpo, consolos, dentes…), ponderada pelo volume
  * de cada parte; sem aço, alças, insertos, neoprene e aberturas (pelo nome).
  */
@@ -589,7 +586,7 @@ export async function pieceCentroid(source: GeometrySource, dbId: DbId): Promise
     total > 0
       ? parts.reduce<Vec3>((acc, p) => add(acc, mul(p.center, p.volume / total)), [0, 0, 0])
       : mul(parts.reduce<Vec3>((acc, p) => add(acc, p.center), [0, 0, 0]), 1 / parts.length);
-  return toProjectBase(world, frame);
+  return toInternalOrigin(world, frame);
 }
 
 /** Guarda os nós já lidos: pais, montagens e a raiz se repetem entre as peças. */
@@ -668,7 +665,7 @@ export async function piecesCentroids(
 
 export interface AxisRow {
   label: string;
-  /** metros, relativos ao ponto base do projeto */
+  /** metros, relativos à origem interna do arquivo */
   xyz: Vec3;
 }
 
@@ -679,8 +676,6 @@ export interface AxisCoordinates {
   rows: AxisRow[];
   /** pontos de mundo do Viewer para o marcador (1 = ponto; 2 = linha) */
   marker: Vec3[];
-  /** o modelo não tem ponto de referência: coordenadas relativas à origem do arquivo */
-  noReference: boolean;
 }
 
 /** Coordenadas do eixo da peça clicada (a instância, não a marca). */
@@ -698,9 +693,8 @@ export async function pieceCoordinates(
     kind,
     rule: axis.rule,
     member: { dbId: member.dbId, name: member.name },
-    rows: axis.points.map((p) => ({ label: p.label, xyz: toProjectBase(p.world, frame) })),
+    rows: axis.points.map((p) => ({ label: p.label, xyz: toInternalOrigin(p.world, frame) })),
     marker: axis.points.map((p) => p.world),
-    noReference: !frame.refPointTransformation,
   };
 }
 

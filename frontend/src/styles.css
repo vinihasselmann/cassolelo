@@ -337,6 +337,10 @@ button.link.danger:disabled { color: var(--text-muted); }
   box-shadow: 0 4px 14px rgb(0 0 0 / 14%); font-size: var(--fs-list);
 }
 .type-filter__menu .link { align-self: flex-start; font-size: var(--fs-list-meta); }
+/* lupa: busca a marca pelo nome (2026-11-24) */
+.name-search__btn { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: var(--tap-sm); min-height: var(--tap-sm); }
+.name-search__btn--on { color: var(--text); }
+.name-search { margin-top: 6px; }
 .type-filter__all { padding-bottom: 4px; border-bottom: 1px solid var(--border-subtle); font-weight: 600; }
 .mark-item--loose .mark-item__code { font-style: italic; font-weight: 500; }
 .pager { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; }
