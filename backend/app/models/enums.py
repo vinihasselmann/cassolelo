@@ -75,6 +75,14 @@ class ParamLevel(StrEnum):
     PIECE = "piece"
 
 
+class ParamSource(StrEnum):
+    """Quem preenche o parâmetro (2026-11-24). PLANNIX = só a importação da planilha do
+    Plannix grava; na tela fica só leitura."""
+
+    MANUAL = "manual"
+    PLANNIX = "plannix"
+
+
 class UnitStatus(StrEnum):
     """Situação da unidade de peça na versão mais recente processada da obra."""
 

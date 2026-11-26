@@ -28,7 +28,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.exc import StaleDataError
 
 from app.models import AuditLog, Mark, ParamDef, ParamValue, User
-from app.models.enums import ParamType
+from app.models.enums import ParamSource, ParamType
 from app.services import audit, events, piece_props, review
 from app.services.errors import ConflictError, NotFoundError, ValidationError
 from app.services.param_defs import in_obra as param_in_obra
@@ -98,6 +98,17 @@ def normalize_date(raw: Any, param: ParamDef) -> str:
     if iso is None:
         raise ValidationError(DATE_INVALID, def_id=param.id, param=param.name, value=str(raw))
     return iso
+
+
+PLANNIX_READONLY = (
+    "{name} é preenchido pelo Plannix: altere no Plannix e importe a planilha de novo."
+)
+
+
+def ensure_editable(param: ParamDef) -> None:
+    """Parâmetro do Plannix só é gravado pela importação (2026-11-24): 422 na edição manual."""
+    if param.source == ParamSource.PLANNIX.value:
+        raise ValidationError(PLANNIX_READONLY.format(name=param.name))
 
 
 def normalize(param: ParamDef, raw: Any) -> Any:
@@ -248,6 +259,8 @@ async def save_values(
                 f"O parâmetro {c.def_id} não existe ou não se aplica a esta marca "
                 f"({mark.category})."
             )
+    for c in changes:
+        ensure_editable(params[c.def_id])
     normalized = {c.def_id: normalize(params[c.def_id], c.value) for c in changes}
 
     existing = {

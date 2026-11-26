@@ -32,6 +32,9 @@ interface Props {
 export function ParamDefDialog({ obraId, obraCode, categories, param, presetCategory, onClose, onSaved }: Props) {
   const queryClient = useQueryClient();
   const used = param?.values_count ?? 0;
+  // do Plannix: a importação acha o parâmetro pelo nome (nome, tipo, nível e escopo travados)
+  const plannix = param?.source === 'plannix';
+  const locked = used > 0 || plannix;
   const [name, setName] = useState(param?.name ?? '');
   const [type, setType] = useState<ParamType>(param?.type ?? 'text');
   const [unit, setUnit] = useState(param?.unit ?? '');
@@ -89,6 +92,12 @@ export function ParamDefDialog({ obraId, obraCode, categories, param, presetCate
             : `Usado em ${used} marca(s).`
           : 'O parâmetro fica disponível nas marcas a que se aplica e aparece no painel, na busca e nas cores.'}
       </p>
+      {plannix && (
+        <p className="hint" role="note">
+          Parâmetro do Plannix: os valores vêm só da importação da planilha. Nome, tipo, preenchimento e escopo não
+          mudam; dá para marcar ou desmarcar como obrigatório.
+        </p>
+      )}
       <form onSubmit={submit} noValidate>
         <div className="field">
           <label htmlFor="pd-name">
@@ -97,6 +106,7 @@ export function ParamDefDialog({ obraId, obraCode, categories, param, presetCate
           <input
             id="pd-name"
             value={name}
+            disabled={plannix}
             placeholder="Ex.: Tipo de forma, Ciclo de cura, Peça com insert"
             onChange={(e) => { setName(e.target.value); }}
           />
@@ -104,7 +114,7 @@ export function ParamDefDialog({ obraId, obraCode, categories, param, presetCate
 
         <div className="field">
           <label htmlFor="pd-type">Tipo</label>
-          <select id="pd-type" value={type} disabled={used > 0} onChange={(e) => { setType(e.target.value as ParamType); }}>
+          <select id="pd-type" value={type} disabled={locked} onChange={(e) => { setType(e.target.value as ParamType); }}>
             {Object.entries(PARAM_TYPE_LABELS).map(([value, label]) => (
               <option key={value} value={value}>
                 {label}
@@ -122,7 +132,7 @@ export function ParamDefDialog({ obraId, obraCode, categories, param, presetCate
               name="pd-level"
               value="mark"
               checked={level === 'mark'}
-              disabled={used > 0}
+              disabled={locked}
               onChange={() => { setLevel('mark'); }}
             />{' '}
             Por marca
@@ -134,7 +144,7 @@ export function ParamDefDialog({ obraId, obraCode, categories, param, presetCate
               name="pd-level"
               value="piece"
               checked={level === 'piece'}
-              disabled={used > 0}
+              disabled={locked}
               onChange={() => { setLevel('piece'); }}
             />{' '}
             Por peça
@@ -175,7 +185,7 @@ export function ParamDefDialog({ obraId, obraCode, categories, param, presetCate
 
         <div className="field">
           <label htmlFor="pd-scope">Escopo</label>
-          <select id="pd-scope" value={scope} disabled={used > 0} onChange={(e) => { setScope(e.target.value as ParamScope); }}>
+          <select id="pd-scope" value={scope} disabled={locked} onChange={(e) => { setScope(e.target.value as ParamScope); }}>
             <option value="global">Biblioteca (entra nesta obra; outras obras podem incluir)</option>
             <option value="obra">Somente esta obra{obraCode ? ` (${obraCode})` : ''}</option>
           </select>

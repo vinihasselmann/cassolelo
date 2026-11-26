@@ -366,3 +366,25 @@ describe('Cadastro: Por marca / Por peça', () => {
     expect(screen.getByRole('radio', { name: 'Por marca' })).toBeDisabled();
   });
 });
+
+describe('Datas do Plannix (2026-11-24)', () => {
+  it('ficam só leitura na tabela, com a etiqueta Plannix; sem parâmetro editável não há lote', async () => {
+    const plannix = (n: number): PieceUnit => ({ ...unit(n, '2026-11-10'), plannix_code: String(1000 + n) });
+    installFakeApi({
+      'GET /api/obras/7/marks/1/units': () => ({
+        ...markUnits([plannix(1), plannix(2)]),
+        params: [
+          { def_id: FAB, name: 'Concretagem', type: 'date', unit: null, required: false, options: null, source: 'plannix' },
+        ],
+      }),
+    });
+    renderSection();
+    const t = await table();
+    expect(within(t).getByRole('columnheader', { name: /Concretagem/ })).toHaveTextContent('Plannix');
+    expect(within(t).queryByRole('button', { name: /^Concretagem de PP001-1/ })).not.toBeInTheDocument();
+    expect(within(t).getAllByTitle('Preenchido pelo Plannix (só leitura)')).toHaveLength(3); // etiqueta + 2 células
+    expect(within(t).getAllByText('10/11/2026')).toHaveLength(2);
+    expect(screen.queryByRole('button', { name: /Preencher selecionadas/ })).not.toBeInTheDocument();
+    expect(within(t).queryByRole('checkbox')).not.toBeInTheDocument();
+  });
+});

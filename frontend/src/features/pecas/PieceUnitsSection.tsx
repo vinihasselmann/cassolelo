@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ApiError } from '../../api/client';
 import {
   fetchMarkUnits,
+  isEditable,
   markUnitsKey,
   saveUnitValues,
   type MarkUnits,
@@ -80,8 +81,15 @@ function ValueCell({ obraId, versionId, unit, param, canEdit, editing, setEditin
     save.mutate({ text, version: row_version });
   };
 
-  if (!canEdit) {
-    return <td className={shown ? 'pv-value' : 'muted'}>{shown ?? '—'}</td>;
+  if (!canEdit || !isEditable(param)) {
+    return (
+      <td
+        className={shown ? 'pv-value' : 'muted'}
+        title={isEditable(param) ? undefined : 'Preenchido pelo Plannix (só leitura)'}
+      >
+        {shown ?? '—'}
+      </td>
+    );
   }
   if (open) {
     return (
@@ -201,6 +209,8 @@ export function PieceUnitsSection({ obraId, markId, versionId, canEdit, focus, o
   const allChecked = rows.length > 0 && rows.every((u) => checked.has(u.id));
   const toggleAll = () => { setChecked(allChecked ? new Set() : new Set(rows.map((u) => u.id))); };
   const selected = rows.filter((u) => checked.has(u.id));
+  // só os do Plannix: nada a preencher aqui
+  const editable = canEdit && params.some(isEditable);
   const missing = withoutPiece(data.data.units);
 
   return (
@@ -214,7 +224,7 @@ export function PieceUnitsSection({ obraId, markId, versionId, canEdit, focus, o
           {error}
         </p>
       )}
-      {canEdit && (
+      {editable && (
         <div className="btn-row unit-actions">
           <button
             type="button"
@@ -230,7 +240,7 @@ export function PieceUnitsSection({ obraId, markId, versionId, canEdit, focus, o
         <table className="unit-table" aria-label="Peças da marca">
           <thead>
             <tr>
-              {canEdit && (
+              {editable && (
                 <th className="unit-check">
                   <input type="checkbox" aria-label="Marcar todas as peças" checked={allChecked} onChange={toggleAll} />
                 </th>
@@ -241,6 +251,11 @@ export function PieceUnitsSection({ obraId, markId, versionId, canEdit, focus, o
                 <th key={p.def_id}>
                   {fieldLabel(p)}
                   {p.required && <span className="req"> *</span>}
+                  {!isEditable(p) && (
+                    <span className="plannix-tag" title="Preenchido pelo Plannix (só leitura)">
+                      Plannix
+                    </span>
+                  )}
                 </th>
               ))}
               <th className="unit-meta">Nível</th>
@@ -259,7 +274,7 @@ export function PieceUnitsSection({ obraId, markId, versionId, canEdit, focus, o
                   aria-selected={isFocus}
                   onClick={() => { if (dbid !== undefined) onPickPiece(dbid); }}
                 >
-                  {canEdit && (
+                  {editable && (
                     <td className="unit-check" onClick={(e) => { e.stopPropagation(); }}>
                       <input
                         type="checkbox"

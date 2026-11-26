@@ -19,9 +19,13 @@ P5 (unidades órfãs): obra E2E-PECREV com DUAS versões (fixtures `pecas` → `
 v2 sem a peça pec-0012). A cada execução apaga as unidades da obra, processa a v1,
 preenche a "Data de fabricação" (hoje) só na unidade da peça pec-0012 e processa a v2:
 essa unidade fica ÓRFÃ com o valor.
+Plannix (2026-11-24): obra E2E-PLX (fixture `pecas`) zerada a cada execução: apaga as
+unidades da obra (com os valores e os Códigos do Plannix), retira dela os parâmetros do
+Plannix (sem apagá-los: são da biblioteca) e reprocessa a versão; a importação de
+`tests/e2e_plannix_xlsx.py` os cria ou inclui de novo.
 Imprime {"obra_id", "version_id", "param_def_id", "rev_obra_id", "rev_version_id",
 "pec_obra_id", "pec_version_id", "pec_param_def_id", "pecrev_obra_id",
-"pecrev_version_id"}.
+"pecrev_version_id", "plx_obra_id", "plx_version_id"}.
 Idempotente: rodar de novo reprocessa as mesmas versões.
 """
 
@@ -44,9 +48,11 @@ from app.config import get_settings
 from app.db import create_engine, create_sessionmaker
 from app.models import (
     ColorScheme,
+    Element,
     Mark,
     ModelVersion,
     Obra,
+    ObraParam,
     Orphan,
     ParamDef,
     ParamValue,
@@ -70,6 +76,8 @@ PEC_URN = "ZTJlLXBlY2Fz"
 PECREV_CODE = "E2E-PECREV"
 PECREV_URNS = {1: "ZTJlLXBlY3JldjE", 2: "ZTJlLXBlY3JldjI"}
 PECREV_FIXTURES = {1: "pecas", 2: "pecas_v2"}
+PLX_CODE = "E2E-PLX"  # igual à Sigla da planilha de tests/e2e_plannix_xlsx.py
+PLX_URN = "ZTJlLXBsYW5uaXg"
 REV_VALUES = {"PP001": "F-11", "PP003": "F-12", "PP004": "F-12", "PP005": "F-13"}
 
 
@@ -284,6 +292,50 @@ async def _piece_revisions(session: AsyncSession, config: ProcessingConfig) -> d
     return {"pecrev_obra_id": obra.id, "pecrev_version_id": versions[2].id}
 
 
+async def _plannix(session: AsyncSession, config: ProcessingConfig) -> dict[str, int]:
+    """Obra E2E-PLX: modelo `pecas` sem unidades, valores nem parâmetros do Plannix."""
+    obra = await session.scalar(select(Obra).where(Obra.code == PLX_CODE))
+    if obra is None:
+        obra = Obra(code=PLX_CODE, name="Obra de teste E2E · Plannix", active=False)
+        obra.acc_item_name = "modelo-plannix.rvt"
+        session.add(obra)
+        await session.flush()
+    version = await session.scalar(
+        select(ModelVersion).where(ModelVersion.acc_version_id == "e2e:plannix:1")
+    )
+    if version is None:
+        version = ModelVersion(
+            obra_id=obra.id,
+            acc_version_id="e2e:plannix:1",
+            version_number=1,
+            urn=PLX_URN,
+            published_by="E2E",
+        )
+        session.add(version)
+    version.status = "pending"
+    # Só esta obra é zerada: os parâmetros do Plannix são da biblioteca e podem ter
+    # valores em obras reais (o seed também roda no banco de dev); aqui só saem da obra.
+    plannix = select(ParamDef.id).where(ParamDef.source == "plannix")
+    await session.execute(
+        delete(ObraParam).where(ObraParam.obra_id == obra.id, ObraParam.def_id.in_(plannix))
+    )
+    units = select(PieceUnit.id).where(PieceUnit.obra_id == obra.id)
+    await session.execute(delete(PieceValue).where(PieceValue.unit_id.in_(units)))
+    await session.execute(delete(PieceUnitLink).where(PieceUnitLink.unit_id.in_(units)))
+    await session.execute(delete(PieceUnit).where(PieceUnit.obra_id == obra.id))
+    await session.execute(delete(SavedFilter).where(SavedFilter.obra_id == obra.id))
+    await session.execute(delete(ColorScheme).where(ColorScheme.obra_id == obra.id))
+    obra.unit_numbering = "provisional"
+    await session.commit()
+    await _process(session, version.id, "pecas", PLX_URN, config)
+    # sem centros: a 1ª abertura do 3D renumera as peças pela montagem (o teste espera por ela)
+    await session.execute(
+        update(Element).where(Element.version_id == version.id).values(centroid=None)
+    )
+    await session.commit()
+    return {"plx_obra_id": obra.id, "plx_version_id": version.id}
+
+
 async def main() -> dict[str, int]:
     settings = get_settings()
     engine = create_engine(settings.database_url)
@@ -327,6 +379,7 @@ async def main() -> dict[str, int]:
             ids |= await _revisions(session, replace(config, review_names=["Seção"]))
             ids |= await _pieces(session, config)
             ids |= await _piece_revisions(session, config)
+            ids |= await _plannix(session, config)
             return ids
     finally:
         await engine.dispose()

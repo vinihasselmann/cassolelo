@@ -28,7 +28,13 @@ from app.models import AuditLog, Mark, ParamDef, ParamValue, User
 from app.models.enums import Role
 from app.services import audit, events, piece_props, review
 from app.services.errors import ConflictError, ForbiddenError, NotFoundError, ValidationError
-from app.services.mark_values import AUDIT_ENTITY, _filled, applicable_params, normalize
+from app.services.mark_values import (
+    AUDIT_ENTITY,
+    _filled,
+    applicable_params,
+    ensure_editable,
+    normalize,
+)
 
 MAX_MARKS = 5000
 SOURCE = "batch"
@@ -155,6 +161,7 @@ def _normalize_changes(ctx: _Context, changes: dict[int, Any]) -> dict[int, Any]
             raise ValidationError(
                 f"O parâmetro {def_id} não existe ou não se aplica a nenhuma marca selecionada."
             )
+        ensure_editable(param)
         out[def_id] = normalize(param, raw)
     return out
 

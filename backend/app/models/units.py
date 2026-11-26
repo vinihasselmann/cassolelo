@@ -35,6 +35,13 @@ class PieceUnit(TimestampMixin, AuthorMixin, Base):
         CheckConstraint(check_in("status", UnitStatus), name="ck_piece_units_status"),
         CheckConstraint("number >= 1", name="ck_piece_units_number"),
         Index("ix_piece_units_obra_id_status", "obra_id", "status"),
+        Index(
+            "uq_piece_units_obra_plannix_code",
+            "obra_id",
+            "plannix_code",
+            unique=True,
+            postgresql_where=text("plannix_code IS NOT NULL"),
+        ),
     )
 
     id: Mapped[int] = mapped_column(BigInteger, Identity(), primary_key=True)
@@ -46,6 +53,8 @@ class PieceUnit(TimestampMixin, AuthorMixin, Base):
     status: Mapped[str] = mapped_column(
         String(10), default=UnitStatus.LINKED, server_default=text("'linked'")
     )
+    # "Código" da peça no Plannix, guardado na 1ª importação que a ligou (2026-11-24)
+    plannix_code: Mapped[str | None] = mapped_column(String(30))
     # versão em que ficou sem peça (status orphan/unlinked)
     since_version_id: Mapped[int | None] = mapped_column(
         BigInteger, ForeignKey("model_versions.id", ondelete="SET NULL")

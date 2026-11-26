@@ -23,6 +23,8 @@ export interface ParamDef {
   categories: string[] | null; // null = todas
   scope: ParamScope;
   level: ParamLevel;
+  /** "plannix" = criado e preenchido só pela importação do Plannix (só leitura) */
+  source?: 'manual' | 'plannix';
   obra_id: number | null;
   obra_code: string | null;
   active: boolean;

@@ -12,7 +12,7 @@ from app.api.obra_access import require_obra_access
 from app.auth import CurrentUser, Role, require_role
 from app.db import SessionDep
 from app.models import User
-from app.models.enums import ParamLevel, ParamScope, ParamType
+from app.models.enums import ParamLevel, ParamScope, ParamSource, ParamType
 from app.services import obra_access
 from app.services import param_defs as service
 from app.services.param_defs import ParamDefInfo, ParamDefInput
@@ -37,6 +37,7 @@ class ParamDefOut(BaseModel):
     categories: list[str] | None  # nulo = todas
     scope: ParamScope
     level: ParamLevel  # por marca ou por peça
+    source: ParamSource = ParamSource.MANUAL  # plannix = só a importação grava (só leitura)
     obra_id: int | None
     obra_code: str | None
     active: bool
@@ -89,6 +90,7 @@ def _out(info: ParamDefInfo) -> ParamDefOut:
         categories=p.categories,
         scope=ParamScope(p.scope),
         level=ParamLevel(p.level),
+        source=ParamSource(p.source),
         obra_id=p.obra_id,
         obra_code=info.obra_code,
         active=p.active,

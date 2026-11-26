@@ -16,7 +16,7 @@ from app.api.obra_access import OBRA_ROUTER_DEPS
 from app.auth import Role, require_role
 from app.db import SessionDep
 from app.models import User
-from app.services import excel_import
+from app.services import excel_import, plannix_import
 from app.services.errors import ValidationError
 
 router = APIRouter(prefix="/obras", tags=["import"], dependencies=OBRA_ROUTER_DEPS)
@@ -51,6 +51,30 @@ class ParamSummaryOut(BaseModel):
     changes: int
 
 
+class PlannixMarkOut(BaseModel):
+    code: str
+    plannix: int  # linhas da marca no Plannix (sem as recusadas)
+    model: int  # peças da marca na versão ativa
+
+
+class PlannixOutsideOut(BaseModel):
+    code: str
+    rows: int
+
+
+class PlannixOut(BaseModel):
+    """Só na planilha do Plannix (plannix_import)."""
+
+    rows: int  # linhas de peça lidas (sem as recusadas)
+    rejected: int  # peças recusadas na produção (ignoradas)
+    linked: int  # linhas ligadas a uma peça do app
+    new_links: int  # Códigos do Plannix guardados agora
+    leftovers: int  # linhas sem peça no modelo
+    new_params: list[str]  # parâmetros a criar na biblioteca
+    check_marks: list[PlannixMarkOut]  # quantidade diferente: conferir
+    outside_model: list[PlannixOutsideOut]  # marcas que não estão no modelo
+
+
 class ImportPreviewOut(BaseModel):
     obra_code: str
     file_version: str | None
@@ -66,6 +90,8 @@ class ImportPreviewOut(BaseModel):
     fill_items: list[ChangeOut]  # até MAX_LISTED
     change_items: list[ChangeOut]
     fingerprint: str
+    clears: int = 0  # alterações que apagam o valor (só no Plannix)
+    plannix: PlannixOut | None = None
 
 
 class ImportApplyOut(BaseModel):
@@ -135,6 +161,25 @@ async def import_preview(
         fill_items=_changes(plan.fills),
         change_items=_changes(plan.changes),
         fingerprint=plan.fingerprint,
+        clears=sum(1 for c in plan.changes if c.new is None),
+        plannix=_plannix(plan.plannix),
+    )
+
+
+def _plannix(info: plannix_import.PlannixInfo | None) -> PlannixOut | None:
+    if info is None:
+        return None
+    return PlannixOut(
+        rows=info.rows,
+        rejected=info.rejected,
+        linked=info.linked,
+        new_links=len(info.new_links),
+        leftovers=info.leftovers,
+        new_params=info.new_params,
+        check_marks=[PlannixMarkOut(**m.__dict__) for m in info.check_marks[:MAX_LISTED]],
+        outside_model=[
+            PlannixOutsideOut(code=c, rows=n) for c, n in info.outside_model[:MAX_LISTED]
+        ],
     )
 
 
@@ -147,7 +192,8 @@ async def import_apply(
     fingerprint: Annotated[str, Query(min_length=1, max_length=64)],
     overwrite: bool = False,
 ) -> ImportApplyOut:
-    """Grava os preenchimentos (e, com overwrite, as alterações) num lote só."""
+    """Grava os preenchimentos (e, com overwrite, as alterações) num lote só. A planilha do
+    Plannix sempre sobrescreve (e célula vazia apaga): `overwrite` não vale para ela."""
     plan, result = await excel_import.apply(
         session,
         obra_id,
@@ -162,6 +208,7 @@ async def import_apply(
         marks_changed=result.marks_changed,
         units_changed=result.units_changed,
         fields_changed=result.fields_changed,
-        skipped_changes=0 if overwrite else len(plan.changes),
+        # o Plannix sobrescreve sempre
+        skipped_changes=0 if overwrite or plan.plannix else len(plan.changes),
         errors=len(plan.errors),
     )

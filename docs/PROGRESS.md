@@ -2099,6 +2099,60 @@ O usuário pediu a volta à ordem proposta no início: **Z → X → Y**, cresce
 1. Se a fábrica quiser coordenadas no sistema do projeto (ponto base ou UTM), será um pedido novo. Hoje é sempre a origem interna.
 2. Mensagem do 422 no navegador: segue genérica ("Dados inválidos"). Com o filtro, as coordenadas não devem mais causar isso.
 
+## Importar a planilha do Plannix (2026-11-24)
+
+Pedido: o app reconhece as peças na exportação do Plannix e preenche sozinho as datas
+das etapas de produção. Análise da amostra (`plannix/tabela.xlsx`, obra 9480) e decisões
+em [plannix.md](plannix.md).
+
+- **Banco** (`0023`): `param_defs.source` (`manual` | `plannix`) e
+  `piece_units.plannix_code` (único na obra).
+- **Backend**
+  - `services/plannix_import.py` (novo): reconhece a planilha (sem aba "Sobre", com
+    Código/Peça/Sigla/Seq.), confere a obra pela Sigla, ignora as recusadas ("Status de
+    Projeto" vazio), tira o sufixo das lajes, desfaz a Seq. que o Excel virou data, liga
+    pelo Código guardado ou pela Seq. n → unidade n, avisa "conferir" e sobras, lista as
+    marcas fora do modelo. Grava as 6 datas (CD, AR, FO, FA, CO, Aca) por peça, sempre
+    sobrescrevendo e apagando com célula vazia, num lote com Desfazer; cria/inclui os
+    parâmetros e guarda os Códigos (auditados no mesmo lote).
+  - `excel_import.py` passa a planilha do Plannix para o serviço novo (mesmas rotas
+    `/import-xlsx/preview` e `/apply`) e não grava parâmetros do Plannix pelo Excel do app.
+  - Só leitura: `mark_values.ensure_editable` (422 "… é preenchido pelo Plannix") na
+    edição manual por marca e por peça, uma a uma e em lote.
+  - API: `PlannixOut` e `clears` na prévia; `source` em `ParamDefOut` e `PieceParamOut`;
+    `plannix_code` em `UnitOut`.
+- **Frontend**: o mesmo botão "Importar Excel" mostra, para o Plannix, o resumo (lidas,
+  ligadas, novas, recusadas, sem peça), os parâmetros a criar, as marcas para conferir e
+  as fora do modelo, a coluna "No Plannix" com "apagar"; sem "Também alterar". Na tabela
+  de peças as datas do Plannix ficam só leitura (etiqueta "Plannix"); o "Preencher
+  selecionadas" não as mostra.
+- **Dados de dev**: o parâmetro global "concretagem" (id 16, 575 valores nas obras 9121,
+  GUI e 9480) foi excluído pelo serviço (lógico, auditado), a pedido, para o Plannix
+  criar o seu "Concretagem".
+- **Aceite (prévia, nada gravado)** com `plannix/tabela.xlsx` na obra 9480: 1.464 peças
+  lidas, 10 recusadas, 1.186 ligadas, 44 sem peça no modelo, 52 marcas (234 linhas) fora
+  do modelo, 22 marcas para conferir, 0 erros (a Seq. foi lida em todas as linhas),
+  2.944 datas a preencher; cerca de 2 s.
+- **Testes**: `test_plannix_import.py` (19: Seq. em texto/dia-mês/mês-ano, sufixo da laje,
+  prévia sem gravar, criação dos parâmetros e Códigos, 2ª importação pelo Código com
+  sobrescrever/apagar e Desfazer, vaga tomada por outro Código, só leitura (422) e
+  `source` na API, obra errada/misturada, nome manual repetido, Seq./data inválidas,
+  papel leitura). Vitest: `ImportPlannix.test.tsx` (2) e só leitura em
+  `PieceUnitsSection.test.tsx` (1).
+- Resultado: backend 984 ok (+1 skip; o teste de desempenho do filtro com 20 mil peças
+  ficou acima de 1 s nesta máquina em duas rodadas, em consultas diferentes a cada vez,
+  sem relação com esta mudança), ruff ok, mypy ok; frontend 311 ok (+2 todo), eslint ok,
+  tsc ok. Playwright não rodado.
+
+### Falta
+1. Aplicar no dev (pela tela) e conferir com a fábrica as 22 marcas com quantidade
+   diferente e as 52 fora do modelo.
+2. E2E (Playwright) da importação do Plannix: exige que a semente do E2E limpe os
+   parâmetros do Plannix e os Códigos entre execuções.
+3. Decidir se as 6 datas devem ser obrigatórias no status (hoje são criadas como não
+   obrigatórias).
+4. Etiqueta "Plannix" também no catálogo de parâmetros.
+
 ## Lupa na lista de marcas (2026-11-24)
 
 - Cabeçalho da coluna esquerda: botão com ícone de lupa ao lado de "Tipo ▾". Abre um campo "Nome da peça" (com foco) que filtra a lista pelo nome da marca: trecho em qualquer posição, sem diferenciar maiúsculas nem acentos (`012` acha PP012 e VA012).
@@ -2109,3 +2163,48 @@ O usuário pediu a volta à ordem proposta no início: **Z → X → Y**, cresce
 
 ### Falta
 - Conferir no tablet real (largura do cabeçalho com lupa + Tipo).
+
+## Correção: "Excluir" no catálogo parecia não fazer nada (2026-11-24)
+
+- Causa: a confirmação de excluir/retirar aparecia no topo da janela do catálogo, acima
+  das listas. Com a lista rolada até o parâmetro, ela ficava fora da vista (caso do
+  "nome peça manual"; a auditoria confirma que nenhuma exclusão chegou ao servidor).
+- Correção (`CatalogDialog.tsx`, `styles.css`): a confirmação abre logo abaixo do
+  parâmetro clicado, com o foco no botão Excluir/Retirar, e o erro da exclusão aparece
+  dentro dela.
+- Teste: o fluxo de excluir em `ModelPage.test.tsx` confere que a confirmação está na linha
+  do parâmetro e com o foco. Frontend 311 ok, eslint ok, tsc ok.
+
+## Plannix: obrigatórias, etiqueta no catálogo, marcas com hífen e E2E (2026-11-24)
+
+Respostas às pendências da importação do Plannix: (1) conferir as 22 marcas da obra 9480
+fica para depois (a informação ainda não existe); (2) as 6 datas são obrigatórias;
+(3) etiqueta no catálogo; (4) E2E.
+
+- **Obrigatórias:** a importação cria as 6 datas com `required = true` (contam no status
+  da peça). No dev, a importação já tinha sido aplicada pela tela (ids 22–27, 1.186
+  Códigos, 2.944 datas) com os parâmetros não obrigatórios; marquei os 6 como
+  obrigatórios pelo serviço (`update_param`, auditado, usuário Ana Admin).
+- **Nome travado:** parâmetro do Plannix não muda de nome, tipo, por marca/por peça nem
+  escopo (422; a importação o acha pelo nome); "obrigatório" e categorias podem mudar. Na
+  janela de edição esses campos ficam desabilitados, com uma nota.
+- **Catálogo:** etiqueta "Plannix" e "preenchido pela importação do Plannix" na descrição.
+- **Marcas com hífen (correção):** a marca era o que vinha antes do 1º "-" ou espaço, o que
+  transformava "P-06" em "P". Agora é o prefixo mais longo de "Peça" (cortando em "-" ou
+  espaço) que existe no modelo; sem nenhum, o mais curto. A prévia da obra 9480 dá os
+  mesmos números de antes.
+- **E2E:** `e2e/plannix.spec.ts` (tablet e desktop) com a obra E2E-PLX semeada (fixture
+  `pecas`) e a planilha de `backend/tests/e2e_plannix_xlsx.py`: prévia, aplicar, datas
+  só leitura na tabela, Desfazer pelo aviso (os Códigos ficam). A semente zera só a
+  E2E-PLX (unidades, valores, Códigos, inclusões dos parâmetros e centros de gravidade);
+  ela não apaga os parâmetros do Plannix, que no banco de dev têm os valores da 9480.
+  O teste espera a renumeração da 1ª abertura do 3D: importar antes dela dá 409 no
+  Aplicar (comportamento certo: a prévia ligou as linhas a outros números).
+- Testes: backend 986 ok (+1 skip; desempenho do filtro de fora, como antes), ruff ok,
+  mypy ok; frontend 313 ok (+2 todo), eslint ok, tsc ok; Playwright 100 ok (8 pulados:
+  Viewer real).
+
+### Falta
+1. Conferir com a fábrica as 22 marcas da obra 9480 com quantidade diferente do modelo.
+2. Na tela, abrir a obra pela 1ª vez e importar na sequência pode dar o 409 "Confira de
+   novo" se a renumeração terminar no meio; o botão resolve. Avaliar se vale avisar.

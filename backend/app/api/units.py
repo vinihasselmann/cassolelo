@@ -18,7 +18,7 @@ from app.api.obra_access import OBRA_ROUTER_DEPS
 from app.auth import CurrentUser, Role, require_role
 from app.db import SessionDep
 from app.models import Mark, ParamDef, User
-from app.models.enums import LinkMethod, ParamType, UnitStatus
+from app.models.enums import LinkMethod, ParamSource, ParamType, UnitStatus
 from app.services import piece_values, unit_orphans
 from app.services.mark_batch import BatchMode
 
@@ -39,6 +39,7 @@ class PieceParamOut(BaseModel):
     unit: str | None
     required: bool
     options: list[str] | None
+    source: ParamSource = ParamSource.MANUAL  # plannix = só leitura na tela
 
 
 class UnitValueOut(BaseModel):
@@ -64,6 +65,7 @@ class UnitOut(BaseModel):
     label: str  # PP001-3
     status: UnitStatus  # linked | unlinked | orphan
     external_id: str | None  # chave da última ligação
+    plannix_code: str | None = None  # "Código" da peça no Plannix (importação)
     since_version_id: int | None
     element: LinkedElementOut | None  # na versão aberta (nulo = sem peça nela)
     values: list[UnitValueOut]
@@ -199,6 +201,7 @@ def _param(p: ParamDef) -> PieceParamOut:
         unit=p.unit,
         required=p.required,
         options=p.options,
+        source=ParamSource(p.source),
     )
 
 
@@ -215,6 +218,7 @@ def _unit(row: piece_values.UnitRow) -> UnitOut:
         label=row.label,
         status=UnitStatus(u.status),
         external_id=u.external_id,
+        plannix_code=u.plannix_code,
         since_version_id=u.since_version_id,
         element=LinkedElementOut(
             element_id=e.element_id,

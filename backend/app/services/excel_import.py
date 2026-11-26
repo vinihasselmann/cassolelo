@@ -56,7 +56,7 @@ from app.models import (
     PieceValue,
     User,
 )
-from app.models.enums import ParamLevel, ParamType, UnitStatus, VersionStatus
+from app.models.enums import ParamLevel, ParamSource, ParamType, UnitStatus, VersionStatus
 from app.services import mark_batch, piece_values
 from app.services.errors import ConflictError, NotFoundError, ValidationError
 from app.services.export import BASE_HEADERS, COORD_HEADERS, SEQ_HEADER
@@ -135,6 +135,9 @@ class ImportPlan:
     warnings: list[Issue] = field(default_factory=list)
     ignored_columns: list[str] = field(default_factory=list)
     params: list[ParamSummary] = field(default_factory=list)
+    # planilha do Plannix (plannix_import): ligações, parâmetros novos, avisos por marca
+    plannix: Any = None
+    fingerprint_extra: list[str] = field(default_factory=list)
     # alvos: (mark_id | unit_id) -> {def_id: valor}
     mark_values: dict[int, dict[int, Any]] = field(default_factory=dict)
     unit_values: dict[int, dict[int, Any]] = field(default_factory=dict)
@@ -145,9 +148,12 @@ class ImportPlan:
     def fingerprint(self) -> str:
         """Resumo estável do que a prévia mostrou (alvos, valor atual e novo)."""
         items = sorted(
-            json.dumps([c.sheet, c.target, c.category, c.def_id, c.old, c.new], default=str)
+            json.dumps(
+                [c.sheet, c.target, c.category, c.def_id, c.param, c.old, c.new], default=str
+            )
             for c in [*self.fills, *self.changes]
         )
+        items.extend(self.fingerprint_extra)
         return hashlib.sha256("\n".join(items).encode()).hexdigest()[:32]
 
     def values_for(
@@ -303,6 +309,8 @@ async def _params(session: AsyncSession, obra_id: int, level: str) -> list[Param
         await session.scalars(
             select(ParamDef)
             .where(ParamDef.active.is_(True), in_obra(obra_id, level=level))
+            # os do Plannix só vêm pela planilha do Plannix (aqui são só leitura)
+            .where(ParamDef.source == ParamSource.MANUAL.value)
             .order_by(func.lower(ParamDef.name), ParamDef.id)
         )
     )
@@ -542,6 +550,13 @@ async def build_plan(session: AsyncSession, obra_id: int, content: bytes) -> Imp
     if obra is None:
         raise NotFoundError("Obra não encontrada.")
     wb = _open(content)
+    from app.services import plannix_import  # o Plannix usa as peças deste módulo
+
+    if plannix_import.is_plannix(wb):
+        try:
+            return await plannix_import.build_plan(session, obra, wb)
+        finally:
+            wb.close()
     try:
         about = _about(wb)
         file_obra = _text(about.get("Obra"))
@@ -583,6 +598,10 @@ async def apply(
         raise ConflictError(
             "Os valores da obra mudaram desde a prévia (alguém gravou agora). Confira de novo."
         )
+    if plan.plannix is not None:
+        from app.services import plannix_import
+
+        return plan, await plannix_import.apply(session, obra_id, plan, actor)
     marks, units = plan.values_for(overwrite)
     if not marks and not units:
         raise ValidationError("Nada para gravar: o arquivo não traz valores novos.")

@@ -23,7 +23,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import Mark, Obra, ObraParam, ParamDef, ParamValue, PieceValue, User
-from app.models.enums import ParamLevel, ParamScope, ParamType
+from app.models.enums import ParamLevel, ParamScope, ParamSource, ParamType
 from app.services import audit, events
 from app.services.errors import ConflictError, NotFoundError, ValidationError
 
@@ -56,6 +56,8 @@ class ParamDefInput:
     include_in_obra_id: Any = UNSET
     # por marca (padrão) ou por peça; imutável depois que houver valores
     level: Any = UNSET
+    # só pelo serviço (a API não expõe): "plannix" = criado pela importação do Plannix
+    source: Any = UNSET
 
 
 @dataclass(frozen=True)
@@ -376,6 +378,7 @@ async def create_param(session: AsyncSession, data: ParamDefInput, actor: User) 
         scope=scope.value,
         obra_id=obra_id,
         level=(ParamLevel.MARK if data.level is UNSET else _clean_level(data.level)).value,
+        source=(ParamSource.MANUAL if data.source is UNSET else ParamSource(data.source)).value,
         created_by=actor.id,
         updated_by=actor.id,
     )
@@ -465,12 +468,33 @@ async def exclude_param(session: AsyncSession, obra_id: int, def_id: int, actor:
     return True
 
 
+def _check_plannix_edit(p: ParamDef, data: ParamDefInput) -> None:
+    """Parâmetro do Plannix: a importação o acha pelo nome e grava datas por peça. Nome,
+    tipo, por marca/por peça e escopo não mudam; o resto (ex.: obrigatório) pode."""
+    blocked = []
+    if data.name is not UNSET and _clean_name(data.name).casefold() != p.name.casefold():
+        blocked.append("o nome")
+    if data.type is not UNSET and str(data.type) != p.type:
+        blocked.append("o tipo")
+    if data.level is not UNSET and str(data.level) != p.level:
+        blocked.append("por marca / por peça")
+    if data.scope is not UNSET and str(data.scope) != p.scope:
+        blocked.append("o escopo")
+    if blocked:
+        raise ValidationError(
+            f"{', '.join(blocked).capitalize()} de “{p.name}” não pode mudar: é um parâmetro "
+            "do Plannix, que a importação acha pelo nome."
+        )
+
+
 async def update_param(
     session: AsyncSession, def_id: int, data: ParamDefInput, actor: User
 ) -> ParamDef:
     p = await get_param(session, def_id)
     before = audit.snapshot(p)
     used = await values_count(session, p.id)
+    if p.source == ParamSource.PLANNIX.value:
+        _check_plannix_edit(p, data)
 
     level = ParamLevel(p.level) if data.level is UNSET else _clean_level(data.level)
     if level.value != p.level and used:

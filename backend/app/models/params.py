@@ -25,7 +25,14 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import AuthorMixin, Base, TimestampMixin
-from app.models.enums import OrphanStatus, ParamLevel, ParamScope, ParamType, check_in
+from app.models.enums import (
+    OrphanStatus,
+    ParamLevel,
+    ParamScope,
+    ParamSource,
+    ParamType,
+    check_in,
+)
 
 
 class ParamDef(TimestampMixin, AuthorMixin, Base):
@@ -34,6 +41,7 @@ class ParamDef(TimestampMixin, AuthorMixin, Base):
         CheckConstraint(check_in("type", ParamType), name="ck_param_defs_type"),
         CheckConstraint(check_in("scope", ParamScope), name="ck_param_defs_scope"),
         CheckConstraint(check_in("level", ParamLevel), name="ck_param_defs_level"),
+        CheckConstraint(check_in("source", ParamSource), name="ck_param_defs_source"),
         CheckConstraint(
             "(scope = 'global' AND obra_id IS NULL) OR (scope = 'obra' AND obra_id IS NOT NULL)",
             name="ck_param_defs_scope_obra",
@@ -69,6 +77,10 @@ class ParamDef(TimestampMixin, AuthorMixin, Base):
     # por marca ou por peça; imutável depois que houver valores
     level: Mapped[str] = mapped_column(
         String(10), default=ParamLevel.MARK, server_default=text("'mark'")
+    )
+    # manual (padrão) ou plannix: só a importação do Plannix grava (2026-11-24)
+    source: Mapped[str] = mapped_column(
+        String(10), default=ParamSource.MANUAL, server_default=text("'manual'")
     )
 
 

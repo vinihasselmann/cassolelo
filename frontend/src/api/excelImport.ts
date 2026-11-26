@@ -29,6 +29,26 @@ export interface ImportParamSummary {
   changes: number;
 }
 
+/** Só na planilha do Plannix (2026-11-24). */
+export interface PlannixPreview {
+  /** linhas de peça lidas (sem as recusadas) */
+  rows: number;
+  /** peças recusadas na produção ("Status de Projeto" vazio): ignoradas */
+  rejected: number;
+  /** linhas ligadas a uma peça do app */
+  linked: number;
+  /** Códigos do Plannix guardados agora (1ª ligação) */
+  new_links: number;
+  /** linhas sem peça no modelo */
+  leftovers: number;
+  /** parâmetros que a importação cria na biblioteca */
+  new_params: string[];
+  /** quantidade diferente entre o Plannix e o modelo: conferir */
+  check_marks: { code: string; plannix: number; model: number }[];
+  /** marcas da planilha que não estão no modelo */
+  outside_model: { code: string; rows: number }[];
+}
+
 export interface ImportPreview {
   obra_code: string;
   file_version: string | null;
@@ -46,6 +66,10 @@ export interface ImportPreview {
   fill_items: ImportChange[];
   change_items: ImportChange[];
   fingerprint: string;
+  /** alterações que apagam o valor (só no Plannix: célula vazia apaga) */
+  clears?: number;
+  /** planilha do Plannix: sempre sobrescreve */
+  plannix?: PlannixPreview | null;
 }
 
 export interface ImportApplied {

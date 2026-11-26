@@ -12,6 +12,8 @@ interface SeedIds {
   pec_param_def_id: number;
   pecrev_obra_id: number;
   pecrev_version_id: number;
+  plx_obra_id: number;
+  plx_version_id: number;
 }
 
 /** Roda o seed das obras de teste (E2E-01 e E2E-REV) e devolve os ids. Também usado
@@ -51,4 +53,6 @@ export default function globalSetup(): void {
   process.env.E2E_PEC_VERSION_ID = String(ids.pec_version_id);
   process.env.E2E_PEC_PARAM_DEF_ID = String(ids.pec_param_def_id);
   process.env.E2E_PECREV_OBRA_ID = String(ids.pecrev_obra_id);
+  process.env.E2E_PLX_OBRA_ID = String(ids.plx_obra_id);
+  process.env.E2E_PLX_VERSION_ID = String(ids.plx_version_id);
 }

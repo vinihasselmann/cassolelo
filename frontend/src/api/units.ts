@@ -11,7 +11,12 @@ export interface PieceParam {
   unit: string | null;
   required: boolean;
   options: string[] | null;
+  /** "plannix" = só a importação do Plannix grava: na tela fica só leitura (2026-11-24) */
+  source?: 'manual' | 'plannix';
 }
+
+/** Parâmetro que a tela pode editar (os do Plannix são só leitura). */
+export const isEditable = (p: Pick<PieceParam, 'source'>): boolean => p.source !== 'plannix';
 
 export interface UnitValue {
   def_id: number;
@@ -38,6 +43,8 @@ export interface PieceUnit {
   label: string; // PP001-3
   status: UnitStatus;
   external_id: string | null;
+  /** "Código" da peça no Plannix (guardado na importação) */
+  plannix_code?: string | null;
   since_version_id: number | null;
   /** Peça do modelo na versão aberta (null = a unidade não tem peça nesta versão). */
   element: LinkedElement | null;

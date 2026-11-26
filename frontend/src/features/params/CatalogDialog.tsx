@@ -21,6 +21,7 @@ function describe(p: ParamDef): string {
   if (p.scope === 'obra') parts.push(`só a obra ${p.obra_code ?? ''}`.trim());
   else parts.push(`biblioteca · em ${plural(p.obras_count ?? 0, 'obra', 'obras')}`);
   if (p.level === 'piece') parts.push('por peça', `${plural(p.values_count, 'peça', 'peças')} com valor`);
+  if (p.source === 'plannix') parts.push('preenchido pela importação do Plannix');
   else parts.push(`${plural(p.values_count, 'marca', 'marcas')} com valor`);
   return parts.join(' · ');
 }
@@ -80,11 +81,39 @@ export function CatalogDialog({ obraId, canEdit, onClose, onNew, onEdit }: Props
   const inObra = defs.data?.filter((p) => p.in_obra !== false) ?? [];
   const library = defs.data?.filter((p) => p.in_obra === false) ?? [];
 
+  // A confirmação fica logo abaixo do parâmetro clicado (no topo da janela ela ficava fora
+  // da vista quando a lista estava rolada, e o clique parecia não fazer nada).
+  const confirmBox = (pend: Pending) => (
+    <div className="confirm catalog__confirm" role="alertdialog" aria-label="Confirmar">
+      <p>{question(pend)}</p>
+      {act.isError && <p role="alert" className="error small">{errorMessage(act.error)}</p>}
+      <div className="actions">
+        <button
+          type="button"
+          className={pend.action === 'delete' ? 'danger' : undefined}
+          disabled={act.isPending}
+          autoFocus
+          onClick={() => { act.mutate(pend); }}
+        >
+          {act.isPending ? 'Aguarde…' : pend.action === 'remove' ? 'Retirar' : 'Excluir'}
+        </button>
+        <button type="button" className="secondary" onClick={() => { act.reset(); setPending(null); }}>
+          Cancelar
+        </button>
+      </div>
+    </div>
+  );
+
   const row = (p: ParamDef) => (
     <li key={p.id} className="catalog__row">
       <div>
         <b>{p.name}</b>
         {p.required && <span className="req" title="Obrigatório"> *</span>}
+        {p.source === 'plannix' && (
+          <span className="plannix-tag" title="Preenchido pela importação do Plannix (só leitura nas telas)">
+            Plannix
+          </span>
+        )}
         <div className="hint">{describe(p)}</div>
         <div className="hint">
           Criado por {p.created_by_name ?? 'sistema'} · {formatDateTime(p.created_at)}
@@ -128,6 +157,7 @@ export function CatalogDialog({ obraId, canEdit, onClose, onNew, onEdit }: Props
           </button>
         </div>
       )}
+      {pending?.param.id === p.id && confirmBox(pending)}
     </li>
   );
 
@@ -140,26 +170,8 @@ export function CatalogDialog({ obraId, canEdit, onClose, onNew, onEdit }: Props
       </p>
       {defs.isPending && <p className="muted">Carregando…</p>}
       {defs.isError && <p role="alert" className="error">{errorMessage(defs.error)}</p>}
-      {act.isError && <p role="alert" className="error">{errorMessage(act.error)}</p>}
-
-      {pending && (
-        <div className="confirm" role="alertdialog" aria-label="Confirmar">
-          <p>{question(pending)}</p>
-          <div className="actions">
-            <button
-              type="button"
-              className={pending.action === 'delete' ? 'danger' : undefined}
-              disabled={act.isPending}
-              onClick={() => { act.mutate(pending); }}
-            >
-              {pending.action === 'remove' ? 'Retirar' : 'Excluir'}
-            </button>
-            <button type="button" className="secondary" onClick={() => { setPending(null); }}>
-              Cancelar
-            </button>
-          </div>
-        </div>
-      )}
+      {/* erro do "Incluir nesta obra" (o das confirmações aparece nelas) */}
+      {act.isError && !pending && <p role="alert" className="error">{errorMessage(act.error)}</p>}
 
       {defs.data && (
         <>

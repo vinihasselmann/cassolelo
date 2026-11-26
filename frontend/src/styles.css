@@ -360,9 +360,17 @@ button.link.danger:disabled { color: var(--text-muted); }
 /* Categorias lado a lado na janela do parâmetro (cabe sem rolar no tablet). */
 fieldset.field .check { display: inline-flex; margin-right: 16px; }
 .req { color: var(--required); }
+/* parâmetro preenchido pela importação do Plannix (só leitura, 2026-11-24) */
+.plannix-tag {
+  margin-left: 6px; padding: 0 5px; border-radius: 4px;
+  border: 1px solid var(--border); color: var(--text-muted);
+  font-size: var(--fs-list-meta); font-weight: 500; white-space: nowrap;
+}
 .params-count { margin: 0 0 8px; }
 .catalog { list-style: none; margin: 8px 0 0; padding: 0; }
-.catalog__row { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border-subtle); }
+.catalog__row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border-subtle); }
+/* confirmação de excluir/retirar logo abaixo do parâmetro (2026-11-24) */
+.catalog__confirm { flex-basis: 100%; margin: 0; }
 .catalog__actions { display: flex; gap: 14px; align-items: flex-start; white-space: nowrap; }
 
 /* ---- Valores por marca ---- */

@@ -38,7 +38,7 @@ from app.models.enums import ParamLevel, Role, VersionStatus
 from app.services import audit, events, piece_props, unit_sequence
 from app.services.errors import ConflictError, ForbiddenError, NotFoundError, ValidationError
 from app.services.mark_batch import BatchMode
-from app.services.mark_values import StaleValuesError, _filled, normalize
+from app.services.mark_values import StaleValuesError, _filled, ensure_editable, normalize
 from app.services.param_defs import in_obra
 from app.services.version_data import VersionNotReadyError
 
@@ -303,6 +303,8 @@ async def save_values(
                 f"O parâmetro {c.def_id} não é por peça ou não se aplica a esta peça "
                 f"({mark.category})."
             )
+    for c in changes:
+        ensure_editable(params[c.def_id])
     normalized = {c.def_id: normalize(params[c.def_id], c.value) for c in changes}
     existing = {
         v.def_id: v
@@ -468,6 +470,7 @@ def _normalize(ctx: _Ctx, changes: dict[int, Any]) -> dict[int, Any]:
             raise ValidationError(
                 f"O parâmetro {def_id} não é por peça ou não se aplica a nenhuma peça selecionada."
             )
+        ensure_editable(param)
         out[def_id] = normalize(param, raw)
     return out
 

@@ -930,6 +930,10 @@ describe('Catálogo de parâmetros da fábrica (6.1)', () => {
     await user.click(screen.getByRole('button', { name: 'Excluir Ciclo de cura' }));
     const ask = screen.getByRole('alertdialog', { name: 'Confirmar' });
     expect(ask).toHaveTextContent('Excluir “Ciclo de cura” da biblioteca? Ele sai de TODAS as obras');
+    // logo abaixo do parâmetro clicado e com o foco no Excluir: no topo da janela ela
+    // ficava fora da vista com a lista rolada e o clique parecia não fazer nada
+    expect(ask.closest('li')).toHaveTextContent('Ciclo de cura');
+    expect(within(ask).getByRole('button', { name: 'Excluir' })).toHaveFocus();
     await user.click(within(ask).getByRole('button', { name: 'Cancelar' }));
     expect(calls.some((c) => c.method === 'DELETE')).toBe(false);
     await user.click(screen.getByRole('button', { name: 'Excluir Ciclo de cura' }));

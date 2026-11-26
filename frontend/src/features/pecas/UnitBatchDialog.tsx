@@ -4,6 +4,7 @@ import { useState, type FormEvent } from 'react';
 import type { BatchMode } from '../../api/markBatch';
 import {
   applyUnitBatch,
+  isEditable,
   previewUnitBatch,
   type UnitBatchField,
   type UnitBatchPreview,
@@ -42,7 +43,10 @@ export function UnitBatchDialog({ obraId, unitIds, labels, summary: caption, onC
     queryFn: () => previewUnitBatch(obraId, { unit_ids: unitIds, changes: {}, mode: 'overwrite' }),
     retry: false,
   });
-  const fields = summary.data?.fields ?? [];
+  // as datas do Plannix só vêm pela importação: não entram no lote
+  const all = summary.data?.fields ?? [];
+  const fields = all.filter(isEditable);
+  const fromPlannix = all.length - fields.length;
   const [draft, setDraft] = useState<Draft | null>(null);
   const current: Draft = draft ?? Object.fromEntries(fields.map((f) => [f.def_id, initialDraft(f)]));
   const [confirm, setConfirm] = useState<{ changes: Record<number, unknown>; preview: UnitBatchPreview } | null>(null);
@@ -113,6 +117,12 @@ export function UnitBatchDialog({ obraId, unitIds, labels, summary: caption, onC
               {f.filled > 0 && f.mixed && <div className="hint">Valores diferentes entre as peças: vazio mantém o de cada uma.</div>}
             </div>
           ))}
+          {fromPlannix > 0 && (
+            <p className="hint">
+              {fromPlannix === 1 ? '1 parâmetro vem' : `${String(fromPlannix)} parâmetros vêm`} do Plannix e não
+              aparece{fromPlannix === 1 ? '' : 'm'} aqui (só leitura).
+            </p>
+          )}
           {nothing && <p role="alert" className="error small">Informe um valor para preencher.</p>}
           {check.isError && <p role="alert" className="error small">{errorMessage(check.error)}</p>}
           <div className="actions">
